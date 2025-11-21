@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试球体</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            overflow: hidden;
+            background: #000;
+        }
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+    <!--引入three.js三维引擎-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- 引入threejs扩展控件OrbitControls.js -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+
+<body>
+    <div id="canvas-container"></div>
+    <script>
+        // 创建场景
+        var scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x222222);
+
+        // 获取容器尺寸
+        var container = document.getElementById('canvas-container');
+        var width = container.clientWidth;
+        var height = container.clientHeight;
+
+        // 创建渲染器
+        var renderer = new THREE.WebGLRenderer({
+            antialias: true
+        });
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+
+        // 创建纹理加载器
+        var textureLoader = new THREE.TextureLoader();
+        
+        // 加载360°全景图
+        var imagePath = encodeURI('全景图1.jpg');
+        
+        console.log('开始加载360°全景图...');
+        
+        // 创建完整球体几何体
+        var geometry = new THREE.SphereGeometry(100, 50, 50);
+        
+        // 翻转球体，使纹理从内部正确显示
+        geometry.scale(-1, 1, 1);
+        
+        // 加载全景图
+        var texture = textureLoader.load(imagePath, 
+            function(loadedTexture) {
+                console.log('全景图纹理加载成功！');
+                loadedTexture.mapping = THREE.UVMapping;
+                loadedTexture.wrapS = THREE.ClampToEdgeWrapping;
+                loadedTexture.wrapT = THREE.ClampToEdgeWrapping;
+            },
+            undefined,
+            function(error) {
+                console.error('全景图纹理加载失败:', error);
+            }
+        );
+        
+        // 创建材质 - 使用DoubleSide双面渲染
+        var material = new THREE.MeshBasicMaterial({
+            map: texture,
+            side: THREE.DoubleSide, // 双面渲染，从内外都能看到纹理
+            color: 0xffffff
+        });
+        
+        // 创建网格
+        var mesh = new THREE.Mesh(geometry, material);
+        scene.add(mesh);
+        
+        // 设置透视投影相机 - 相机位于球体内部
+        var camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+        camera.position.set(0, -20, -1); // 相机位置在球体内部，Y轴降低20个单位，使视角更矮
+        // 不需要lookAt，相机已经在中心，OrbitControls会处理旋转
+        
+        // 调试：检查纹理加载状态
+        console.log('网格位置:', mesh.position);
+        console.log('相机位置:', camera.position);
+        console.log('相机近远平面:', camera.near, camera.far);
+
+        // 添加控制器
+        // 检查OrbitControls是否加载
+        if (typeof THREE.OrbitControls !== 'undefined') {
+            var controls = new THREE.OrbitControls(camera, renderer.domElement);
+        } else if (typeof OrbitControls !== 'undefined') {
+            var controls = new OrbitControls(camera, renderer.domElement);
+        } else {
+            console.error('OrbitControls未加载！');
+            alert('OrbitControls未加载，无法拖动视角');
+        }
+        
+        // 配置控制器
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.enablePan = false; // 禁止平移
+        controls.enableZoom = true; // 允许缩放
+        controls.rotateSpeed = 1.0; // 旋转速度
+        
+        // 如果相机在球体内部，限制旋转范围
+        controls.minDistance = 0;
+        controls.maxDistance = Infinity;
+        
+        console.log('OrbitControls已配置，可以拖动视角');
+
+        // 添加坐标轴辅助线
+        var axesHelper = new THREE.AxesHelper(150);
+        scene.add(axesHelper);
+
+        // 窗口大小变化时更新
+        window.addEventListener('resize', function() {
+            width = container.clientWidth;
+            height = container.clientHeight;
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+        });
+
+        // 渲染循环
+        function render() {
+            controls.update();
+            renderer.render(scene, camera);
+            requestAnimationFrame(render);
+        }
+        render();
+
+        console.log('场景已创建，应该能看到一个绿色的线框球体');
+    </script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+import { createRouter, createWebHistory } from 'vue-router'
+
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes: [
+    // 用户端路由（租客可访问）
+    {path:'/',name:'home',component:()=>import('../views/tenant/Home.vue'), meta: { requiresAuth: true, allowedUserTypes: [1, 2, 3] }},
+    {path:'/house-selection',name:'house-selection',component:()=>import('../views/tenant/HouseSelection.vue'), meta: { requiresAuth: true, allowedUserTypes: [1, 2, 3] }},
+    {path:'/house-tour',name:'house-tour',component:()=>import('../views/tenant/HouseTour.vue'), meta: { requiresAuth: true, allowedUserTypes: [1, 2, 3] }},
+    {path:'/user-profile',name:'user-profile',component:()=>import('../views/tenant/UserProfile.vue'), meta: { requiresAuth: true, allowedUserTypes: [1, 2, 3] }},
+    {path:'/appointment',name:'appointment',component:()=>import('../views/tenant/Appointment.vue'), meta: { requiresAuth: true, allowedUserTypes: [1, 2, 3] }},
+    
+    // 登录页面（共享，无需登录）
+    {path:'/login',name:'login',component:()=>import('../views/Login.vue'), meta: { requiresAuth: false }},
+    
+    // 管理员端路由（仅管理员可访问）
+    {path:'/admin',name:'admin',component:()=>import('../views/admin/Admin.vue'), meta: { requiresAuth: true, allowedUserTypes: [3] }},
+    
+    // 房东端路由（仅房东和管理员可访问）
+    {path:'/landlord-admin',name:'landlord-admin',component:()=>import('../views/landlord/LandlordAdmin.vue'), meta: { requiresAuth: true, allowedUserTypes: [2, 3] }}
+  ],
+})
+
+// 路由守卫 - 权限控制
+router.beforeEach((to, from, next) => {
+  // 获取用户信息
+  const user = JSON.parse(localStorage.getItem('user') || '{}')
+  
+  // 如果路由需要认证
+  if (to.meta.requiresAuth) {
+    // 检查用户是否已登录
+    if (!user.id) {
+      // 未登录，重定向到登录页
+      next('/login')
+      return
+    }
+    
+    // 检查用户类型权限
+    const allowedUserTypes = to.meta.allowedUserTypes || []
+    if (!allowedUserTypes.includes(user.userType)) {
+      // 用户类型无权限，根据用户类型重定向到对应首页
+      switch (user.userType) {
+        case 1: // 租客
+          next('/')
+          break
+        case 2: // 房东
+          next('/landlord-admin')
+          break
+        case 3: // 管理员
+          next('/admin')
+          break
+        default:
+          next('/login')
+      }
+      
+      // 显示权限不足提示
+      alert('您没有权限访问该页面')
+      return
+    }
+  }
+  
+  // 如果用户已登录但访问登录页，重定向到对应首页
+  if (to.path === '/login' && user.id) {
+    switch (user.userType) {
+      case 1: // 租客
+        next('/')
+        break
+      case 2: // 房东
+        next('/landlord-admin')
+        break
+      case 3: // 管理员
+        next('/admin')
+        break
+      default:
+        next('/')
+    }
+    return
+  }
+  
+  next()
+})
+
+export default router
