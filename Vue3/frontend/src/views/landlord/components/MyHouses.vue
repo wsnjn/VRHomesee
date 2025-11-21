@@ -5,8 +5,276 @@
       <div class="header-actions">
         <button @click="emit('refresh')" class="refresh-btn">刷新</button>
         <button @click="showAddHouse = true" class="add-btn">添加房屋</button>
+    </div>
+
+    <!-- 编辑房屋模态框 -->
+      <!-- 房屋详情模态框 -->
+      <div v-if="showHouseDetail" class="modal-overlay">
+        <div class="modal-content" style="max-width: 800px;">
+          <div class="modal-header">
+            <h3>房屋详情</h3>
+            <button @click="closeHouseDetail" class="close-btn">×</button>
+          </div>
+          <div class="modal-body">
+            <div v-if="loadingHouseDetail" class="loading">加载中...</div>
+            <div v-else-if="houseDetailError" class="error-message">{{ houseDetailError }}</div>
+            <div v-else-if="houseDetailData" class="house-detail-content">
+              <!-- 房屋基本信息 -->
+              <div class="detail-section">
+                <h4 class="section-title">基本信息</h4>
+                <div class="detail-grid">
+                  <div class="detail-item">
+                    <label>地址：</label>
+                    <span>{{ getHouseFullAddress(houseDetailData.houseInfo) }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <label>面积：</label>
+                    <span>{{ houseDetailData.houseInfo.roomArea || '--' }} ㎡</span>
+                  </div>
+                  <div class="detail-item">
+                    <label>楼层：</label>
+                    <span>{{ houseDetailData.houseInfo.floorInfo || '--' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <label>朝向：</label>
+                    <span>{{ houseDetailData.houseInfo.orientation || '--' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <label>装修：</label>
+                    <span>{{ getDecorationText(houseDetailData.houseInfo.decoration) }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <label>电梯：</label>
+                    <span>{{ houseDetailData.houseInfo.hasElevator === 1 ? '有' : '无' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <label>租赁类型：</label>
+                    <span>{{ getRentalTypeText(houseDetailData.houseInfo.rentalType) }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <label>状态：</label>
+                    <span class="house-status" :class="getStatusClass(houseDetailData.houseInfo.status)">
+                      {{ getStatusText(houseDetailData.houseInfo.status) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 价格信息 -->
+              <div class="detail-section">
+                <h4 class="section-title">价格信息</h4>
+                <div class="detail-grid">
+                  <div class="detail-item">
+                    <label>月租金：</label>
+                    <span class="price-highlight">{{ houseDetailData.houseInfo.rentPrice }} 元/月</span>
+                  </div>
+                  <div class="detail-item">
+                    <label>水费单价：</label>
+                    <span>{{ houseDetailData.houseInfo.waterPrice ? houseDetailData.houseInfo.waterPrice + '元/吨' : '包含在租金内' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <label>电费单价：</label>
+                    <span>{{ houseDetailData.houseInfo.electricPrice ? houseDetailData.houseInfo.electricPrice + '元/度' : '包含在租金内' }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 租客信息 -->
+              <div class="detail-section">
+                <h4 class="section-title">租客信息</h4>
+                <div v-if="!houseDetailData.hasTenant" class="no-tenant">
+                  <p>当前没有租客</p>
+                </div>
+                <div v-else class="tenants-list">
+                  <div v-for="(tenant, index) in houseDetailData.tenants" :key="tenant.id" class="tenant-item">
+                    <h5>租客 {{ index + 1 }}</h5>
+                    <div class="tenant-details">
+                      <div class="detail-item">
+                        <label>合同编号：</label>
+                        <span>{{ tenant.contractNumber }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <label>租约状态：</label>
+                        <span>{{ getContractStatusText(tenant.contractStatus) }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <label>合同期限：</label>
+                        <span>{{ formatDate(tenant.contractStartDate) }} 至 {{ formatDate(tenant.contractEndDate) }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <label>月租金：</label>
+                        <span>{{ tenant.monthlyRent }} 元</span>
+                      </div>
+                      <div class="detail-item">
+                        <label>押金：</label>
+                        <span>{{ tenant.depositAmount }} 元</span>
+                      </div>
+                      <div class="detail-item">
+                        <label>付款周期：</label>
+                        <span>{{ getPaymentCycleText(tenant.paymentCycle) }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <label>租金状态：</label>
+                        <span>{{ getRentStatusText(tenant.rentStatus) }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <label>押金状态：</label>
+                        <span>{{ getDepositStatusText(tenant.depositStatus) }}</span>
+                      </div>
+                      <div v-if="tenant.emergencyContact" class="detail-item">
+                        <label>紧急联系人：</label>
+                        <span>{{ tenant.emergencyContact }} ({{ tenant.emergencyPhone || '无电话' }})</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 描述信息 -->
+              <div v-if="houseDetailData.houseInfo.description" class="detail-section">
+                <h4 class="section-title">房屋描述</h4>
+                <div class="description-content">
+                  {{ houseDetailData.houseInfo.description }}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button @click="closeHouseDetail" class="cancel-btn">关闭</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 编辑房屋模态框 -->
+      <div v-if="showEditHouse" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>编辑房屋信息</h3>
+          <button @click="closeEditHouse" class="close-btn">×</button>
+        </div>
+        <div class="modal-body">
+          <form @submit.prevent="handleSubmitEditHouse" class="edit-house-form">
+            <div class="form-grid">
+              <!-- 价格信息 -->
+              <div class="form-group">
+                <label for="edit-rentPrice">月租金 (元) *</label>
+                <input 
+                  type="number" 
+                  id="edit-rentPrice" 
+                  v-model="editHouseData.rentPrice" 
+                  required 
+                  step="0.01" 
+                  placeholder="如：2500"
+                >
+              </div>
+              <div class="form-group">
+                <label for="edit-waterPrice">水费单价 (元/吨)</label>
+                <input 
+                  type="number" 
+                  id="edit-waterPrice" 
+                  v-model="editHouseData.waterPrice" 
+                  step="0.01" 
+                  placeholder="如：3.5"
+                >
+              </div>
+              <div class="form-group">
+                <label for="edit-electricPrice">电费单价 (元/度)</label>
+                <input 
+                  type="number" 
+                  id="edit-electricPrice" 
+                  v-model="editHouseData.electricPrice" 
+                  step="0.01" 
+                  placeholder="如：0.8"
+                >
+              </div>
+
+              <!-- 房屋基本信息 -->
+              <div class="form-group">
+                <label for="edit-roomArea">房屋面积 (㎡)</label>
+                <input 
+                  type="number" 
+                  id="edit-roomArea" 
+                  v-model="editHouseData.roomArea" 
+                  step="0.01" 
+                  placeholder="如：85.5"
+                >
+              </div>
+              <div class="form-group">
+                <label for="edit-floorInfo">楼层信息</label>
+                <input 
+                  type="text" 
+                  id="edit-floorInfo" 
+                  v-model="editHouseData.floorInfo" 
+                  placeholder="如：5/18"
+                >
+              </div>
+              <div class="form-group">
+                <label for="edit-orientation">朝向</label>
+                <input 
+                  type="text" 
+                  id="edit-orientation" 
+                  v-model="editHouseData.orientation" 
+                  placeholder="如：南"
+                >
+              </div>
+              <div class="form-group">
+                <label for="edit-decoration">装修程度</label>
+                <select id="edit-decoration" v-model="editHouseData.decoration">
+                  <option value="1">毛坯</option>
+                  <option value="2">简装</option>
+                  <option value="3">精装</option>
+                  <option value="4">豪装</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="edit-hasElevator">有无电梯</label>
+                <select id="edit-hasElevator" v-model="editHouseData.hasElevator">
+                  <option value="0">无</option>
+                  <option value="1">有</option>
+                </select>
+              </div>
+
+              <!-- 租赁信息 -->
+              <div class="form-group">
+                <label for="edit-rentalType">租赁类型 *</label>
+                <select id="edit-rentalType" v-model="editHouseData.rentalType" required>
+                  <option value="0">整租</option>
+                  <option value="1">合租</option>
+                  <option value="2">单间</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="edit-status">房屋状态 *</label>
+                <select id="edit-status" v-model="editHouseData.status" required>
+                  <option value="0">可租</option>
+                  <option value="1">已租</option>
+                  <option value="2">下架</option>
+                  <option value="3">预租</option>
+                </select>
+              </div>
+
+              <!-- 描述信息 -->
+              <div class="form-group full-width">
+                <label for="edit-description">房屋描述</label>
+                <textarea 
+                  id="edit-description" 
+                  v-model="editHouseData.description" 
+                  rows="4" 
+                  placeholder="请描述房屋的装修情况、设施配备、周边环境等信息..."
+                ></textarea>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button @click="closeEditHouse" class="cancel-btn">取消</button>
+          <button @click="handleSubmitEditHouse" class="confirm-btn" :disabled="updatingHouse">
+            {{ updatingHouse ? '更新中...' : '确认更新' }}
+          </button>
+        </div>
       </div>
     </div>
+  </div>
 
     <!-- 房屋列表表格 -->
     <div class="houses-table-container">
@@ -93,15 +361,15 @@
               </td>
               <td class="actions-cell">
                 <div class="house-actions">
-                  <button @click="emit('editHouse', house)" class="action-btn edit-btn">编辑</button>
+                  <button @click="openEditHouse(house)" class="action-btn edit-btn">编辑</button>
                   <button 
-                    @click="emit('toggleHouseStatus', house)" 
+                    @click="toggleHouseStatus(house)" 
                     class="action-btn status-btn"
                     :class="getStatusBtnClass(house.status)"
                   >
                     {{ getStatusBtnText(house.status) }}
                   </button>
-                  <button @click="emit('viewHouseDetail', house)" class="action-btn detail-btn">详情</button>
+                  <button @click="openHouseDetail(house)" class="action-btn detail-btn">详情</button>
                 </div>
               </td>
             </tr>
@@ -324,6 +592,9 @@
 
 <script setup>
 import { ref, defineProps, defineEmits } from 'vue'
+import axios from 'axios'
+
+const API_BASE_URL = 'http://localhost:8080/api'
 
 const props = defineProps({
   myHouses: {
@@ -343,12 +614,111 @@ const props = defineProps({
 const emit = defineEmits([
   'refresh',
   'editHouse',
-  'toggleHouseStatus',
   'viewHouseDetail',
   'submitAddHouse'
 ])
 
 const showAddHouse = ref(false)
+const showEditHouse = ref(false)
+const editingHouse = ref(null)
+const updatingHouse = ref(false)
+
+// 房屋详情相关
+const showHouseDetail = ref(false)
+const loadingHouseDetail = ref(false)
+const houseDetailData = ref(null)
+const houseDetailError = ref('')
+
+// 编辑房屋数据
+const editHouseData = ref({
+  rentPrice: null,
+  waterPrice: null,
+  electricPrice: null,
+  status: '0',
+  roomArea: null,
+  floorInfo: '',
+  orientation: '',
+  decoration: '2',
+  hasElevator: '0',
+  rentalType: '0',
+  description: ''
+})
+
+// 打开编辑房屋模态框
+const openEditHouse = (house) => {
+  editingHouse.value = house
+  editHouseData.value = {
+    rentPrice: house.rentPrice,
+    waterPrice: house.waterPrice,
+    electricPrice: house.electricPrice,
+    status: house.status.toString(),
+    roomArea: house.roomArea,
+    floorInfo: house.floorInfo || '',
+    orientation: house.orientation || '',
+    decoration: house.decoration ? house.decoration.toString() : '2',
+    hasElevator: house.hasElevator ? house.hasElevator.toString() : '0',
+    rentalType: house.rentalType ? house.rentalType.toString() : '0',
+    description: house.description || ''
+  }
+  showEditHouse.value = true
+}
+
+// 提交编辑房屋
+const handleSubmitEditHouse = async () => {
+  if (!editingHouse.value) return
+  
+  updatingHouse.value = true
+  try {
+    const updateData = {
+      rentPrice: parseFloat(editHouseData.value.rentPrice),
+      waterPrice: editHouseData.value.waterPrice ? parseFloat(editHouseData.value.waterPrice) : null,
+      electricPrice: editHouseData.value.electricPrice ? parseFloat(editHouseData.value.electricPrice) : null,
+      status: parseInt(editHouseData.value.status),
+      roomArea: editHouseData.value.roomArea ? parseFloat(editHouseData.value.roomArea) : null,
+      floorInfo: editHouseData.value.floorInfo,
+      orientation: editHouseData.value.orientation,
+      decoration: parseInt(editHouseData.value.decoration),
+      hasElevator: parseInt(editHouseData.value.hasElevator),
+      rentalType: parseInt(editHouseData.value.rentalType),
+      description: editHouseData.value.description
+    }
+
+    const response = await axios.put(`${API_BASE_URL}/landlord/house/${editingHouse.value.id}`, updateData)
+    
+    if (response.data.success) {
+      alert('房屋信息更新成功！')
+      showEditHouse.value = false
+      // 重新加载房屋列表
+      emit('refresh')
+    } else {
+      alert(`更新失败: ${response.data.message}`)
+    }
+  } catch (error) {
+    console.error('更新房屋信息失败:', error)
+    alert('更新房屋信息失败，请稍后重试')
+  } finally {
+    updatingHouse.value = false
+  }
+}
+
+// 关闭编辑模态框
+const closeEditHouse = () => {
+  showEditHouse.value = false
+  editingHouse.value = null
+  editHouseData.value = {
+    rentPrice: null,
+    waterPrice: null,
+    electricPrice: null,
+    status: '0',
+    roomArea: null,
+    floorInfo: '',
+    orientation: '',
+    decoration: '2',
+    hasElevator: '0',
+    rentalType: '0',
+    description: ''
+  }
+}
 
 // 新房屋数据
 const newHouse = ref({
@@ -496,6 +866,88 @@ const getStatusBtnClass = (status) => {
     3: 'btn-available'
   }
   return classMap[status] || 'btn-default'
+}
+
+// 打开房屋详情
+const openHouseDetail = async (house) => {
+  showHouseDetail.value = true
+  loadingHouseDetail.value = true
+  houseDetailError.value = ''
+  houseDetailData.value = null
+  
+  try {
+    const response = await axios.get(`${API_BASE_URL}/landlord/house/${house.id}`)
+    
+    if (response.data.success) {
+      houseDetailData.value = response.data.data
+    } else {
+      houseDetailError.value = response.data.message || '获取房屋详情失败'
+    }
+  } catch (error) {
+    console.error('获取房屋详情失败:', error)
+    houseDetailError.value = '获取房屋详情失败，请稍后重试'
+  } finally {
+    loadingHouseDetail.value = false
+  }
+}
+
+// 关闭房屋详情
+const closeHouseDetail = () => {
+  showHouseDetail.value = false
+  houseDetailData.value = null
+  houseDetailError.value = ''
+}
+
+// 租约状态文本映射
+const getContractStatusText = (status) => {
+  const statusMap = {
+    0: '待签约',
+    1: '已签约',
+    2: '履行中',
+    3: '已到期',
+    4: '提前解约',
+    5: '已退租'
+  }
+  return statusMap[status] || '未知'
+}
+
+// 付款周期文本映射
+const getPaymentCycleText = (cycle) => {
+  const cycleMap = {
+    1: '月付',
+    2: '季付',
+    3: '年付'
+  }
+  return cycleMap[cycle] || '未知'
+}
+
+// 租金状态文本映射
+const getRentStatusText = (status) => {
+  const statusMap = {
+    0: '未付款',
+    1: '已付款',
+    2: '逾期',
+    3: '部分付款'
+  }
+  return statusMap[status] || '未知'
+}
+
+// 押金状态文本映射
+const getDepositStatusText = (status) => {
+  const statusMap = {
+    0: '未付',
+    1: '已付',
+    2: '已退',
+    3: '抵扣中'
+  }
+  return statusMap[status] || '未知'
+}
+
+// 格式化日期
+const formatDate = (dateString) => {
+  if (!dateString) return '--'
+  const date = new Date(dateString)
+  return date.toLocaleDateString('zh-CN')
 }
 </script>
 

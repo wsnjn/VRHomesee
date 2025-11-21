@@ -9,6 +9,7 @@ const router = createRouter({
     {path:'/house-tour',name:'house-tour',component:()=>import('../views/tenant/HouseTour.vue'), meta: { requiresAuth: true, allowedUserTypes: [1, 2, 3] }},
     {path:'/user-profile',name:'user-profile',component:()=>import('../views/tenant/UserProfile.vue'), meta: { requiresAuth: true, allowedUserTypes: [1, 2, 3] }},
     {path:'/appointment',name:'appointment',component:()=>import('../views/tenant/Appointment.vue'), meta: { requiresAuth: true, allowedUserTypes: [1, 2, 3] }},
+    {path:'/my-appointments',name:'my-appointments',component:()=>import('../views/tenant/MyAppointments.vue'), meta: { requiresAuth: true, allowedUserTypes: [1, 2, 3] }},
     
     // 登录页面（共享，无需登录）
     {path:'/login',name:'login',component:()=>import('../views/Login.vue'), meta: { requiresAuth: false }},

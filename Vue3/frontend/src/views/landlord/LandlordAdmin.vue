@@ -52,6 +52,13 @@
               租约列表
             </li>
             <li 
+              :class="{ active: activeTab === 'tenant-matching' }"
+              @click="switchTab('tenant-matching')"
+            >
+              <span class="menu-icon">🤝</span>
+              租客匹配
+            </li>
+            <li 
               :class="{ active: activeTab === 'rent-payment' }"
               @click="switchTab('rent-payment')"
             >
@@ -136,10 +143,12 @@
 
         <!-- 租约管理 -->
         <div v-if="activeTab === 'tenant-management'">
-          <placeholder-page 
-            title="租约管理"
-            message="租约列表管理功能开发中..."
-          />
+          <tenant-management :userPhone="userPhone" />
+        </div>
+
+        <!-- 租客匹配 -->
+        <div v-if="activeTab === 'tenant-matching'">
+          <landlord-tenant-matching :userPhone="userPhone" />
         </div>
 
         <!-- 租金管理 -->
@@ -180,6 +189,8 @@ import LandlordDashboard from './components/LandlordDashboard.vue'
 import MyHouses from './components/MyHouses.vue'
 import HouseStatus from './components/HouseStatus.vue'
 import AddHouse from './components/AddHouse.vue'
+import TenantManagement from './components/TenantManagement.vue'
+import LandlordTenantMatching from './components/LandlordTenantMatching.vue'
 
 // 占位页面组件
 const PlaceholderPage = {

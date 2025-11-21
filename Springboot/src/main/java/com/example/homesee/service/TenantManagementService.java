@@ -309,4 +309,87 @@ public class TenantManagementService {
         
         return result;
     }
+
+
+    /**
+     * 根据房东ID获取租约列表
+     * @param landlordId 房东ID
+     * @return 租约列表
+     */
+    public Map<String, Object> getContractsByLandlordId(Long landlordId) {
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            List<TenantManagement> contracts = tenantManagementRepository.findByLandlordId(landlordId);
+            List<Map<String, Object>> contractList = contracts.stream()
+                    .map(this::convertToMap)
+                    .toList();
+            
+            result.put("success", true);
+            result.put("contracts", contractList);
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", "获取租约列表失败: " + e.getMessage());
+        }
+        
+        return result;
+    }
+
+    /**
+     * 根据房东ID和状态获取租约列表
+     * @param landlordId 房东ID
+     * @param status 状态
+     * @return 租约列表
+     */
+    public Map<String, Object> getContractsByLandlordIdAndStatus(Long landlordId, Integer status) {
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            List<TenantManagement> contracts = tenantManagementRepository.findByLandlordIdAndContractStatus(landlordId, status);
+            List<Map<String, Object>> contractList = contracts.stream()
+                    .map(this::convertToMap)
+                    .toList();
+            
+            result.put("success", true);
+            result.put("contracts", contractList);
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", "获取租约列表失败: " + e.getMessage());
+        }
+        
+        return result;
+    }
+
+    /**
+     * 将租约实体转换为Map
+     */
+    private Map<String, Object> convertToMap(TenantManagement contract) {
+        Map<String, Object> contractMap = new HashMap<>();
+        contractMap.put("id", contract.getId());
+        contractMap.put("contractNumber", contract.getContractNumber());
+        contractMap.put("roomId", contract.getRoomId());
+        contractMap.put("landlordId", contract.getLandlordId());
+        contractMap.put("tenantId", contract.getTenantId());
+        contractMap.put("contractStartDate", contract.getContractStartDate());
+        contractMap.put("contractEndDate", contract.getContractEndDate());
+        contractMap.put("actualMoveInDate", contract.getActualMoveInDate());
+        contractMap.put("actualMoveOutDate", contract.getActualMoveOutDate());
+        contractMap.put("monthlyRent", contract.getMonthlyRent());
+        contractMap.put("depositAmount", contract.getDepositAmount());
+        contractMap.put("paymentCycle", contract.getPaymentCycle());
+        contractMap.put("contractStatus", contract.getContractStatus());
+        contractMap.put("rentStatus", contract.getRentStatus());
+        contractMap.put("depositStatus", contract.getDepositStatus());
+        contractMap.put("waterInitialReading", contract.getWaterInitialReading());
+        contractMap.put("electricInitialReading", contract.getElectricInitialReading());
+        contractMap.put("lastWaterReading", contract.getLastWaterReading());
+        contractMap.put("lastElectricReading", contract.getLastElectricReading());
+        contractMap.put("emergencyContact", contract.getEmergencyContact());
+        contractMap.put("emergencyPhone", contract.getEmergencyPhone());
+        contractMap.put("contractSignedTime", contract.getContractSignedTime());
+        contractMap.put("createdTime", contract.getCreatedTime());
+        contractMap.put("updatedTime", contract.getUpdatedTime());
+        
+        return contractMap;
+    }
 }

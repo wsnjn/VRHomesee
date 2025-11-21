@@ -8,23 +8,6 @@
       </div>
     </div>
 
-    <!-- 状态筛选器 -->
-    <div class="status-filter">
-      <div class="filter-title">状态筛选：</div>
-      <div class="filter-buttons">
-        <button 
-          v-for="status in statusFilters" 
-          :key="status.value"
-          @click="toggleStatusFilter(status.value)"
-          class="filter-btn"
-          :class="{ active: selectedStatusFilters.includes(status.value) }"
-        >
-          <span class="filter-dot" :class="`dot-${status.value}`"></span>
-          {{ status.label }}
-        </button>
-      </div>
-    </div>
-
     <!-- 状态统计概览 -->
     <div class="status-overview">
       <div class="status-cards">
@@ -59,126 +42,202 @@
       </div>
     </div>
 
-    <!-- 状态分布和详情 -->
-    <div class="status-container">
-      <!-- 房屋状态分布 -->
-      <div class="chart-section">
-        <h3>房屋状态分布</h3>
-        <div class="status-distribution">
-          <div class="distribution-bar">
-            <div 
-              class="distribution-segment available" 
-              :style="{ width: getStatusPercentage('available') }"
-              :title="`可租: ${statistics.availableHouses || 0}`"
-            ></div>
-            <div 
-              class="distribution-segment rented" 
-              :style="{ width: getStatusPercentage('rented') }"
-              :title="`已租: ${statistics.rentedHouses || 0}`"
-            ></div>
-            <div 
-              class="distribution-segment offline" 
-              :style="{ width: getStatusPercentage('offline') }"
-              :title="`下架: ${statistics.offlineHouses || 0}`"
-            ></div>
-            <div 
-              class="distribution-segment pre-rent" 
-              :style="{ width: getStatusPercentage('pre-rent') }"
-              :title="`预租: ${statistics.preRentHouses || 0}`"
-            ></div>
-          </div>
-          <div class="distribution-legend">
-            <div class="legend-item">
-              <span class="legend-color available"></span>
-              <span>可租 ({{ statistics.availableHouses || 0 }})</span>
+    <!-- 房屋状态详情 -->
+    <div class="chart-section">
+      <h3>房屋状态详情</h3>
+      <div class="status-details">
+        <!-- 按状态分组显示 -->
+        <div class="status-groups">
+          <div 
+            v-for="status in statusFilters" 
+            :key="status.value"
+            class="status-group"
+            v-show="selectedStatusFilters.includes(status.value)"
+          >
+            <div class="group-header" :class="`header-${status.value}`">
+              <div class="group-header-left">
+                <button @click="toggleCollapse(status.value)" class="collapse-btn">
+                  <span :class="collapsedStates[status.value] ? 'collapse-icon collapsed' : 'collapse-icon'">
+                    ▼
+                  </span>
+                </button>
+                <h4>{{ status.label }} ({{ getHousesByStatus(status.value).length }})</h4>
+              </div>
+              <span class="group-count">{{ getHousesByStatus(status.value).length }}</span>
             </div>
-            <div class="legend-item">
-              <span class="legend-color rented"></span>
-              <span>已租 ({{ statistics.rentedHouses || 0 }})</span>
-            </div>
-            <div class="legend-item">
-              <span class="legend-color offline"></span>
-              <span>下架 ({{ statistics.offlineHouses || 0 }})</span>
-            </div>
-            <div class="legend-item">
-              <span class="legend-color pre-rent"></span>
-              <span>预租 ({{ statistics.preRentHouses || 0 }})</span>
+            <div class="group-houses" v-show="!collapsedStates[status.value]">
+              <div 
+                v-for="house in getHousesByStatus(status.value)" 
+                :key="house.id"
+                class="status-house-card"
+                :class="`house-${house.status}`"
+              >
+                <div class="house-main-info">
+                  <div class="house-address">
+                    <strong>{{ getHouseFullAddress(house) }}</strong>
+                    <span class="house-community">{{ house.communityName }}</span>
+                  </div>
+                  <div class="house-price-status">
+                    <span class="house-price">{{ house.rentPrice }} 元/月</span>
+                    <span class="house-status" :class="getStatusClass(house.status)">
+                      {{ getStatusText(house.status) }}
+                    </span>
+                  </div>
+                </div>
+                <div class="house-actions">
+                  <button 
+                    @click="toggleHouseStatus(house)" 
+                    class="action-btn status-btn"
+                    :class="getStatusBtnClass(house.status)"
+                  >
+                    {{ getStatusBtnText(house.status) }}
+                  </button>
+                  <button @click="openHouseDetail(house)" class="action-btn detail-btn">详情</button>
+                  <button @click="emit('editHouse', house)" class="action-btn edit-btn">编辑</button>
+                </div>
+              </div>
+              <div v-if="getHousesByStatus(status.value).length === 0" class="no-houses-in-group">
+                暂无{{ status.label }}的房屋
+              </div>
             </div>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- 房屋状态详情 -->
-      <div class="chart-section">
-        <h3>房屋状态详情</h3>
-        <div class="status-details">
-          <!-- 按状态分组显示 -->
-          <div class="status-groups">
-            <div 
-              v-for="status in statusFilters" 
-              :key="status.value"
-              class="status-group"
-              v-show="selectedStatusFilters.includes(status.value)"
-            >
-              <div class="group-header" :class="`header-${status.value}`">
-                <h4>{{ status.label }} ({{ getHousesByStatus(status.value).length }})</h4>
-                <span class="group-count">{{ getHousesByStatus(status.value).length }}</span>
-              </div>
-              <div class="group-houses">
-                <div 
-                  v-for="house in getHousesByStatus(status.value)" 
-                  :key="house.id"
-                  class="status-house-card"
-                  :class="`house-${house.status}`"
-                >
-                  <div class="house-main-info">
-                    <div class="house-address">
-                      <strong>{{ getHouseFullAddress(house) }}</strong>
-                      <span class="house-community">{{ house.communityName }}</span>
-                    </div>
-                    <div class="house-price-status">
-                      <span class="house-price">{{ house.rentPrice }} 元/月</span>
-                      <span class="house-status" :class="getStatusClass(house.status)">
-                        {{ getStatusText(house.status) }}
-                      </span>
-                    </div>
-                  </div>
-                  <div class="house-details">
-                    <div class="detail-item">
-                      <span class="detail-label">面积：</span>
-                      <span class="detail-value">{{ house.roomArea || '--' }} ㎡</span>
-                    </div>
-                    <div class="detail-item">
-                      <span class="detail-label">楼层：</span>
-                      <span class="detail-value">{{ house.floorInfo || '--' }}</span>
-                    </div>
-                    <div class="detail-item">
-                      <span class="detail-label">朝向：</span>
-                      <span class="detail-value">{{ house.orientation || '--' }}</span>
-                    </div>
-                    <div class="detail-item">
-                      <span class="detail-label">装修：</span>
-                      <span class="detail-value">{{ getDecorationText(house.decoration) }}</span>
-                    </div>
-                  </div>
-                  <div class="house-actions">
-                    <button 
-                      @click="emit('toggleHouseStatus', house)" 
-                      class="action-btn status-btn"
-                      :class="getStatusBtnClass(house.status)"
-                    >
-                      {{ getStatusBtnText(house.status) }}
-                    </button>
-                    <button @click="emit('viewHouseDetail', house)" class="action-btn detail-btn">详情</button>
-                    <button @click="emit('editHouse', house)" class="action-btn edit-btn">编辑</button>
-                  </div>
+    <!-- 房屋详情模态框 -->
+    <div v-if="showHouseDetail" class="modal-overlay">
+      <div class="modal-content" style="max-width: 800px;">
+        <div class="modal-header">
+          <h3>房屋详情</h3>
+          <button @click="closeHouseDetail" class="close-btn">×</button>
+        </div>
+        <div class="modal-body">
+          <div v-if="loadingHouseDetail" class="loading">加载中...</div>
+          <div v-else-if="houseDetailError" class="error-message">{{ houseDetailError }}</div>
+          <div v-else-if="houseDetailData" class="house-detail-content">
+            <!-- 房屋基本信息 -->
+            <div class="detail-section">
+              <h4 class="section-title">基本信息</h4>
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <label>地址：</label>
+                  <span>{{ getHouseFullAddress(houseDetailData.houseInfo) }}</span>
                 </div>
-                <div v-if="getHousesByStatus(status.value).length === 0" class="no-houses-in-group">
-                  暂无{{ status.label }}的房屋
+                <div class="detail-item">
+                  <label>面积：</label>
+                  <span>{{ houseDetailData.houseInfo.roomArea || '--' }} ㎡</span>
+                </div>
+                <div class="detail-item">
+                  <label>楼层：</label>
+                  <span>{{ houseDetailData.houseInfo.floorInfo || '--' }}</span>
+                </div>
+                <div class="detail-item">
+                  <label>朝向：</label>
+                  <span>{{ houseDetailData.houseInfo.orientation || '--' }}</span>
+                </div>
+                <div class="detail-item">
+                  <label>装修：</label>
+                  <span>{{ getDecorationText(houseDetailData.houseInfo.decoration) }}</span>
+                </div>
+                <div class="detail-item">
+                  <label>电梯：</label>
+                  <span>{{ houseDetailData.houseInfo.hasElevator === 1 ? '有' : '无' }}</span>
+                </div>
+                <div class="detail-item">
+                  <label>租赁类型：</label>
+                  <span>{{ getRentalTypeText(houseDetailData.houseInfo.rentalType) }}</span>
+                </div>
+                <div class="detail-item">
+                  <label>状态：</label>
+                  <span class="house-status" :class="getStatusClass(houseDetailData.houseInfo.status)">
+                    {{ getStatusText(houseDetailData.houseInfo.status) }}
+                  </span>
                 </div>
               </div>
             </div>
+
+            <!-- 价格信息 -->
+            <div class="detail-section">
+              <h4 class="section-title">价格信息</h4>
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <label>月租金：</label>
+                  <span class="price-highlight">{{ houseDetailData.houseInfo.rentPrice }} 元/月</span>
+                </div>
+                <div class="detail-item">
+                  <label>水费单价：</label>
+                  <span>{{ houseDetailData.houseInfo.waterPrice ? houseDetailData.houseInfo.waterPrice + '元/吨' : '包含在租金内' }}</span>
+                </div>
+                <div class="detail-item">
+                  <label>电费单价：</label>
+                  <span>{{ houseDetailData.houseInfo.electricPrice ? houseDetailData.houseInfo.electricPrice + '元/度' : '包含在租金内' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 租客信息 -->
+            <div class="detail-section">
+              <h4 class="section-title">租客信息</h4>
+              <div v-if="!houseDetailData.hasTenant" class="no-tenant">
+                <p>当前没有租客</p>
+              </div>
+              <div v-else class="tenants-list">
+                <div v-for="(tenant, index) in houseDetailData.tenants" :key="tenant.id" class="tenant-item">
+                  <h5>租客 {{ index + 1 }}</h5>
+                  <div class="tenant-details">
+                    <div class="detail-item">
+                      <label>合同编号：</label>
+                      <span>{{ tenant.contractNumber }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <label>租约状态：</label>
+                      <span>{{ getContractStatusText(tenant.contractStatus) }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <label>合同期限：</label>
+                      <span>{{ formatDate(tenant.contractStartDate) }} 至 {{ formatDate(tenant.contractEndDate) }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <label>月租金：</label>
+                      <span>{{ tenant.monthlyRent }} 元</span>
+                    </div>
+                    <div class="detail-item">
+                      <label>押金：</label>
+                      <span>{{ tenant.depositAmount }} 元</span>
+                    </div>
+                    <div class="detail-item">
+                      <label>付款周期：</label>
+                      <span>{{ getPaymentCycleText(tenant.paymentCycle) }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <label>租金状态：</label>
+                      <span>{{ getRentStatusText(tenant.rentStatus) }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <label>押金状态：</label>
+                      <span>{{ getDepositStatusText(tenant.depositStatus) }}</span>
+                    </div>
+                    <div v-if="tenant.emergencyContact" class="detail-item">
+                      <label>紧急联系人：</label>
+                      <span>{{ tenant.emergencyContact }} ({{ tenant.emergencyPhone || '无电话' }})</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 描述信息 -->
+            <div v-if="houseDetailData.houseInfo.description" class="detail-section">
+              <h4 class="section-title">房屋描述</h4>
+              <div class="description-content">
+                {{ houseDetailData.houseInfo.description }}
+              </div>
+            </div>
           </div>
+        </div>
+        <div class="modal-footer">
+          <button @click="closeHouseDetail" class="cancel-btn">关闭</button>
         </div>
       </div>
     </div>
@@ -187,6 +246,9 @@
 
 <script setup>
 import { ref, defineProps, defineEmits } from 'vue'
+import axios from 'axios'
+
+const API_BASE_URL = 'http://localhost:8080/api'
 
 const props = defineProps({
   statistics: {
@@ -209,6 +271,12 @@ const emit = defineEmits([
 
 // 状态筛选相关数据
 const selectedStatusFilters = ref([0, 1, 2, 3]) // 默认显示所有状态
+const collapsedStates = ref({
+  0: false, // 可租状态默认展开
+  1: false, // 已租状态默认展开
+  2: false, // 下架状态默认展开
+  3: false  // 预租状态默认展开
+})
 const statusFilters = [
   { value: 0, label: '可租' },
   { value: 1, label: '已租' },
@@ -216,7 +284,12 @@ const statusFilters = [
   { value: 3, label: '预租' }
 ]
 
-// 切换状态筛选
+// 切换折叠状态
+const toggleCollapse = (status) => {
+  collapsedStates.value[status] = !collapsedStates.value[status]
+}
+
+// 根据状态获取房屋列表
 const toggleStatusFilter = (status) => {
   const index = selectedStatusFilters.value.indexOf(status)
   if (index > -1) {
@@ -303,6 +376,16 @@ const getDecorationText = (decoration) => {
   return decorationMap[decoration] || '--'
 }
 
+// 获取租赁类型文本
+const getRentalTypeText = (rentalType) => {
+  const rentalTypeMap = {
+    0: '整租',
+    1: '合租',
+    2: '单间'
+  }
+  return rentalTypeMap[rentalType] || '未知'
+}
+
 // 获取状态按钮文本
 const getStatusBtnText = (status) => {
   const textMap = {
@@ -312,6 +395,137 @@ const getStatusBtnText = (status) => {
     3: '设为可租'
   }
   return textMap[status] || '操作'
+}
+
+// 房屋详情相关
+const showHouseDetail = ref(false)
+const loadingHouseDetail = ref(false)
+const houseDetailData = ref(null)
+const houseDetailError = ref('')
+
+// 切换房屋状态
+const toggleHouseStatus = async (house) => {
+  if (!house.id) return
+  
+  const currentStatus = house.status
+  let newStatus
+  
+  // 根据当前状态确定新状态
+  switch (currentStatus) {
+    case 0: // 可租 -> 下架
+      newStatus = 2
+      break
+    case 1: // 已租 -> 可租
+      newStatus = 0
+      break
+    case 2: // 下架 -> 可租
+      newStatus = 0
+      break
+    case 3: // 预租 -> 可租
+      newStatus = 0
+      break
+    default:
+      return
+  }
+  
+  try {
+    const response = await axios.put(`${API_BASE_URL}/landlord/house/${house.id}`, {
+      status: newStatus
+    })
+    
+    if (response.data.success) {
+      alert('房屋状态更新成功！')
+      // 重新加载房屋列表
+      emit('refreshHouses')
+    } else {
+      alert(`更新失败: ${response.data.message}`)
+    }
+  } catch (error) {
+    console.error('更新房屋状态失败:', error)
+    alert('更新房屋状态失败，请稍后重试')
+  }
+}
+
+// 打开房屋详情
+const openHouseDetail = async (house) => {
+  showHouseDetail.value = true
+  loadingHouseDetail.value = true
+  houseDetailError.value = ''
+  houseDetailData.value = null
+  
+  try {
+    const response = await axios.get(`${API_BASE_URL}/landlord/house/${house.id}`)
+    
+    if (response.data.success) {
+      houseDetailData.value = response.data.data
+    } else {
+      houseDetailError.value = response.data.message || '获取房屋详情失败'
+    }
+  } catch (error) {
+    console.error('获取房屋详情失败:', error)
+    houseDetailError.value = '获取房屋详情失败，请稍后重试'
+  } finally {
+    loadingHouseDetail.value = false
+  }
+}
+
+// 关闭房屋详情
+const closeHouseDetail = () => {
+  showHouseDetail.value = false
+  houseDetailData.value = null
+  houseDetailError.value = ''
+}
+
+// 租约状态文本映射
+const getContractStatusText = (status) => {
+  const statusMap = {
+    0: '待签约',
+    1: '已签约',
+    2: '履行中',
+    3: '已到期',
+    4: '提前解约',
+    5: '已退租'
+  }
+  return statusMap[status] || '未知'
+}
+
+// 付款周期文本映射
+const getPaymentCycleText = (cycle) => {
+  const cycleMap = {
+    1: '月付',
+    2: '季付',
+    3: '年付'
+  }
+  return cycleMap[cycle] || '未知'
+}
+
+// 租金状态文本映射
+const getRentStatusText = (status) => {
+  const statusMap = {
+    0: '未付款',
+    1: '已付款',
+    2: '逾期',
+    3: '部分付款'
+  }
+  return statusMap[status] || '未知'
+}
+
+// 押金状态文本映射
+const getDepositStatusText = (status) => {
+  const statusMap = {
+    0: '未付',
+    1: '已付',
+    2: '已退',
+    3: '抵扣中'
+  }
+  return statusMap[status] || '未知'
+}
+
+// 格式化日期
+const formatDate = (dateString) => {
+  if (!dateString) return '--'
+  const date = new Date(dateString)
+  return date.toLocaleDateString('zh-CN')
 }
 
 // 获取状态按钮样式类
@@ -582,8 +796,7 @@ const getStatusBtnClass = (status) => {
 }
 
 .status-details {
-  max-height: 400px;
-  overflow-y: auto;
+  /* 移除高度限制，让内容自然展开 */
 }
 
 /* 状态分组样式 */
@@ -606,6 +819,40 @@ const getStatusBtnClass = (status) => {
   padding: 1rem 1.5rem;
   color: white;
   font-weight: 600;
+  cursor: pointer;
+}
+
+.group-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.collapse-btn {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.collapse-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.collapse-icon {
+  display: inline-block;
+  transition: transform 0.3s ease;
+  font-size: 0.8rem;
+}
+
+.collapse-icon.collapsed {
+  transform: rotate(-90deg);
 }
 
 .group-header h4 {
@@ -834,30 +1081,262 @@ const getStatusBtnClass = (status) => {
   border-radius: 8px;
 }
 
-/* 响应式设计 */
-@media (max-width: 1024px) {
-  .status-charts {
-    grid-template-columns: 1fr;
-  }
-  
-  .distribution-legend {
-    grid-template-columns: 1fr;
-  }
+/* 模态框样式 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
 }
 
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  max-height: 90vh;
+  overflow-y: auto;
+  width: 100%;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+  background: #f8f9fa;
+  border-radius: 12px 12px 0 0;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1.5rem;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #6c757d;
+  padding: 0.25rem;
+  line-height: 1;
+  transition: color 0.3s;
+}
+
+.close-btn:hover {
+  color: #dc3545;
+}
+
+.modal-body {
+  padding: 1.5rem;
+  max-height: calc(90vh - 120px);
+  overflow-y: auto;
+}
+
+.modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e9ecef;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.cancel-btn {
+  padding: 0.75rem 1.5rem;
+  border: 1px solid #6c757d;
+  border-radius: 6px;
+  background: white;
+  color: #6c757d;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.cancel-btn:hover {
+  background: #6c757d;
+  color: white;
+}
+
+/* 房屋详情内容样式 */
+.loading, .error-message {
+  text-align: center;
+  padding: 2rem;
+  color: #6c757d;
+}
+
+.error-message {
+  color: #dc3545;
+}
+
+.detail-section {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.detail-section:last-of-type {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.section-title {
+  margin: 0 0 1rem 0;
+  color: #2c3e50;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.detail-item label {
+  font-weight: 600;
+  color: #495057;
+  margin-right: 1rem;
+  min-width: 100px;
+}
+
+.detail-item span {
+  color: #2c3e50;
+  text-align: right;
+  flex: 1;
+}
+
+.price-highlight {
+  color: #dc3545;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+/* 租客信息样式 */
+.no-tenant {
+  text-align: center;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  color: #6c757d;
+}
+
+.tenants-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.tenant-item {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1.5rem;
+  border-left: 4px solid #17a2b8;
+}
+
+.tenant-item h5 {
+  margin: 0 0 1rem 0;
+  color: #2c3e50;
+  font-size: 1.1rem;
+}
+
+.tenant-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.tenant-details .detail-item {
+  background: white;
+  margin-bottom: 0.5rem;
+}
+
+.description-content {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 6px;
+  line-height: 1.6;
+  color: #495057;
+}
+
+/* 响应式设计 */
 @media (max-width: 768px) {
-  .status-cards {
-    grid-template-columns: 1fr 1fr;
+  .modal-content {
+    margin: 1rem;
+    max-height: 85vh;
   }
   
-  .status-filter {
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .tenant-details {
+    grid-template-columns: 1fr;
+  }
+  
+  .detail-item {
     flex-direction: column;
     align-items: flex-start;
   }
   
-  .filter-buttons {
-    width: 100%;
+  .detail-item label {
+    margin-bottom: 0.25rem;
+    min-width: auto;
   }
+  
+  .detail-item span {
+    text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  .status-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .filter-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filter-btn {
+    justify-content: center;
+  }
+  
+  .house-actions {
+    flex-direction: column;
+  }
+  
+  .house-actions .action-btn {
+    flex: 1;
+    min-width: 80px;
+  }
+  
+  .modal-body {
+    padding: 1rem;
+  }
+  
+  .modal-header, .modal-footer {
+    padding: 1rem;
+  }
+}
   
   .house-main-info {
     flex-direction: column;
@@ -877,7 +1356,7 @@ const getStatusBtnClass = (status) => {
   .house-actions {
     flex-wrap: wrap;
   }
-}
+
 
 @media (max-width: 480px) {
   .status-cards {

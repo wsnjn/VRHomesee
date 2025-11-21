@@ -225,4 +225,26 @@ public class ViewingAppointmentController {
     public Map<String, Object> getFollowUpAppointments() {
         return viewingAppointmentService.getFollowUpAppointments();
     }
+
+    /**
+     * 根据房东手机号获取预约列表
+     * @param landlordPhone 房东手机号
+     * @return 预约列表
+     */
+    @GetMapping("/landlord/{landlordPhone}")
+    public Map<String, Object> getAppointmentsByLandlord(@PathVariable String landlordPhone) {
+        return viewingAppointmentService.getAppointmentsByLandlordPhone(landlordPhone);
+    }
+
+    /**
+     * 根据房东手机号和状态获取预约列表
+     * @param landlordPhone 房东手机号
+     * @param status 预约状态
+     * @return 预约列表
+     */
+    @GetMapping("/landlord/{landlordPhone}/status/{status}")
+    public Map<String, Object> getAppointmentsByLandlordAndStatus(@PathVariable String landlordPhone, 
+                                                                  @PathVariable Integer status) {
+        return viewingAppointmentService.getAppointmentsByLandlordPhoneAndStatus(landlordPhone, status);
+    }
 }

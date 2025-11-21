@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/room-info")
-@CrossOrigin(origins = "*")
 public class RoomInfoFilterController {
 
     @Autowired

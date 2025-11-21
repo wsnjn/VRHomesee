@@ -363,12 +363,118 @@ public class ViewingAppointmentService {
     }
 
     /**
+     * 根据房东手机号获取预约列表（包含房屋信息）
+     */
+    public Map<String, Object> getAppointmentsByLandlordPhone(String landlordPhone) {
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            List<ViewingAppointment> appointments = viewingAppointmentRepository.findByLandlordPhone(landlordPhone);
+            List<Map<String, Object>> appointmentList = appointments.stream()
+                    .map(appointment -> {
+                        Map<String, Object> appointmentMap = convertToMap(appointment);
+                        // 添加房屋信息
+                        try {
+                            Optional<RoomInfo> roomOptional = roomInfoRepository.findById(appointment.getRoomId());
+                            if (roomOptional.isPresent()) {
+                                RoomInfo room = roomOptional.get();
+                                Map<String, Object> roomInfo = convertRoomToMap(room);
+                                appointmentMap.put("roomInfo", roomInfo);
+                            }
+                        } catch (Exception e) {
+                            // 如果获取房屋信息失败，不影响主要预约数据
+                            System.err.println("获取房屋信息失败: " + e.getMessage());
+                        }
+                        return appointmentMap;
+                    })
+                    .toList();
+
+            result.put("success", true);
+            result.put("appointments", appointmentList);
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", "获取预约列表失败: " + e.getMessage());
+        }
+
+        return result;
+    }
+
+    /**
+     * 根据房东手机号和状态获取预约列表
+     */
+    public Map<String, Object> getAppointmentsByLandlordPhoneAndStatus(String landlordPhone, Integer status) {
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            List<ViewingAppointment> appointments = viewingAppointmentRepository.findByLandlordPhoneAndStatus(landlordPhone, status);
+            List<Map<String, Object>> appointmentList = appointments.stream()
+                    .map(this::convertToMap)
+                    .toList();
+
+            result.put("success", true);
+            result.put("appointments", appointmentList);
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", "获取预约列表失败: " + e.getMessage());
+        }
+
+        return result;
+    }
+
+    /**
      * 生成预约编号
      */
     private String generateAppointmentNumber() {
         String timestamp = String.valueOf(System.currentTimeMillis());
         String random = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         return "AP" + timestamp.substring(timestamp.length() - 6) + random;
+    }
+
+    /**
+     * 将房屋实体转换为Map（只包含地址信息）
+     */
+    private Map<String, Object> convertRoomToMap(RoomInfo room) {
+        Map<String, Object> roomMap = new HashMap<>();
+        
+        // 构建完整地址
+        String address = buildFullAddress(room);
+        roomMap.put("address", address);
+        
+        return roomMap;
+    }
+
+    /**
+     * 构建完整地址
+     */
+    private String buildFullAddress(RoomInfo room) {
+        StringBuilder address = new StringBuilder();
+        
+        if (room.getProvince() != null && !room.getProvince().isEmpty()) {
+            address.append(room.getProvince());
+        }
+        if (room.getCity() != null && !room.getCity().isEmpty()) {
+            address.append(room.getCity());
+        }
+        if (room.getDistrict() != null && !room.getDistrict().isEmpty()) {
+            address.append(room.getDistrict());
+        }
+        if (room.getStreet() != null && !room.getStreet().isEmpty()) {
+            address.append(room.getStreet());
+        }
+        if (room.getCommunityName() != null && !room.getCommunityName().isEmpty()) {
+            address.append(room.getCommunityName());
+        }
+        if (room.getBuildingUnit() != null && !room.getBuildingUnit().isEmpty()) {
+            address.append(room.getBuildingUnit());
+        }
+        if (room.getDoorNumber() != null && !room.getDoorNumber().isEmpty()) {
+            address.append(room.getDoorNumber());
+        }
+        if (room.getRoomNumber() != null && !room.getRoomNumber().isEmpty()) {
+            address.append(room.getRoomNumber());
+        }
+        
+        return address.length() > 0 ? address.toString() : "未知地址";
     }
 
     /**

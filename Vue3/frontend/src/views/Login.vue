@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import EarthModel from '../components/EarthModel.vue'
@@ -130,6 +130,19 @@ const checkUsername = async () => {
     console.error('检查用户名失败:', error)
   }
 }
+
+// 计算按钮文本
+const buttonText = computed(() => {
+  return loading.value ? '处理中...' : (isLogin.value ? '登录' : '注册')
+})
+
+// 计算按钮字符数组（用于动画）
+const buttonChars = computed(() => {
+  if (loading.value) {
+    return []
+  }
+  return buttonText.value.split('')
+})
 </script>
 
 <template>
@@ -227,12 +240,25 @@ const checkUsername = async () => {
             >
           </div>
           
+          <!-- 加载状态使用普通按钮 -->
           <button 
+            v-if="loading" 
             type="submit" 
             class="submit-btn" 
-            :disabled="loading"
+            disabled
           >
-            {{ loading ? '处理中...' : (isLogin ? '登录' : '注册') }}
+            处理中...
+          </button>
+          <!-- 非加载状态使用btn-1动画按钮 -->
+          <button 
+            v-else 
+            type="submit" 
+            class="btn-1"
+          >
+            <span class="original">{{ isLogin ? '登录' : '注册' }}</span>
+            <div class="letters">
+              <span v-for="(char, index) in buttonChars" :key="index">{{ char }}</span>
+            </div>
           </button>
         </form>
         <p class="toggle-text">
@@ -247,6 +273,7 @@ const checkUsername = async () => {
 </template>
 
 <style scoped>
+@import '../assets/css/btn-styles.css';
 .auth-container {
   display: flex;
   min-height: 100vh;

@@ -8,10 +8,16 @@ const showUserMenu = ref(false)
 // 从localStorage获取用户信息
 const user = ref(null)
 
+// 预约信息
+const appointments = ref([])
+const loadingAppointments = ref(false)
+
 onMounted(() => {
   const userData = localStorage.getItem('user')
   if (userData) {
     user.value = JSON.parse(userData)
+    // 如果用户已登录，获取预约信息
+    fetchUserAppointments()
   }
   
   // 初始化Canvas徽标动画
@@ -35,6 +41,10 @@ const navigateToLogin = () => {
 
 const navigateToHouseSelection = () => {
   router.push('/house-selection')
+}
+
+const navigateToMyAppointments = () => {
+  router.push('/my-appointments')
 }
 
 const navigateToUserProfile = () => {
@@ -71,6 +81,63 @@ const handleClickOutside = (event) => {
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
 })
+
+// 获取用户预约信息
+const fetchUserAppointments = async () => {
+  if (!user.value) return
+  
+  loadingAppointments.value = true
+  try {
+    const response = await fetch(`http://localhost:8080/api/viewing-appointment/user/${user.value.id}`)
+    if (response.ok) {
+      appointments.value = await response.json()
+    } else {
+      console.error('获取预约信息失败')
+    }
+  } catch (error) {
+    console.error('获取预约信息时出错:', error)
+  } finally {
+    loadingAppointments.value = false
+  }
+}
+
+// 预约状态映射
+const getAppointmentStatusText = (status) => {
+  const statusMap = {
+    0: '待确认',
+    1: '已确认',
+    2: '已完成',
+    3: '已取消',
+    4: '已过期',
+    5: '用户爽约'
+  }
+  return statusMap[status] || '未知状态'
+}
+
+// 预约类型映射
+const getAppointmentTypeText = (type) => {
+  return type === 1 ? '现场看房' : '视频看房'
+}
+
+// 状态样式类映射
+const getStatusClass = (status) => {
+  const statusClassMap = {
+    0: 'status-pending',
+    1: 'status-confirmed',
+    2: 'status-completed',
+    3: 'status-cancelled',
+    4: 'status-expired',
+    5: 'status-missed'
+  }
+  return statusClassMap[status] || 'status-unknown'
+}
+
+// 日期格式化
+const formatDate = (dateString) => {
+  if (!dateString) return '未设置'
+  const date = new Date(dateString)
+  return date.toLocaleDateString('zh-CN')
+}
 
 // Canvas徽标动画初始化
 const initLogoAnimation = () => {
@@ -264,7 +331,7 @@ const initLogoAnimation = () => {
     <!-- 顶部导航栏 -->
     <nav class="navbar">
       <div class="logo-container">
-        <img src="../assets/logo/logo (1).png" alt="HOMSEE Logo" class="nav-logo">
+        <img src="@/assets/logo/logo (1).png" alt="HOMSEE Logo" class="nav-logo">
       </div>
       <div class="nav-content">
         <!-- 用户信息区域 - 在最右侧显示 -->
@@ -302,9 +369,10 @@ const initLogoAnimation = () => {
           <h3>智能匹配</h3>
           <p>根据您的偏好和预算，智能推荐最适合的房源</p>
         </div>
-        <div class="feature-card">
+        <div class="feature-card" @click="navigateToMyAppointments">
           <h3>安全保障</h3>
           <p>严格的房源审核机制，确保每一笔交易的安全可靠</p>
+          <p class="sub-feature">查看我的预约信息 →</p>
         </div>
       </div>
     </main>
@@ -500,5 +568,146 @@ const initLogoAnimation = () => {
   margin: 0;
   color: #666;
   line-height: 1.5;
+}
+
+/* 预约信息样式 */
+.appointments-section {
+  margin-top: 1.5rem;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 1rem;
+}
+
+.appointments-section h4 {
+  margin: 0 0 1rem 0;
+  color: #2c3e50;
+  font-size: 1rem;
+}
+
+.loading, .no-appointments {
+  text-align: center;
+  color: #666;
+  padding: 1rem;
+  font-style: italic;
+}
+
+.appointments-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.appointment-item {
+  background: #f8f9fa;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid #e9ecef;
+}
+
+.appointment-item:last-child {
+  margin-bottom: 0;
+}
+
+.appointment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.appointment-number {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.9rem;
+}
+
+.appointment-status {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.status-pending {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.status-confirmed {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+}
+
+.status-completed {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.status-cancelled {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.status-expired {
+  background-color: #e2e3e5;
+  color: #383d41;
+  border: 1px solid #d6d8db;
+}
+
+.status-missed {
+  background-color: #f5e6e8;
+  color: #721c24;
+  border: 1px solid #f1b0b7;
+}
+
+.status-unknown {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  border: 1px solid #e9ecef;
+}
+
+.appointment-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.detail-row .label {
+  font-weight: 500;
+  color: #495057;
+  min-width: 80px;
+}
+
+.detail-row span:last-child {
+  color: #6c757d;
+  text-align: right;
+  flex: 1;
+}
+
+/* 子功能样式 */
+.sub-feature {
+  margin-top: 1rem;
+  color: #007bff;
+  font-weight: 500;
+  text-align: center;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.sub-feature:hover {
+  color: #0056b3;
 }
 </style>

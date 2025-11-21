@@ -59,4 +59,12 @@ public interface ViewingAppointmentRepository extends JpaRepository<ViewingAppoi
     // 查找最近创建的预约
     @Query("SELECT va FROM ViewingAppointment va ORDER BY va.appointmentCreatedTime DESC")
     List<ViewingAppointment> findRecentAppointments();
+    
+    // 根据房东手机号查找预约列表
+    @Query("SELECT va FROM ViewingAppointment va JOIN RoomInfo ri ON va.roomId = ri.id WHERE ri.landlordPhone = :landlordPhone")
+    List<ViewingAppointment> findByLandlordPhone(@Param("landlordPhone") String landlordPhone);
+    
+    // 根据房东手机号和状态查找预约列表
+    @Query("SELECT va FROM ViewingAppointment va JOIN RoomInfo ri ON va.roomId = ri.id WHERE ri.landlordPhone = :landlordPhone AND va.status = :status")
+    List<ViewingAppointment> findByLandlordPhoneAndStatus(@Param("landlordPhone") String landlordPhone, @Param("status") Integer status);
 }

@@ -71,6 +71,14 @@ public interface TenantManagementRepository extends JpaRepository<TenantManageme
     List<TenantManagement> findByRoomIdAndContractStatus(Long roomId, Integer contractStatus);
     
     /**
+     * 根据房东ID和合同状态查找租约
+     * @param landlordId 房东ID
+     * @param contractStatus 合同状态
+     * @return 租约列表
+     */
+    List<TenantManagement> findByLandlordIdAndContractStatus(Long landlordId, Integer contractStatus);
+    
+    /**
      * 统计各状态的租约数量
      * @return 状态统计
      */

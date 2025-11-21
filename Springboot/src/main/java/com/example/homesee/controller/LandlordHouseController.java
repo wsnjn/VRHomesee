@@ -1,11 +1,14 @@
 package com.example.homesee.controller;
 
 import com.example.homesee.entity.RoomInfo;
+import com.example.homesee.entity.TenantManagement;
 import com.example.homesee.repository.RoomInfoRepository;
+import com.example.homesee.repository.TenantManagementRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +20,9 @@ public class LandlordHouseController {
 
     @Autowired
     private RoomInfoRepository roomInfoRepository;
+
+    @Autowired
+    private TenantManagementRepository tenantManagementRepository;
 
     /**
      * 获取房东的所有房屋列表
@@ -106,7 +112,7 @@ public class LandlordHouseController {
     }
 
     /**
-     * 获取房屋详细信息
+     * 获取房屋详细信息（包含租客信息）
      * @param houseId 房屋ID
      * @return 房屋详细信息
      */
@@ -123,9 +129,19 @@ public class LandlordHouseController {
                 return result;
             }
             
+            // 获取房屋的租客信息
+            List<TenantManagement> tenants = tenantManagementRepository.findByRoomIdAndContractStatus(houseId, 1); // 1-已签约
+            
+            // 构建房屋详情响应
+            Map<String, Object> houseDetail = new HashMap<>();
+            houseDetail.put("houseInfo", house);
+            houseDetail.put("tenants", tenants);
+            houseDetail.put("hasTenant", !tenants.isEmpty());
+            houseDetail.put("tenantCount", tenants.size());
+            
             result.put("success", true);
             result.put("message", "获取房屋详情成功");
-            result.put("house", house);
+            result.put("data", houseDetail);
         } catch (Exception e) {
             result.put("success", false);
             result.put("message", "获取房屋详情失败: " + e.getMessage());
@@ -238,6 +254,106 @@ public class LandlordHouseController {
         } catch (Exception e) {
             result.put("success", false);
             result.put("message", "更新房屋状态失败: " + e.getMessage());
+        }
+        
+        return result;
+    }
+
+    /**
+     * 更新房屋信息
+     * @param houseId 房屋ID
+     * @param updateData 更新数据
+     * @return 更新结果
+     */
+    @PutMapping("/house/{houseId}")
+    public Map<String, Object> updateHouse(@PathVariable Long houseId, @RequestBody Map<String, Object> updateData) {
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            RoomInfo house = roomInfoRepository.findById(houseId).orElse(null);
+            
+            if (house == null) {
+                result.put("success", false);
+                result.put("message", "房屋不存在");
+                return result;
+            }
+            
+            // 更新租金信息
+            if (updateData.get("rentPrice") != null) {
+                house.setRentPrice(new BigDecimal(updateData.get("rentPrice").toString()));
+            }
+            
+            // 更新水电费信息
+            if (updateData.get("waterPrice") != null) {
+                house.setWaterPrice(new BigDecimal(updateData.get("waterPrice").toString()));
+            }
+            if (updateData.get("electricPrice") != null) {
+                house.setElectricPrice(new BigDecimal(updateData.get("electricPrice").toString()));
+            }
+            
+            // 更新房屋状态
+            if (updateData.get("status") != null) {
+                house.setStatus(Integer.parseInt(updateData.get("status").toString()));
+            }
+            
+            // 更新其他基本信息
+            if (updateData.get("roomArea") != null) {
+                house.setRoomArea(new BigDecimal(updateData.get("roomArea").toString()));
+            }
+            if (updateData.get("floorInfo") != null) {
+                house.setFloorInfo((String) updateData.get("floorInfo"));
+            }
+            if (updateData.get("orientation") != null) {
+                house.setOrientation((String) updateData.get("orientation"));
+            }
+            if (updateData.get("decoration") != null) {
+                house.setDecoration(Integer.parseInt(updateData.get("decoration").toString()));
+            }
+            if (updateData.get("hasElevator") != null) {
+                house.setHasElevator(Integer.parseInt(updateData.get("hasElevator").toString()));
+            }
+            if (updateData.get("rentalType") != null) {
+                house.setRentalType(Integer.parseInt(updateData.get("rentalType").toString()));
+            }
+            if (updateData.get("description") != null) {
+                house.setDescription((String) updateData.get("description"));
+            }
+            
+            // 保存更新后的房屋信息
+            RoomInfo updatedHouse = roomInfoRepository.save(house);
+            
+            result.put("success", true);
+            result.put("message", "房屋信息更新成功");
+            result.put("house", updatedHouse);
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", "更新房屋信息失败: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return result;
+    }
+
+    /**
+     * 获取即将到期的租约
+     * @param landlordPhone 房东手机号
+     * @return 即将到期的租约列表
+     */
+    @GetMapping("/expiring-contracts")
+    public Map<String, Object> getExpiringContracts(@RequestParam String landlordPhone) {
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            // 这里应该从数据库查询即将到期的租约
+            // 由于目前没有租约数据模型，先返回空数组
+            List<Map<String, Object>> contracts = new ArrayList<>();
+            
+            result.put("success", true);
+            result.put("message", "获取即将到期租约成功");
+            result.put("contracts", contracts);
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", "获取即将到期租约失败: " + e.getMessage());
         }
         
         return result;
