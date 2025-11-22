@@ -190,7 +190,7 @@ const formatDate = (dateString) => {
 
     <!-- 主内容区域 -->
     <main class="main-content">
-      <h1>欢迎来到HOMSEE</h1>
+      <h1>欢迎来到HOMESEE</h1>
       <p>专业的租房平台，为您提供优质的房屋租赁服务</p>
       <div class="features">
         <div class="feature-card" @click="navigateToHouseSelection">
