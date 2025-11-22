@@ -19,9 +19,6 @@ onMounted(() => {
     // 如果用户已登录，获取预约信息
     fetchUserAppointments()
   }
-  
-  // 初始化Canvas徽标动画
-  initLogoAnimation()
 })
 
 // 计算属性：是否已登录
@@ -33,6 +30,14 @@ const isLoggedIn = computed(() => {
 const displayName = computed(() => {
   if (!user.value) return ''
   return user.value.realName || user.value.username || '用户'
+})
+
+// 计算属性：获取头像URL
+const avatarUrl = computed(() => {
+  if (!user.value || !user.value.avatar) {
+    return '/src/assets/image/default-avatar.png'
+  }
+  return `/src/assets/image/${user.value.avatar}?t=${new Date().getTime()}`
 })
 
 const navigateToLogin = () => {
@@ -142,208 +147,31 @@ const formatDate = (dateString) => {
   const date = new Date(dateString)
   return date.toLocaleDateString('zh-CN')
 }
-
-// Canvas徽标动画初始化
-const initLogoAnimation = () => {
-  // 获取Canvas元素和上下文
-  const canvas = document.getElementById('logoCanvas')
-  if (!canvas) return
-  
-  const ctx = canvas.getContext('2d')
-  
-  // 设置Canvas大小为窗口大小
-  function resizeCanvas() {
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
-    drawLogo()
-  }
-  
-  // 颜色定义
-  const colors = {
-    background: 'transparent',
-    darkBlue: '#0066CC',
-    mediumBlue: '#3399FF',
-    lightBlue: '#66B2FF'
-  }
-  
-  // 徽标参数
-  const logoParams = {
-    baseWidth: 0.3,
-    baseHeight: 0.03,
-    building1Width: 0.075,
-    building1Height: 0.15,
-    building2Width: 0.06,
-    building2Height: 0.22,
-    depth: 0.05
-  }
-  
-  // 动画状态
-  let animationProgress = 0
-  let animationDirection = 1
-  const animationSpeed = 0.002
-  
-  // 绘制徽标
-  function drawLogo() {
-    // 清除Canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-    
-    // 计算徽标位置和尺寸 - 底部对齐
-    const centerX = canvas.width / 2
-    const centerY = canvas.height * 0.85
-    
-    const baseWidth = canvas.width * logoParams.baseWidth
-    const baseHeight = canvas.height * logoParams.baseHeight
-    const building1Width = canvas.width * logoParams.building1Width
-    const building1Height = canvas.height * logoParams.building1Height
-    const building2Width = canvas.width * logoParams.building2Width
-    const building2Height = canvas.height * logoParams.building2Height
-    const depth = canvas.width * logoParams.depth
-    
-    
-    // 绘制建筑1（矮胖）
-    const building1X = centerX - baseWidth * 0.25
-    drawBuilding(building1X, centerY, building1Width, building1Height, depth, 0)
-    
-    // 绘制建筑2（高耸）
-    const building2X = centerX + baseWidth * 0.25 - building2Width
-    drawBuilding(building2X, centerY, building2Width, building2Height, depth, 1)
-    
-    // 绘制文字
-    drawText(centerX, centerY + baseHeight + canvas.height * 0.03)
-    
-    // 更新动画进度
-    animationProgress += animationSpeed * animationDirection
-    if (animationProgress >= 1 || animationProgress <= 0) {
-      animationDirection *= -1
-    }
-  }
-  
-  
-  // 绘制单个建筑
-  function drawBuilding(x, baseY, width, height, depth, isTall) {
-    const y = baseY - height
-    
-    ctx.save()
-    
-    // 创建渐变 - 根据建筑高度调整颜色
-    const gradient = ctx.createLinearGradient(x, y, x + width, y + height)
-    if (isTall) {
-      gradient.addColorStop(0, colors.lightBlue)
-      gradient.addColorStop(0.5, colors.mediumBlue)
-      gradient.addColorStop(1, colors.darkBlue)
-    } else {
-      gradient.addColorStop(0, colors.darkBlue)
-      gradient.addColorStop(0.5, colors.mediumBlue)
-      gradient.addColorStop(1, colors.lightBlue)
-    }
-    
-    ctx.strokeStyle = gradient
-    ctx.lineWidth = 3
-    ctx.lineCap = 'round'
-    ctx.lineJoin = 'round'
-    
-    // 应用动画效果
-    ctx.globalAlpha = animationProgress
-    
-    // 绘制建筑正面
-    ctx.beginPath()
-    ctx.moveTo(x, baseY)
-    ctx.lineTo(x + width, baseY)
-    ctx.lineTo(x + width, y)
-    ctx.lineTo(x, y)
-    ctx.closePath()
-    ctx.stroke()
-    
-    // 绘制立体效果
-    ctx.beginPath()
-    ctx.moveTo(x + width, baseY)
-    ctx.lineTo(x + width + depth, baseY - depth)
-    ctx.lineTo(x + width + depth, y - depth)
-    ctx.lineTo(x + width, y)
-    ctx.stroke()
-    
-    ctx.beginPath()
-    ctx.moveTo(x + width, y)
-    ctx.lineTo(x + width + depth, y - depth)
-    ctx.lineTo(x + depth, y - depth)
-    ctx.lineTo(x, y)
-    ctx.stroke()
-    
-    // 添加一些细节线条增强立体感
-    ctx.globalAlpha = 0.5 * animationProgress
-    ctx.beginPath()
-    for (let i = 1; i < 4; i++) {
-      const segmentHeight = height / 4
-      ctx.moveTo(x, baseY - segmentHeight * i)
-      ctx.lineTo(x + width, baseY - segmentHeight * i)
-    }
-    ctx.stroke()
-    
-    ctx.restore()
-  }
-  
-  // 绘制文字
-  function drawText(centerX, y) {
-    ctx.save()
-    
-    // 创建文字渐变
-    const gradient = ctx.createLinearGradient(
-      centerX - 150, y, 
-      centerX + 150, y + 60
-    )
-    gradient.addColorStop(0, colors.darkBlue)
-    gradient.addColorStop(0.5, colors.mediumBlue)
-    gradient.addColorStop(1, colors.lightBlue)
-    
-    ctx.strokeStyle = gradient
-    ctx.lineWidth = 3
-    ctx.font = `bold ${canvas.width * 0.06}px Arial, sans-serif`
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    
-    // 应用动画效果
-    ctx.globalAlpha = animationProgress
-    
-    // 绘制文字描边
-    ctx.strokeText('HOMESEE', centerX, y)
-    
-    // 添加微弱的填充增强可读性
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)'
-    ctx.fillText('HOMESEE', centerX, y)
-    
-    ctx.restore()
-  }
-  
-  // 动画循环
-  function animate() {
-    drawLogo()
-    requestAnimationFrame(animate)
-  }
-  
-  // 初始化
-  window.addEventListener('resize', resizeCanvas)
-  resizeCanvas()
-  animate()
-}
 </script>
 
 <template>
   <div class="home-container">
-    <!-- Canvas背景 -->
-    <canvas id="logoCanvas" class="logo-canvas"></canvas>
-    
     <!-- 顶部导航栏 -->
     <nav class="navbar">
       <div class="logo-container">
-        <img src="@/assets/logo/logo (1).png" alt="HOMSEE Logo" class="nav-logo">
+        <img src="/src/assets/logo/logo (1).png" alt="HOMESEE Logo" class="nav-logo-canvas">
       </div>
       <div class="nav-content">
         <!-- 用户信息区域 - 在最右侧显示 -->
         <div class="user-info-container" v-if="isLoggedIn">
-          <div class="user-info" @click="toggleUserMenu">
-            <div class="user-name">{{ displayName }}</div>
-            <div class="user-phone">{{ user.phone }}</div>
-          </div>
+          <button class="button-message" @click="toggleUserMenu">
+            <div class="content-avatar">
+              <div class="status-user"></div>
+              <div class="avatar">
+                <img :src="avatarUrl" alt="用户头像" class="user-img">
+              </div>
+            </div>
+            <div class="notice-content">
+              <div class="username">{{ displayName }}</div>
+              <div class="lable-message">{{ user.username }}</div>
+              <div class="user-id">{{ user.phone }}</div>
+            </div>
+          </button>
           
           <!-- 用户菜单下拉框 -->
           <div v-if="showUserMenu" class="user-menu">
@@ -387,25 +215,17 @@ const initLogoAnimation = () => {
 .home-container {
   min-height: 100vh;
   position: relative;
-}
-
-.logo-canvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  pointer-events: none;
+  background: #ffffff;
 }
 
 .navbar {
   display: flex;
   align-items: center;
-  background-color: #9ac7e0;
-  color: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  color: #333;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   height: 70px;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .logo-container {
@@ -416,15 +236,12 @@ const initLogoAnimation = () => {
   justify-content: center;
   margin: 0;
   padding: 0;
-  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  border-right: 1px solid #e0e0e0;
 }
 
-.nav-logo {
+.nav-logo-canvas {
+  width: 94px;
   height: 70px;
-  width: auto;
-  object-fit: contain;
-  margin: 0;
-  padding: 0;
 }
 
 .nav-content {
@@ -455,18 +272,25 @@ const initLogoAnimation = () => {
 }
 
 .nav-link.router-link-active {
-  background-color: #007bff;
+  background-color: #667eea;
 }
 
 .login-btn {
-  background-color: #007bff;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
   border: none;
   cursor: pointer;
   font-size: 1rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
 .login-btn:hover {
-  background-color: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
 }
 
 .user-info-container {
@@ -503,75 +327,119 @@ const initLogoAnimation = () => {
   position: absolute;
   top: 100%;
   right: 0;
-  background: white;
-  border-radius: 4px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  min-width: 120px;
+  background: rgba(43, 43, 43, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  min-width: 140px;
   z-index: 1000;
-  margin-top: 4px;
+  margin-top: 8px;
   overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .menu-item {
   padding: 0.75rem 1rem;
   cursor: pointer;
-  transition: background-color 0.3s;
-  color: #333;
+  transition: all 0.3s ease;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 0.9rem;
+  font-weight: 400;
 }
 
 .menu-item:hover {
-  background-color: #f8f9fa;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
 }
 
 .menu-item:not(:last-child) {
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .main-content {
-  padding: 2rem;
+  padding: 3rem 2rem;
   max-width: 1200px;
   margin: 0 auto;
+  position: relative;
+  z-index: 2;
 }
 
 .main-content h1 {
   text-align: center;
-  margin-bottom: 1rem;
-  color: #333;
+  margin-bottom: 1.5rem;
+  color: #2c3e50;
+  font-size: 3rem;
+  font-weight: 700;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .main-content p {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
   color: #666;
-  font-size: 1.1rem;
+  font-size: 1.3rem;
+  font-weight: 300;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .features {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  margin-top: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2.5rem;
+  margin-top: 3rem;
 }
 
 .feature-card {
   background: white;
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 2.5rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   border: 1px solid #e0e0e0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.feature-card:hover::before {
+  transform: scaleX(1);
 }
 
 .feature-card h3 {
   margin-top: 0;
   color: #2c3e50;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  position: relative;
 }
 
 .feature-card p {
   text-align: left;
   margin: 0;
   color: #666;
-  line-height: 1.5;
+  line-height: 1.6;
+  font-size: 1rem;
+  font-weight: 300;
 }
 
 /* 预约信息样式 */
@@ -698,6 +566,187 @@ const initLogoAnimation = () => {
   color: #6c757d;
   text-align: right;
   flex: 1;
+}
+
+/* 新的用户信息按钮样式 */
+.user-info-container {
+  --text-color: rgb(255, 255, 255);
+  --bg-color-sup: #5e5e5e;
+  --bg-color: #2b2b2b;
+  --bg-hover-color: #161616;
+  --online-status: #00da00;
+  --font-size: 16px;
+  --btn-transition: all 0.2s ease-out;
+}
+
+.button-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font: 400 var(--font-size) Helvetica Neue, sans-serif;
+  box-shadow: 0 0 2.17382px rgba(0,0,0,.049),0 1.75px 6.01034px rgba(0,0,0,.07),0 3.63px 14.4706px rgba(0,0,0,.091),0 22px 48px rgba(0,0,0,.14);
+  background-color: var(--bg-color);
+  border-radius: 68px;
+  cursor: pointer;
+  padding: 6px 10px 6px 6px;
+  width: fit-content;
+  height: 40px;
+  border: 0;
+  overflow: hidden;
+  position: relative;
+  transition: var(--btn-transition);
+}
+
+.button-message:hover {
+  height: 56px;
+  padding: 8px 20px 8px 8px;
+  background-color: var(--bg-hover-color);
+  transition: var(--btn-transition);
+}
+
+.button-message:active {
+  transform: scale(0.99);
+}
+
+.content-avatar {
+  width: 30px;
+  height: 30px;
+  margin: 0;
+  transition: var(--btn-transition);
+  position: relative;
+}
+
+.button-message:hover .content-avatar {
+  width: 40px;
+  height: 40px;
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: var(--bg-color-sup);
+}
+
+.user-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.status-user {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  right: 1px;
+  bottom: 1px;
+  border-radius: 50%;
+  outline: solid 2px var(--bg-color);
+  background-color: var(--online-status);
+  transition: var(--btn-transition);
+  animation: active-status 2s ease-in-out infinite;
+}
+
+.button-message:hover .status-user {
+  width: 10px;
+  height: 10px;
+  right: 1px;
+  bottom: 1px;
+  outline: solid 3px var(--bg-hover-color);
+}
+
+.notice-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding-left: 8px;
+  text-align: initial;
+  color: var(--text-color);
+}
+
+.username {
+  letter-spacing: -6px;
+  height: 0;
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: var(--btn-transition);
+}
+
+.user-id {
+  font-size: 12px;
+  letter-spacing: -6px;
+  height: 0;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: var(--btn-transition);
+}
+
+.lable-message {
+  display: flex;
+  align-items: center;
+  opacity: 1;
+  transform: scaleY(1);
+  transition: var(--btn-transition);
+}
+
+.button-message:hover .username {
+  height: auto;
+  letter-spacing: normal;
+  opacity: 1;
+  transform: translateY(0);
+  transition: var(--btn-transition);
+}
+
+.button-message:hover .user-id {
+  height: auto;
+  letter-spacing: normal;
+  opacity: 1;
+  transform: translateY(0);
+  transition: var(--btn-transition);
+}
+
+.button-message:hover .lable-message {
+  height: 0;
+  transform: scaleY(0);
+  transition: var(--btn-transition);
+}
+
+.lable-message, .username {
+  font-weight: 600;
+}
+
+.number-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  margin-left: 8px;
+  font-size: 12px;
+  width: 16px;
+  height: 16px;
+  background-color: var(--bg-color-sup);
+  border-radius: 20px;
+}
+
+/* 在线状态动画 */
+@keyframes active-status {
+  0% {
+    background-color: var(--online-status);
+  }
+
+  33.33% {
+    background-color: #93e200;
+  }
+
+  66.33% {
+    background-color: #93e200;
+  }
+
+  100% {
+    background-color: var(--online-status);
+  }
 }
 
 /* 子功能样式 */

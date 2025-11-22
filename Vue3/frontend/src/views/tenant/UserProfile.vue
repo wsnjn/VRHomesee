@@ -318,7 +318,31 @@ const uploadAvatar = async () => {
     <!-- 顶部导航栏 -->
     <nav class="navbar">
       <div class="nav-left">
-        <button @click="goBack" class="back-btn">← 返回</button>
+        <button @click="goBack" class="button back-button">
+          <div class="outline"></div>
+          <div class="state state--default">
+            <div class="icon">
+              <svg
+                width="1em"
+                height="1em"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M14.2199 21.63C13.0399 21.63 11.3699 20.8 10.0499 16.83L9.32988 14.67L7.16988 13.95C3.20988 12.63 2.37988 10.96 2.37988 9.78001C2.37988 8.61001 3.20988 6.93001 7.16988 5.60001L15.6599 2.77001C17.7799 2.06001 19.5499 2.27001 20.6399 3.35001C21.7299 4.43001 21.9399 6.21001 21.2299 8.33001L18.3999 16.82C17.0699 20.8 15.3999 21.63 14.2199 21.63ZM7.63988 7.03001C4.85988 7.96001 3.86988 9.06001 3.86988 9.78001C3.86988 10.5 4.85988 11.6 7.63988 12.52L10.1599 13.36C10.3799 13.43 10.5599 13.61 10.6299 13.83L11.4699 16.35C12.3899 19.13 13.4999 20.12 14.2199 20.12C14.9399 20.12 16.0399 19.13 16.9699 16.35L19.7999 7.86001C20.3099 6.32001 20.2199 5.06001 19.5699 4.41001C18.9199 3.76001 17.6599 3.68001 16.1299 4.19001L7.63988 7.03001Z"
+                ></path>
+                <path
+                  d="M10.11 14.4C9.92005 14.4 9.73005 14.33 9.58005 14.18C9.29005 13.89 9.29005 13.41 9.58005 13.12L13.16 9.53C13.45 9.24 13.93 9.24 14.22 9.53C14.51 9.82 14.51 10.3 14.22 10.59L10.64 14.18C10.5 14.33 10.3 14.4 10.11 14.4Z"
+                ></path>
+              </svg>
+            </div>
+            <p>
+              <span style="--i:0">返</span>
+              <span style="--i:1">回</span>
+            </p>
+          </div>
+        </button>
       </div>
       <div class="nav-center">
         <h2>个人信息</h2>
@@ -363,16 +387,64 @@ const uploadAvatar = async () => {
                 class="file-input"
                 :disabled="avatarUploading"
               >
-              <label for="avatar-input" class="file-input-label">
-                {{ avatarFile ? '重新选择' : '选择头像' }}
+              <label for="avatar-input" class="button select-avatar-button">
+                <div class="outline"></div>
+                <div class="state state--default">
+                  <div class="icon">
+                    <svg
+                      width="1em"
+                      height="1em"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M14.2199 21.63C13.0399 21.63 11.3699 20.8 10.0499 16.83L9.32988 14.67L7.16988 13.95C3.20988 12.63 2.37988 10.96 2.37988 9.78001C2.37988 8.61001 3.20988 6.93001 7.16988 5.60001L15.6599 2.77001C17.7799 2.06001 19.5499 2.27001 20.6399 3.35001C21.7299 4.43001 21.9399 6.21001 21.2299 8.33001L18.3999 16.82C17.0699 20.8 15.3999 21.63 14.2199 21.63ZM7.63988 7.03001C4.85988 7.96001 3.86988 9.06001 3.86988 9.78001C3.86988 10.5 4.85988 11.6 7.63988 12.52L10.1599 13.36C10.3799 13.43 10.5599 13.61 10.6299 13.83L11.4699 16.35C12.3899 19.13 13.4999 20.12 14.2199 20.12C14.9399 20.12 16.0399 19.13 16.9699 16.35L19.7999 7.86001C20.3099 6.32001 20.2199 5.06001 19.5699 4.41001C18.9199 3.76001 17.6599 3.68001 16.1299 4.19001L7.63988 7.03001Z"
+                      ></path>
+                      <path
+                        d="M10.11 14.4C9.92005 14.4 9.73005 14.33 9.58005 14.18C9.29005 13.89 9.29005 13.41 9.58005 13.12L13.16 9.53C13.45 9.24 13.93 9.24 14.22 9.53C14.51 9.82 14.51 10.3 14.22 10.59L10.64 14.18C10.5 14.33 10.3 14.4 10.11 14.4Z"
+                      ></path>
+                    </svg>
+                  </div>
+                  <p>
+                    <span style="--i:0">{{ avatarFile ? '重' : '选' }}</span>
+                    <span style="--i:1">{{ avatarFile ? '新' : '择' }}</span>
+                    <span style="--i:2">{{ avatarFile ? '选' : '头' }}</span>
+                    <span style="--i:3">{{ avatarFile ? '择' : '像' }}</span>
+                  </p>
+                </div>
               </label>
             </div>
             <button 
               @click="uploadAvatar" 
               :disabled="!avatarFile || avatarUploading" 
-              class="upload-btn"
+              class="button upload-avatar-button"
             >
-              {{ avatarUploading ? '上传中...' : '上传头像' }}
+              <div class="outline"></div>
+              <div class="state state--default">
+                <div class="icon">
+                  <svg
+                    width="1em"
+                    height="1em"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M14.2199 21.63C13.0399 21.63 11.3699 20.8 10.0499 16.83L9.32988 14.67L7.16988 13.95C3.20988 12.63 2.37988 10.96 2.37988 9.78001C2.37988 8.61001 3.20988 6.93001 7.16988 5.60001L15.6599 2.77001C17.7799 2.06001 19.5499 2.27001 20.6399 3.35001C21.7299 4.43001 21.9399 6.21001 21.2299 8.33001L18.3999 16.82C17.0699 20.8 15.3999 21.63 14.2199 21.63ZM7.63988 7.03001C4.85988 7.96001 3.86988 9.06001 3.86988 9.78001C3.86988 10.5 4.85988 11.6 7.63988 12.52L10.1599 13.36C10.3799 13.43 10.5599 13.61 10.6299 13.83L11.4699 16.35C12.3899 19.13 13.4999 20.12 14.2199 20.12C14.9399 20.12 16.0399 19.13 16.9699 16.35L19.7999 7.86001C20.3099 6.32001 20.2199 5.06001 19.5699 4.41001C18.9199 3.76001 17.6599 3.68001 16.1299 4.19001L7.63988 7.03001Z"
+                    ></path>
+                    <path
+                      d="M10.11 14.4C9.92005 14.4 9.73005 14.33 9.58005 14.18C9.29005 13.89 9.29005 13.41 9.58005 13.12L13.16 9.53C13.45 9.24 13.93 9.24 14.22 9.53C14.51 9.82 14.51 10.3 14.22 10.59L10.64 14.18C10.5 14.33 10.3 14.4 10.11 14.4Z"
+                    ></path>
+                  </svg>
+                </div>
+                <p>
+                  <span style="--i:0">{{ avatarUploading ? '上' : '上' }}</span>
+                  <span style="--i:1">{{ avatarUploading ? '传' : '传' }}</span>
+                  <span style="--i:2">{{ avatarUploading ? '中' : '头' }}</span>
+                  <span style="--i:3">{{ avatarUploading ? '...' : '像' }}</span>
+                </p>
+              </div>
             </button>
           </div>
           <div class="avatar-tips">
@@ -619,20 +691,19 @@ const uploadAvatar = async () => {
 <style scoped>
 .user-profile-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #a1e1fb 0%, #76fff8 100%);
+  background: #ffffff;
   padding-bottom: 2rem;
   position: relative;
 }
-
 
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid #e0e0e0;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -646,7 +717,7 @@ const uploadAvatar = async () => {
 }
 
 .back-btn {
-  background: linear-gradient(135deg, #ff0000, #764ba2);
+  background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -685,7 +756,7 @@ const uploadAvatar = async () => {
 }
 
 .save-btn {
-  background: linear-gradient(135deg, #7300ff, #00aaff);
+  background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -693,12 +764,12 @@ const uploadAvatar = async () => {
   cursor: pointer;
   font-weight: 500;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
 .save-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
 }
 
 .save-btn:disabled {
@@ -714,14 +785,13 @@ const uploadAvatar = async () => {
   border-radius: 12px;
   font-weight: 500;
   text-align: center;
-  backdrop-filter: blur(10px);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .message.success {
   background: rgba(40, 167, 69, 0.1);
-  color: #5100ff;
-  border: 2px solid rgba(0, 255, 60, 0.3);
+  color: #155724;
+  border: 2px solid rgba(40, 167, 69, 0.3);
 }
 
 .message.error {
@@ -733,60 +803,63 @@ const uploadAvatar = async () => {
 .loading-section {
   text-align: center;
   padding: 3rem;
-  color: white;
+  color: #666;
   font-size: 1.2rem;
 }
 
 .profile-content {
-  padding: 2rem;
-  max-width: 1000px;
-  margin: 0 auto;
+  padding: 1rem;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .info-card {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  padding: 2rem;
-  margin-bottom: 2rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.3s ease;
+  background: white;
+  border-radius: 8px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
+  transition: all 0.2s ease;
+  height: fit-content;
 }
 
 .info-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .avatar-card {
   text-align: center;
+  grid-column: 1 / -1;
 }
 
 .card-title {
-  margin: 0 0 1.5rem 0;
+  margin: 0 0 1rem 0;
   color: #2c3e50;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   font-weight: 600;
-  padding-bottom: 0.75rem;
-  border-bottom: 3px solid;
-  border-image: linear-gradient(135deg, #ff0000, #764ba2) 1;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #f0f0f0;
 }
 
 .avatar-section {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .avatar-preview {
-  width: 120px;
-  height: 120px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   overflow: hidden;
-  border: 4px solid #fff;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  border: 3px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .avatar-image {
@@ -797,7 +870,7 @@ const uploadAvatar = async () => {
 
 .avatar-actions {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
   align-items: center;
   flex-wrap: wrap;
   justify-content: center;
@@ -812,36 +885,38 @@ const uploadAvatar = async () => {
 }
 
 .file-input-label {
-  background: linear-gradient(135deg, #ff0000, #764ba2);
+  background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
-  padding: 0.75rem 1.5rem;
-  border-radius: 25px;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
   cursor: pointer;
   font-weight: 500;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  font-size: 0.9rem;
 }
 
 .file-input-label:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 .upload-btn {
-  background: linear-gradient(135deg, #d000ff, #00eaff);
+  background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
   border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 25px;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
   cursor: pointer;
   font-weight: 500;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  font-size: 0.9rem;
 }
 
 .upload-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 .upload-btn:disabled {
@@ -853,68 +928,61 @@ const uploadAvatar = async () => {
 
 .avatar-tips {
   color: #6c757d;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   text-align: center;
 }
 
 .info-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
 }
 
 .info-item {
   display: flex;
   flex-direction: column;
-  padding: 1rem;
-  background: rgba(248, 249, 250, 0.8);
-  border-radius: 12px;
-  transition: all 0.3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.info-item:hover {
-  background: rgba(255, 255, 255, 0.9);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
 }
 
 .info-item label {
   font-weight: 600;
   color: #495057;
-  margin-bottom: 0.5rem;
-  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+  font-size: 0.85rem;
 }
 
 .info-item span {
   color: #2c3e50;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 500;
 }
 
 .editable-field {
   color: #2c3e50;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 500;
-  padding: 0.5rem 0;
+  padding: 0.25rem 0;
   cursor: pointer;
   border-bottom: 2px dashed transparent;
   transition: all 0.3s ease;
-  border-radius: 6px;
+  border-radius: 4px;
 }
 
 .editable-field:hover {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+  background: rgba(102, 126, 234, 0.1);
   border-bottom: 2px dashed #667eea;
-  padding: 0.5rem;
+  padding: 0.25rem 0.5rem;
 }
 
 .edit-input, .edit-textarea {
   width: 100%;
-  padding: 0.75rem;
-  border: 2px solid #e9ecef;
-  border-radius: 12px;
-  font-size: 1rem;
+  padding: 0.5rem;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  font-size: 0.9rem;
   transition: all 0.3s ease;
   background: white;
 }
@@ -922,12 +990,11 @@ const uploadAvatar = async () => {
 .edit-input:focus, .edit-textarea:focus {
   outline: none;
   border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-  transform: translateY(-1px);
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
 }
 
 .edit-textarea {
-  min-height: 100px;
+  min-height: 60px;
   resize: vertical;
 }
 
@@ -937,86 +1004,94 @@ const uploadAvatar = async () => {
 
 /* 状态样式 */
 .certified {
-  color: #8d00f8;
+  color: #155724;
   font-weight: 600;
-  background: rgba(40, 167, 69, 0.1);
+  background: #d4edda;
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
   display: inline-block;
+  border: 1px solid #c3e6cb;
 }
 
 .not-certified {
-  color: #dc3545;
+  color: #721c24;
   font-weight: 600;
-  background: rgba(220, 53, 69, 0.1);
+  background: #f8d7da;
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
   display: inline-block;
+  border: 1px solid #f5c6cb;
 }
 
 .status-active {
-  color: #2b00ff;
+  color: #155724;
   font-weight: 600;
-  background: rgba(40, 167, 69, 0.1);
+  background: #d4edda;
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
   display: inline-block;
+  border: 1px solid #c3e6cb;
 }
 
 .status-inactive {
-  color: #ffc107;
+  color: #856404;
   font-weight: 600;
-  background: rgba(255, 193, 7, 0.1);
+  background: #fff3cd;
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
   display: inline-block;
+  border: 1px solid #ffeaa7;
 }
 
 .status-disabled {
-  color: #dc3545;
+  color: #721c24;
   font-weight: 600;
-  background: rgba(220, 53, 69, 0.1);
+  background: #f8d7da;
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
   display: inline-block;
+  border: 1px solid #f5c6cb;
 }
 
 .credit-high {
-  color: #7700ff;
+  color: #155724;
   font-weight: 600;
-  background: rgba(40, 167, 69, 0.1);
+  background: #d4edda;
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
   display: inline-block;
+  border: 1px solid #c3e6cb;
 }
 
 .credit-medium {
-  color: #ffc107;
+  color: #856404;
   font-weight: 600;
-  background: rgba(255, 193, 7, 0.1);
+  background: #fff3cd;
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
   display: inline-block;
+  border: 1px solid #ffeaa7;
 }
 
 .credit-low {
-  color: #dc3545;
+  color: #721c24;
   font-weight: 600;
-  background: rgba(220, 53, 69, 0.1);
+  background: #f8d7da;
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
   display: inline-block;
+  border: 1px solid #f5c6cb;
 }
 
 .not-logged-in {
   text-align: center;
   padding: 4rem 2rem;
-  color: white;
-  backdrop-filter: blur(10px);
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
+  color: #666;
+  background: white;
+  border-radius: 12px;
   margin: 2rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .not-logged-in p {
@@ -1035,12 +1110,374 @@ const uploadAvatar = async () => {
   font-size: 1.1rem;
   font-weight: 500;
   transition: all 0.3s ease;
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
 .login-btn:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 35px rgba(102, 126, 234, 0.6);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* 特殊按钮样式 */
+.button {
+  --primary: #667eea;
+  --neutral-1: #f7f8f7;
+  --neutral-2: #e7e7e7;
+  --radius: 14px;
+
+  cursor: pointer;
+  border-radius: var(--radius);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+  border: none;
+  box-shadow: 0 0.5px 0.5px 1px rgba(255, 255, 255, 0.2),
+    0 10px 20px rgba(0, 0, 0, 0.2), 0 4px 5px 0px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.3s ease;
+  min-width: 120px;
+  padding: 12px;
+  height: 48px;
+  font-family: "Galano Grotesque", Poppins, Montserrat, sans-serif;
+  font-style: normal;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.button:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 1px 2px rgba(255, 255, 255, 0.3),
+    0 15px 30px rgba(0, 0, 0, 0.3), 0 10px 3px -3px rgba(0, 0, 0, 0.04);
+}
+
+.button:active {
+  transform: scale(1);
+  box-shadow: 0 0 1px 2px rgba(255, 255, 255, 0.3),
+    0 10px 3px -3px rgba(0, 0, 0, 0.2);
+}
+
+.button:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius);
+  border: 2.5px solid transparent;
+  background: linear-gradient(var(--neutral-1), var(--neutral-2)) padding-box,
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.45))
+      border-box;
+  z-index: 0;
+  transition: all 0.4s ease;
+}
+
+.button:hover::after {
+  transform: scale(1.05, 1.1);
+  box-shadow: inset 0 -1px 3px 0 rgba(255, 255, 255, 1);
+}
+
+.button::before {
+  content: "";
+  inset: 5px 4px 4px 4px;
+  position: absolute;
+  background: linear-gradient(to top, var(--neutral-1), var(--neutral-2));
+  border-radius: 20px;
+  filter: blur(0.5px);
+  z-index: 2;
+}
+
+.state p {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.state .icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  transform: scale(1.15);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.state .icon svg {
+  overflow: visible;
+}
+
+/* Outline */
+.outline {
+  position: absolute;
+  border-radius: inherit;
+  overflow: hidden;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  inset: -2px -3.5px;
+}
+
+.outline::before {
+  content: "";
+  position: absolute;
+  inset: -100%;
+  background: conic-gradient(
+    from 180deg,
+    transparent 60%,
+    white 80%,
+    transparent 100%
+  );
+  animation: spin 2s linear infinite;
+  animation-play-state: paused;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.button:hover .outline {
+  opacity: 1;
+}
+
+.button:hover .outline::before {
+  animation-play-state: running;
+}
+
+/* Letters */
+.state p span {
+  display: block;
+  opacity: 0;
+  animation: slideDown 0.8s ease forwards calc(var(--i) * 0.03s);
+}
+
+.button:hover p span {
+  opacity: 1;
+  animation: wave 0.5s ease forwards calc(var(--i) * 0.02s);
+}
+
+.button:focus p span {
+  opacity: 1;
+  animation: disapear 0.6s ease forwards calc(var(--i) * 0.03s);
+}
+
+@keyframes wave {
+  30% {
+    opacity: 1;
+    transform: translateY(4px) translateX(0) rotate(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-3px) translateX(0) rotate(0);
+    color: var(--primary);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) translateX(0) rotate(0);
+  }
+}
+
+@keyframes slideDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) translateX(5px) rotate(-90deg);
+    color: var(--primary);
+    filter: blur(5px);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(4px) translateX(0) rotate(0);
+    filter: blur(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-3px) translateX(0) rotate(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) translateX(0) rotate(0);
+  }
+}
+
+@keyframes disapear {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(5px) translateY(20px);
+    color: var(--primary);
+    filter: blur(5px);
+  }
+}
+
+/* Plane */
+.state--default .icon svg {
+  animation: land 0.6s ease forwards;
+}
+
+.button:hover .state--default .icon {
+  transform: rotate(45deg) scale(1.15);
+}
+
+.button:focus .state--default svg {
+  animation: takeOff 0.8s linear forwards;
+}
+
+.button:focus .state--default .icon {
+  transform: rotate(0) scale(1.15);
+}
+
+@keyframes takeOff {
+  0% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(70px) rotate(45deg) scale(2);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(160px) rotate(45deg) scale(0);
+  }
+}
+
+@keyframes land {
+  0% {
+    transform: translateX(-60px) translateY(30px) rotate(-50deg) scale(2);
+    opacity: 0;
+    filter: blur(3px);
+  }
+  100% {
+    transform: translateX(0) translateY(0) rotate(0);
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+/* Contrail */
+.state--default .icon:before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  height: 2px;
+  width: 0;
+  left: -5px;
+  background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.5));
+}
+
+.button:focus .state--default .icon:before {
+  animation: contrail 0.8s linear forwards;
+}
+
+@keyframes contrail {
+  0% {
+    width: 0;
+    opacity: 1;
+  }
+  8% {
+    width: 15px;
+  }
+  60% {
+    opacity: 0.7;
+    width: 80px;
+  }
+  100% {
+    opacity: 0;
+    width: 160px;
+  }
+}
+
+/* States */
+.state {
+  padding-left: 25px;
+  z-index: 2;
+  display: flex;
+  position: relative;
+}
+
+.state--default span:nth-child(4) {
+  margin-right: 5px;
+}
+
+.state--sent {
+  display: none;
+}
+
+.state--sent svg {
+  transform: scale(1.15);
+  margin-right: 8px;
+}
+
+.button:focus .state--default {
+  position: absolute;
+}
+
+.button:focus .state--sent {
+  display: flex;
+}
+
+.button:focus .state--sent span {
+  opacity: 0;
+  animation: slideDown 0.8s ease forwards calc(var(--i) * 0.2s);
+}
+
+.button:focus .state--sent .icon svg {
+  opacity: 0;
+  animation: appear 1.2s ease forwards 0.8s;
+}
+
+@keyframes appear {
+  0% {
+    opacity: 0;
+    transform: scale(4) rotate(-40deg);
+    color: var(--primary);
+    filter: blur(4px);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(0.6);
+    filter: blur(1px);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 移除旧的按钮样式 */
+.back-btn,
+.file-input-label,
+.upload-btn {
+  display: none;
+}
+
+/* 特定按钮样式调整 */
+.back-button,
+.select-avatar-button,
+.upload-avatar-button {
+  min-width: 120px;
+}
+
+/* 文件输入容器调整 */
+.file-input-container {
+  position: relative;
+  display: inline-block;
+}
+
+.file-input {
+  display: none;
 }
 
 @media (max-width: 768px) {
@@ -1069,8 +1506,8 @@ const uploadAvatar = async () => {
     width: 100%;
   }
   
-  .file-input-label,
-  .upload-btn {
+  .select-avatar-button,
+  .upload-avatar-button {
     width: 100%;
     text-align: center;
   }

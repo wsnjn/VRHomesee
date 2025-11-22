@@ -1,47 +1,26 @@
 <template>
   <div class="smart-matching-container">
-    <div class="header">
-      <h1>智能匹配</h1>
-      <p>根据您的偏好和预算，智能推荐最适合的房源</p>
-    </div>
-    
-    <div class="matching-content">
-            <div class="ghost-animation">
-                <div id="ghost">
-                    <div id="red">
-                        <!-- 15x15网格的所有元素 -->
-                        <div id="a1"></div><div id="a2"></div><div id="a3"></div><div id="a4"></div><div id="a5"></div><div id="a6"></div><div id="a7"></div><div id="a8"></div><div id="a9"></div><div id="a10"></div><div id="a11"></div><div id="a12"></div><div id="a13"></div><div id="a14"></div><div id="a15"></div>
-                        <div id="b1"></div><div id="b2"></div><div id="b3"></div><div id="b4"></div><div id="b5"></div><div id="b6"></div><div id="b7"></div><div id="b8"></div><div id="b9"></div><div id="b10"></div><div id="b11"></div><div id="b12"></div><div id="b13"></div><div id="b14"></div><div id="b15"></div>
-                        <div id="c1"></div><div id="c2"></div><div id="c3"></div><div id="c4"></div><div id="c5"></div><div id="c6"></div><div id="c7"></div><div id="c8"></div><div id="c9"></div><div id="c10"></div><div id="c11"></div><div id="c12"></div><div id="c13"></div><div id="c14"></div><div id="c15"></div>
-                        <div id="d1"></div><div id="d2"></div><div id="d3"></div><div id="d4"></div><div id="d5"></div><div id="d6"></div><div id="d7"></div><div id="d8"></div><div id="d9"></div><div id="d10"></div><div id="d11"></div><div id="d12"></div><div id="d13"></div><div id="d14"></div><div id="d15"></div>
-                        <div id="e1"></div><div id="e2"></div><div id="e3"></div><div id="e4"></div><div id="e5"></div><div id="e6"></div><div id="e7"></div><div id="e8"></div><div id="e9"></div><div id="e10"></div><div id="e11"></div><div id="e12"></div><div id="e13"></div><div id="e14"></div><div id="e15"></div>
-                        <div id="f1"></div><div id="f2"></div><div id="f3"></div><div id="f4"></div><div id="f5"></div><div id="f6"></div><div id="f7"></div><div id="f8"></div><div id="f9"></div><div id="f10"></div><div id="f11"></div><div id="f12"></div><div id="f13"></div><div id="f14"></div><div id="f15"></div>
-                        <div id="g1"></div><div id="g2"></div><div id="g3"></div><div id="g4"></div><div id="g5"></div><div id="g6"></div><div id="g7"></div><div id="g8"></div><div id="g9"></div><div id="g10"></div><div id="g11"></div><div id="g12"></div><div id="g13"></div><div id="g14"></div><div id="g15"></div>
-                        <div id="h1"></div><div id="h2"></div><div id="h3"></div><div id="h4"></div><div id="h5"></div><div id="h6"></div><div id="h7"></div><div id="h8"></div><div id="h9"></div><div id="h10"></div><div id="h11"></div><div id="h12"></div><div id="h13"></div><div id="h14"></div><div id="h15"></div>
-                        <div id="i1"></div><div id="i2"></div><div id="i3"></div><div id="i4"></div><div id="i5"></div><div id="i6"></div><div id="i7"></div><div id="i8"></div><div id="i9"></div><div id="i10"></div><div id="i11"></div><div id="i12"></div><div id="i13"></div><div id="i14"></div><div id="i15"></div>
-                        <div id="j1"></div><div id="j2"></div><div id="j3"></div><div id="j4"></div><div id="j5"></div><div id="j6"></div><div id="j7"></div><div id="j8"></div><div id="j9"></div><div id="j10"></div><div id="j11"></div><div id="j12"></div><div id="j13"></div><div id="j14"></div><div id="j15"></div>
-                        <div id="k1"></div><div id="k2"></div><div id="k3"></div><div id="k4"></div><div id="k5"></div><div id="k6"></div><div id="k7"></div><div id="k8"></div><div id="k9"></div><div id="k10"></div><div id="k11"></div><div id="k12"></div><div id="k13"></div><div id="k14"></div><div id="k15"></div>
-                        <div id="l1"></div><div id="l2"></div><div id="l3"></div><div id="l4"></div><div id="l5"></div><div id="l6"></div><div id="l7"></div><div id="l8"></div><div id="l9"></div><div id="l10"></div><div id="l11"></div><div id="l12"></div><div id="l13"></div><div id="l14"></div><div id="l15"></div>
-                        <div id="m1"></div><div id="m2"></div><div id="m3"></div><div id="m4"></div><div id="m5"></div><div id="m6"></div><div id="m7"></div><div id="m8"></div><div id="m9"></div><div id="m10"></div><div id="m11"></div><div id="m12"></div><div id="m13"></div><div id="m14"></div><div id="m15"></div>
-                        <div id="n1"></div><div id="n2"></div><div id="n3"></div><div id="n4"></div><div id="n5"></div><div id="n6"></div><div id="n7"></div><div id="n8"></div><div id="n9"></div><div id="n10"></div><div id="n11"></div><div id="n12"></div><div id="n13"></div><div id="n14"></div><div id="n15"></div>
-                        <div id="o1"></div><div id="o2"></div><div id="o3"></div><div id="o4"></div><div id="o5"></div><div id="o6"></div><div id="o7"></div><div id="o8"></div><div id="o9"></div><div id="o10"></div><div id="o11"></div><div id="o12"></div><div id="o13"></div><div id="o14"></div><div id="o15"></div>
-                    </div>
-                    <div id="shadow"></div>
-                </div>
-            </div>
-      
-      <div class="matching-info">
-        <div class="loading-text">
-          <p>正在为您智能匹配最佳房源...</p>
-          <div class="progress-bar">
-            <div class="progress"></div>
-          </div>
+    <div class="ghost-animation" :class="{ 'jump': isJumping }" @click="makeDinoJump">
+      <div id="ghost">
+        <div id="red">
+          <!-- 15x15网格的所有元素 -->
+          <div id="a1"></div><div id="a2"></div><div id="a3"></div><div id="a4"></div><div id="a5"></div><div id="a6"></div><div id="a7"></div><div id="a8"></div><div id="a9"></div><div id="a10"></div><div id="a11"></div><div id="a12"></div><div id="a13"></div><div id="a14"></div><div id="a15"></div>
+          <div id="b1"></div><div id="b2"></div><div id="b3"></div><div id="b4"></div><div id="b5"></div><div id="b6"></div><div id="b7"></div><div id="b8"></div><div id="b9"></div><div id="b10"></div><div id="b11"></div><div id="b12"></div><div id="b13"></div><div id="b14"></div><div id="b15"></div>
+          <div id="c1"></div><div id="c2"></div><div id="c3"></div><div id="c4"></div><div id="c5"></div><div id="c6"></div><div id="c7"></div><div id="c8"></div><div id="c9"></div><div id="c10"></div><div id="c11"></div><div id="c12"></div><div id="c13"></div><div id="c14"></div><div id="c15"></div>
+          <div id="d1"></div><div id="d2"></div><div id="d3"></div><div id="d4"></div><div id="d5"></div><div id="d6"></div><div id="d7"></div><div id="d8"></div><div id="d9"></div><div id="d10"></div><div id="d11"></div><div id="d12"></div><div id="d13"></div><div id="d14"></div><div id="d15"></div>
+          <div id="e1"></div><div id="e2"></div><div id="e3"></div><div id="e4"></div><div id="e5"></div><div id="e6"></div><div id="e7"></div><div id="e8"></div><div id="e9"></div><div id="e10"></div><div id="e11"></div><div id="e12"></div><div id="e13"></div><div id="e14"></div><div id="e15"></div>
+          <div id="f1"></div><div id="f2"></div><div id="f3"></div><div id="f4"></div><div id="f5"></div><div id="f6"></div><div id="f7"></div><div id="f8"></div><div id="f9"></div><div id="f10"></div><div id="f11"></div><div id="f12"></div><div id="f13"></div><div id="f14"></div><div id="f15"></div>
+          <div id="g1"></div><div id="g2"></div><div id="g3"></div><div id="g4"></div><div id="g5"></div><div id="g6"></div><div id="g7"></div><div id="g8"></div><div id="g9"></div><div id="g10"></div><div id="g11"></div><div id="g12"></div><div id="g13"></div><div id="g14"></div><div id="g15"></div>
+          <div id="h1"></div><div id="h2"></div><div id="h3"></div><div id="h4"></div><div id="h5"></div><div id="h6"></div><div id="h7"></div><div id="h8"></div><div id="h9"></div><div id="h10"></div><div id="h11"></div><div id="h12"></div><div id="h13"></div><div id="h14"></div><div id="h15"></div>
+          <div id="i1"></div><div id="i2"></div><div id="i3"></div><div id="i4"></div><div id="i5"></div><div id="i6"></div><div id="i7"></div><div id="i8"></div><div id="i9"></div><div id="i10"></div><div id="i11"></div><div id="i12"></div><div id="i13"></div><div id="i14"></div><div id="i15"></div>
+          <div id="j1"></div><div id="j2"></div><div id="j3"></div><div id="j4"></div><div id="j5"></div><div id="j6"></div><div id="j7"></div><div id="j8"></div><div id="j9"></div><div id="j10"></div><div id="j11"></div><div id="j12"></div><div id="j13"></div><div id="j14"></div><div id="j15"></div>
+          <div id="k1"></div><div id="k2"></div><div id="k3"></div><div id="k4"></div><div id="k5"></div><div id="k6"></div><div id="k7"></div><div id="k8"></div><div id="k9"></div><div id="k10"></div><div id="k11"></div><div id="k12"></div><div id="k13"></div><div id="k14"></div><div id="k15"></div>
+          <div id="l1"></div><div id="l2"></div><div id="l3"></div><div id="l4"></div><div id="l5"></div><div id="l6"></div><div id="l7"></div><div id="l8"></div><div id="l9"></div><div id="l10"></div><div id="l11"></div><div id="l12"></div><div id="l13"></div><div id="l14"></div><div id="l15"></div>
+          <div id="m1"></div><div id="m2"></div><div id="m3"></div><div id="m4"></div><div id="m5"></div><div id="m6"></div><div id="m7"></div><div id="m8"></div><div id="m9"></div><div id="m10"></div><div id="m11"></div><div id="m12"></div><div id="m13"></div><div id="m14"></div><div id="m15"></div>
+          <div id="n1"></div><div id="n2"></div><div id="n3"></div><div id="n4"></div><div id="n5"></div><div id="n6"></div><div id="n7"></div><div id="n8"></div><div id="n9"></div><div id="n10"></div><div id="n11"></div><div id="n12"></div><div id="n13"></div><div id="n14"></div><div id="n15"></div>
+          <div id="o1"></div><div id="o2"></div><div id="o3"></div><div id="o4"></div><div id="o5"></div><div id="o6"></div><div id="o7"></div><div id="o8"></div><div id="o9"></div><div id="o10"></div><div id="o11"></div><div id="o12"></div><div id="o13"></div><div id="o14"></div><div id="o15"></div>
         </div>
-        
-        <div class="action-buttons">
-          <button class="btn-primary" @click="goBack">返回首页</button>
-          <button class="btn-secondary" @click="viewResults">查看匹配结果</button>
-        </div>
+        <div id="shadow"></div>
       </div>
     </div>
   </div>
@@ -50,158 +29,42 @@
 <script>
 export default {
   name: 'SmartMatching',
+  data() {
+    return {
+      isJumping: false
+    }
+  },
   methods: {
-    goBack() {
-      this.$router.push('/');
-    },
-    viewResults() {
-      // 这里可以跳转到匹配结果页面
-      alert('匹配完成！这里可以跳转到匹配结果页面');
+    makeDinoJump() {
+      if (!this.isJumping) {
+        this.isJumping = true;
+        setTimeout(() => {
+          this.isJumping = false;
+        }, 600);
+      }
     }
   }
 }
 </script>
 
 <style scoped>
- * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
         .smart-matching-container {
             width: 100%;
-            max-width: 1000px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            color: white;
-        }
-        
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        
-        .header p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-        }
-        
-        .matching-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 40px;
+            height: 100%;
+            background: transparent;
+            position: relative;
         }
         
         .ghost-animation {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-        }
-        
-        .matching-info {
-            text-align: center;
-            color: white;
-            width: 100%;
-        }
-        
-        .loading-text {
-            margin-bottom: 30px;
-        }
-        
-        .loading-text p {
-            font-size: 1.3rem;
-            margin-bottom: 20px;
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 0 auto;
-        }
-        
-        .progress {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
-            border-radius: 4px;
-            animation: progressAnimation 2s ease-in-out infinite;
-        }
-        
-        @keyframes progressAnimation {
-            0% {
-                transform: translateX(-100%);
-            }
-            100% {
-                transform: translateX(100%);
-            }
-        }
-        
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        
-        .btn-primary, .btn-secondary {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 25px;
-            font-size: 1rem;
+            position: fixed;
+            left: 20px;
+            bottom: 20px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: bold;
-            min-width: 150px;
+            transition: transform 0.6s ease;
         }
         
-        .btn-primary {
-            background: #ff6b6b;
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: #ff5252;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
-        }
-        
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 2px solid rgba(255, 255, 255, 0.5);
-        }
-        
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+        .ghost-animation.jump {
+            transform: translateY(-500px);
         }
         
         /* 幽灵容器 */

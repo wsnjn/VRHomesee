@@ -328,12 +328,14 @@ const buttonChars = computed(() => {
 }
 
 .auth-form {
-  background: white;
+  background: rgb(78, 202, 255);
   padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border-radius: 15px;
+  box-shadow: 4px 6px 0px black;
+  border: 4px solid;
   width: 100%;
   max-width: 400px;
+  transition: box-shadow 250ms, transform 250ms;
 }
 
 .auth-form h2 {
@@ -357,14 +359,15 @@ const buttonChars = computed(() => {
   align-items: center;
   justify-content: center;
   gap: 0.5em;
-  border-radius: 25px;
+  border-radius: 15px;
   padding: 0.6em;
-  border: none;
+  border: 4px solid;
   outline: none;
   color: #333;
-  background-color: #f5f5f5;
-  box-shadow: inset 2px 5px 10px rgba(0, 0, 0, 0.1);
+  background-color: yellow;
+  box-shadow: 4px 6px 0px black;
   margin-bottom: 1rem;
+  transition: box-shadow 250ms, transform 250ms;
 }
 
 .input-icon {
@@ -380,6 +383,7 @@ const buttonChars = computed(() => {
   width: 100%;
   color: #333;
   font-size: 1rem;
+  font-weight: 600;
 }
 
 .input-field::placeholder {
