@@ -236,6 +236,17 @@ export default {
                 "m1 m2 m3 m4 m5 m6 m7 m8 m9 m10 m11 m12 m13 m14 m15"
                 "n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12 n13 n14 n15"
                 "o1 o2 o3 o4 o5 o6 o7 o8 o9 o10 o11 o12 o13 o14 o15";
+            animation: bodyBounce 0.5s infinite alternate;
+        }
+
+        /* 身体上下弹跳动画 */
+        @keyframes bodyBounce {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(-20px);
+            }
         }
         
         /* 为每个网格元素设置grid-area和背景色 */
@@ -390,10 +401,10 @@ export default {
         #j5 { grid-area: j5; background-color: #205722; }
         #j6 { grid-area: j6; background-color: #4CAF50; }
         #j7 { grid-area: j7; background-color: #c1d55a; }
-        #j8 { grid-area: j8; background-color: #c1d55a; } /* 眼睛 */
-        #j9 { grid-area: j9; background-color: #c1d55a;} /* 眼睛 */
-        #j10 { grid-area: j10; background-color: #c1d55a; } /* 眼睛 */
-        #j11 { grid-area: j11; background-color: #c1d55a; } /* 眼睛 */
+        #j8 { grid-area: j8; background-color: #c1d55a; } 
+        #j9 { grid-area: j9; background-color: #c1d55a;} 
+        #j10 { grid-area: j10; background-color: #c1d55a; } 
+        #j11 { grid-area: j11; background-color: #c1d55a; } 
         #j12 { grid-area: j12; background-color: #205722; }
         #j13 { grid-area: j13; background-color: transparent;  }
         #j14 { grid-area: j14; background-color: transparent;  }
@@ -406,10 +417,10 @@ export default {
         #k5 { grid-area: k5; background-color: #205722; }
         #k6 { grid-area: k6; background-color: #4CAF50; }
         #k7 { grid-area: k7; background-color: #c1d55a; }
-        #k8 { grid-area: k8; background-color: #c1d55a; } /* 眼睛 */
-        #k9 { grid-area: k9; background-color: #c1d55a;} /* 眼睛 */
-        #k10 { grid-area: k10; background-color: #c1d55a; } /* 眼睛 */
-        #k11 { grid-area: k11; background-color: #c1d55a; } /* 眼睛 */
+        #k8 { grid-area: k8; background-color: #c1d55a; } 
+        #k9 { grid-area: k9; background-color: #c1d55a;}
+        #k10 { grid-area: k10; background-color: #c1d55a; } 
+        #k11 { grid-area: k11; background-color: #c1d55a; } 
         #k12 { grid-area: k12; background-color: #205722;  }
         #k13 { grid-area: k13; background-color: transparent; }
         #k14 { grid-area: k14; background-color: transparent; }
@@ -422,10 +433,10 @@ export default {
         #l5 { grid-area: l5; background-color: #4CAF50; }
         #l6 { grid-area: l6; background-color: #4CAF50; }
         #l7 { grid-area: l7; background-color: #c1d55a; }
-        #l8 { grid-area: l8; background-color: #c1d55a; } /* 瞳孔 */
-        #l9 { grid-area: l9; background-color: #c1d55a;} /* 瞳孔 */
-        #l10 { grid-area: l10; background-color: #c1d55a; } /* 瞳孔 */
-        #l11 { grid-area: l11; background-color: #c1d55a; } /* 瞳孔 */
+        #l8 { grid-area: l8; background-color: #c1d55a; } 
+        #l9 { grid-area: l9; background-color: #c1d55a;}
+        #l10 { grid-area: l10; background-color: #c1d55a; } 
+        #l11 { grid-area: l11; background-color: #c1d55a; } 
         #l12 { grid-area: l12; background-color: #205722;  }
         #l13 { grid-area: l13; background-color: transparent;  }
         #l14 { grid-area: l14; background-color: transparent;  }
@@ -440,10 +451,10 @@ export default {
         #m7 { grid-area: m7; background-color: #4CAF50;}
         #m8 { grid-area: m8; background-color: #205722;}
         #m9 { grid-area: m9; background-color: #205722;}
-        #m10 { grid-area: m10; background-color: #205722; }
-        #m11 { grid-area: m11; background-color: #205722; }
+        #m10 { grid-area: m10; background-color:  #4CAF50; }
+        #m11 { grid-area: m11; background-color: #4CAF50; }
         #m12 { grid-area: m12; background-color: #205722; }
-        #m13 { grid-area: m13; background-color: #205722; }
+        #m13 { grid-area: m13; background-color:  transparent;}
         #m14 { grid-area: m14; background-color: transparent;   }
         #m15 { grid-area: m15; background-color: transparent;   }
         
@@ -455,11 +466,11 @@ export default {
         #n6 { grid-area: n6; background-color: #4CAF50; }
         #n7 { grid-area: n7; background-color: #205722; }
         #n8 { grid-area: n8; background-color: transparent;   }
-        #n9 { grid-area: n9; background-color: transparent;   }
-        #n10 { grid-area: n10; background-color:transparent;   }
-        #n11 { grid-area: n11; background-color:transparent;   }
+        #n9 { grid-area: n9; background-color: #205722;  }
+        #n10 { grid-area: n10; background-color:#4CAF50;   }
+        #n11 { grid-area: n11; background-color:#205722;   }
         #n12 { grid-area: n12; background-color:transparent;   }
-        #n13 { grid-area: n13; background-color:transparent;   }
+        #n13 { grid-area: n13; background-color:transparent; }
         #n14 { grid-area: n14; background-color: transparent;   }
         #n15 { grid-area: n15; background-color: transparent;   }
         
@@ -469,13 +480,13 @@ export default {
         #o4 { grid-area: o4; background-color: transparent; }
         #o5 { grid-area: o5; background-color: #205722; }
         #o6 { grid-area: o6; background-color: #205722; }
-        #o7 { grid-area: o7; background-color: transparent;   }
+        #o7 { grid-area: o7; background-color: #205722; }
         #o8 { grid-area: o8; background-color: transparent;   }
-        #o9 { grid-area: o9; background-color: transparent;   }
-        #o10 { grid-area: o10; background-color: transparent;   }
-        #o11 { grid-area: o11; background-color: transparent;   }
-        #o12 { grid-area: o12; background-color: transparent;   }
-        #o13 { grid-area: o13; background-color: transparent;   }
+        #o9 { grid-area: o9; background-color: #205722;   }
+        #o10 { grid-area: o10; background-color: #205722;  }
+        #o11 { grid-area: o11; background-color: #205722;  }
+        #o12 { grid-area: o12; background-color: transparent;  }
+        #o13 { grid-area: o13; background-color: transparent;  }
         #o14 { grid-area: o14; background-color: transparent;   }
         #o15 { grid-area: o15; background-color: transparent;   }
         
