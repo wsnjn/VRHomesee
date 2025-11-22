@@ -47,6 +47,10 @@ const navigateToMyAppointments = () => {
   router.push('/my-appointments')
 }
 
+const navigateToSmartMatching = () => {
+  router.push('/smart-matching')
+}
+
 const navigateToUserProfile = () => {
   router.push('/user-profile')
   showUserMenu.value = false
@@ -365,7 +369,7 @@ const initLogoAnimation = () => {
           <h3>VR漫游看房</h3>
           <p>体验沉浸式的房屋漫游功能，支持360度全景浏览和场景切换</p>
         </div>
-        <div class="feature-card">
+        <div class="feature-card" @click="navigateToSmartMatching">
           <h3>智能匹配</h3>
           <p>根据您的偏好和预算，智能推荐最适合的房源</p>
         </div>

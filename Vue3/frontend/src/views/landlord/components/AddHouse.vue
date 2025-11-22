@@ -224,8 +224,8 @@
 
         <!-- 表单操作 -->
         <div class="form-actions">
-          <button type="button" @click="emit('cancel')" class="btn-cancel">取消</button>
-          <button type="submit" :disabled="submitting" class="btn-submit">
+          <button type="button" @click="emit('cancel')" class="cancel-btn">取消</button>
+          <button type="submit" :disabled="submitting" class="submit-btn">
             <span v-if="submitting">提交中...</span>
             <span v-else>添加房屋</span>
           </button>
@@ -352,42 +352,59 @@ defineExpose({ resetForm })
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #e9ecef;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgb(179, 208, 253) 0%, rgb(164, 202, 248) 100%);
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(79, 156, 232, 0.3);
 }
 
 .page-header h2 {
   margin: 0;
-  color: #2c3e50;
-  font-size: 1.8rem;
+  color: white;
+  font-size: 2rem;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .header-actions {
   display: flex;
   gap: 1rem;
+  align-items: center;
 }
 
 .cancel-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  border: 1px solid #dc3545;
-  background: white;
-  color: #dc3545;
-  border-radius: 8px;
+  border: none;
+  border-radius: 12px;
   cursor: pointer;
   font-weight: 600;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(79, 156, 232, 0.3);
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgb(255, 107, 107) 0%, rgb(220, 53, 69) 100%);
+  color: white;
 }
 
 .cancel-btn:hover {
-  background: #dc3545;
-  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+  background: linear-gradient(135deg, rgb(245, 97, 97) 0%, rgb(200, 35, 51) 100%);
+}
+
+.cancel-btn:active {
+  transform: translateY(0);
 }
 
 .form-container {
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(79, 156, 232, 0.2);
   overflow: hidden;
+  border: 1px solid rgba(179, 208, 253, 0.3);
 }
 
 .house-form {
@@ -397,7 +414,7 @@ defineExpose({ resetForm })
 .form-section {
   margin-bottom: 2.5rem;
   padding-bottom: 2rem;
-  border-bottom: 1px solid #f8f9fa;
+  border-bottom: 1px solid rgba(179, 208, 253, 0.3);
 }
 
 .form-section:last-child {
@@ -408,8 +425,10 @@ defineExpose({ resetForm })
 .form-section h3 {
   margin: 0 0 1.5rem 0;
   color: #2c3e50;
-  font-size: 1.3rem;
-  font-weight: 600;
+  font-size: 1.5rem;
+  font-weight: 700;
+  padding-left: 0.5rem;
+  border-left: 4px solid rgb(179, 208, 253);
 }
 
 .form-grid {
@@ -449,8 +468,8 @@ defineExpose({ resetForm })
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #28a745;
-  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+  border-color: rgb(179, 208, 253);
+  box-shadow: 0 0 0 3px rgba(179, 208, 253, 0.2);
 }
 
 .form-group input::placeholder,
@@ -478,42 +497,54 @@ defineExpose({ resetForm })
   gap: 1rem;
   margin-top: 2rem;
   padding-top: 2rem;
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid rgba(179, 208, 253, 0.3);
 }
 
-.btn-cancel,
-.btn-submit {
+.cancel-btn,
+.submit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   padding: 0.75rem 2rem;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   font-weight: 600;
   font-size: 1rem;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(79, 156, 232, 0.3);
+  position: relative;
+  overflow: hidden;
   min-width: 120px;
 }
 
-.btn-cancel {
-  background: #6c757d;
+.cancel-btn {
+  background: linear-gradient(135deg, rgb(255, 107, 107) 0%, rgb(220, 53, 69) 100%);
   color: white;
 }
 
-.btn-cancel:hover {
-  background: #5a6268;
+.cancel-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+  background: linear-gradient(135deg, rgb(245, 97, 97) 0%, rgb(200, 35, 51) 100%);
 }
 
-.btn-submit {
-  background: #28a745;
+.submit-btn {
+  background: linear-gradient(135deg, rgb(102, 187, 106) 0%, rgb(76, 175, 80) 100%);
   color: white;
 }
 
-.btn-submit:hover:not(:disabled) {
-  background: #218838;
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+  background: linear-gradient(135deg, rgb(92, 177, 96) 0%, rgb(66, 165, 70) 100%);
 }
 
-.btn-submit:disabled {
-  background: #6c757d;
+.submit-btn:disabled {
+  background: linear-gradient(135deg, rgb(149, 185, 240) 0%, rgb(119, 162, 224) 100%);
   cursor: not-allowed;
+  transform: none;
   opacity: 0.7;
 }
 
@@ -543,8 +574,8 @@ defineExpose({ resetForm })
     flex-direction: column;
   }
   
-  .btn-cancel,
-  .btn-submit {
+  .cancel-btn,
+  .submit-btn {
     width: 100%;
   }
 }
@@ -560,7 +591,11 @@ defineExpose({ resetForm })
   }
   
   .form-section h3 {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
+  }
+  
+  .page-header h2 {
+    font-size: 1.6rem;
   }
 }
 </style>

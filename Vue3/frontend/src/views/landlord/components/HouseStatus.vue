@@ -1,106 +1,106 @@
 <template>
   <div class="house-status-page">
-    <div class="page-header">
-      <h2>房屋状态监控</h2>
-      <div class="header-actions">
-        <button @click="emit('refreshStatistics')" class="refresh-btn">刷新</button>
-        <button @click="emit('refreshHouses')" class="refresh-btn">刷新房屋</button>
-      </div>
-    </div>
 
     <!-- 状态统计概览 -->
     <div class="status-overview">
       <div class="status-cards">
-        <div class="status-card status-available" @click="toggleStatusFilter(0)">
-          <div class="status-icon">🏠</div>
-          <div class="status-info">
-            <h3>{{ statistics.availableHouses || 0 }}</h3>
-            <p>可租房屋</p>
-          </div>
-        </div>
-        <div class="status-card status-rented" @click="toggleStatusFilter(1)">
-          <div class="status-icon">✅</div>
-          <div class="status-info">
-            <h3>{{ statistics.rentedHouses || 0 }}</h3>
-            <p>已租房屋</p>
-          </div>
-        </div>
-        <div class="status-card status-offline" @click="toggleStatusFilter(2)">
-          <div class="status-icon">⏸️</div>
-          <div class="status-info">
-            <h3>{{ statistics.offlineHouses || 0 }}</h3>
-            <p>下架房屋</p>
-          </div>
-        </div>
-        <div class="status-card status-pre-rent" @click="toggleStatusFilter(3)">
-          <div class="status-icon">⏰</div>
-          <div class="status-info">
-            <h3>{{ statistics.preRentHouses || 0 }}</h3>
-            <p>预租房屋</p>
+        <!-- 四个状态的翻转开关 -->
+        <div class="flip-switch-container">
+          <div class="flip-switch">
+            <input type="radio" id="switch-available" name="house-status-switch" value="0" v-model="selectedStatus" />
+            <input type="radio" id="switch-rented" name="house-status-switch" value="1" v-model="selectedStatus" />
+            <input type="radio" id="switch-offline" name="house-status-switch" value="2" v-model="selectedStatus" />
+            <input type="radio" id="switch-pre-rent" name="house-status-switch" value="3" v-model="selectedStatus" />
+
+            <label for="switch-available" class="switch-button">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+                fill="currentColor"
+              >
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8h5z"></path>
+              </svg>
+              <span>可租</span>
+              <div class="status-count">{{ statistics.availableHouses || 0 }}</div>
+            </label>
+
+            <label for="switch-rented" class="switch-button">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+                fill="currentColor"
+              >
+                <path
+                  d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+                ></path>
+              </svg>
+              <span>已租</span>
+              <div class="status-count">{{ statistics.rentedHouses || 0 }}</div>
+            </label>
+
+            <label for="switch-offline" class="switch-button">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+                fill="currentColor"
+              >
+                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+              </svg>
+              <span>下架</span>
+              <div class="status-count">{{ statistics.offlineHouses || 0 }}</div>
+            </label>
+
+            <label for="switch-pre-rent" class="switch-button">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+                fill="currentColor"
+              >
+                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+              </svg>
+              <span>预租</span>
+              <div class="status-count">{{ statistics.preRentHouses || 0 }}</div>
+            </label>
+
+            <div class="switch-card">
+              <div class="card-face card-front"></div>
+              <div class="card-face card-back"></div>
+              <div class="card-face card-left"></div>
+              <div class="card-face card-right"></div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 房屋状态详情 -->
-    <div class="chart-section">
-      <h3>房屋状态详情</h3>
-      <div class="status-details">
-        <!-- 按状态分组显示 -->
-        <div class="status-groups">
-          <div 
-            v-for="status in statusFilters" 
-            :key="status.value"
-            class="status-group"
-            v-show="selectedStatusFilters.includes(status.value)"
-          >
-            <div class="group-header" :class="`header-${status.value}`">
-              <div class="group-header-left">
-                <button @click="toggleCollapse(status.value)" class="collapse-btn">
-                  <span :class="collapsedStates[status.value] ? 'collapse-icon collapsed' : 'collapse-icon'">
-                    ▼
-                  </span>
-                </button>
-                <h4>{{ status.label }} ({{ getHousesByStatus(status.value).length }})</h4>
-              </div>
-              <span class="group-count">{{ getHousesByStatus(status.value).length }}</span>
+    <!-- 房屋列表 -->
+    <div class="houses-list-section">
+      <div class="houses-list">
+        <div 
+          v-for="house in filteredHouses" 
+          :key="house.id"
+          class="status-house-card"
+          :class="`house-${house.status}`"
+        >
+          <div class="house-main-info">
+            <div class="house-address">
+              <strong>{{ getHouseFullAddress(house) }}</strong>
             </div>
-            <div class="group-houses" v-show="!collapsedStates[status.value]">
-              <div 
-                v-for="house in getHousesByStatus(status.value)" 
-                :key="house.id"
-                class="status-house-card"
-                :class="`house-${house.status}`"
-              >
-                <div class="house-main-info">
-                  <div class="house-address">
-                    <strong>{{ getHouseFullAddress(house) }}</strong>
-                    <span class="house-community">{{ house.communityName }}</span>
-                  </div>
-                  <div class="house-price-status">
-                    <span class="house-price">{{ house.rentPrice }} 元/月</span>
-                    <span class="house-status" :class="getStatusClass(house.status)">
-                      {{ getStatusText(house.status) }}
-                    </span>
-                  </div>
-                </div>
-                <div class="house-actions">
-                  <button 
-                    @click="toggleHouseStatus(house)" 
-                    class="action-btn status-btn"
-                    :class="getStatusBtnClass(house.status)"
-                  >
-                    {{ getStatusBtnText(house.status) }}
-                  </button>
-                  <button @click="openHouseDetail(house)" class="action-btn detail-btn">详情</button>
-                  <button @click="emit('editHouse', house)" class="action-btn edit-btn">编辑</button>
-                </div>
-              </div>
-              <div v-if="getHousesByStatus(status.value).length === 0" class="no-houses-in-group">
-                暂无{{ status.label }}的房屋
-              </div>
-            </div>
+          <div class="house-price-status">
+            <span class="house-price">{{ house.rentPrice }} 元/月</span>
           </div>
+          </div>
+        </div>
+        <div v-if="filteredHouses.length === 0" class="no-houses">
+          暂无{{ getStatusText(selectedStatus) }}的房屋
         </div>
       </div>
     </div>
@@ -245,7 +245,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps, defineEmits } from 'vue'
+import { ref, computed, defineProps, defineEmits } from 'vue'
 import axios from 'axios'
 
 const API_BASE_URL = 'http://localhost:8080/api'
@@ -269,63 +269,13 @@ const emit = defineEmits([
   'editHouse'
 ])
 
-// 状态筛选相关数据
-const selectedStatusFilters = ref([0, 1, 2, 3]) // 默认显示所有状态
-const collapsedStates = ref({
-  0: false, // 可租状态默认展开
-  1: false, // 已租状态默认展开
-  2: false, // 下架状态默认展开
-  3: false  // 预租状态默认展开
+// 当前选中的状态
+const selectedStatus = ref('0') // 默认选中"可租"状态
+
+// 过滤后的房屋列表
+const filteredHouses = computed(() => {
+  return props.myHouses.filter(house => house.status === parseInt(selectedStatus.value))
 })
-const statusFilters = [
-  { value: 0, label: '可租' },
-  { value: 1, label: '已租' },
-  { value: 2, label: '下架' },
-  { value: 3, label: '预租' }
-]
-
-// 切换折叠状态
-const toggleCollapse = (status) => {
-  collapsedStates.value[status] = !collapsedStates.value[status]
-}
-
-// 根据状态获取房屋列表
-const toggleStatusFilter = (status) => {
-  const index = selectedStatusFilters.value.indexOf(status)
-  if (index > -1) {
-    selectedStatusFilters.value.splice(index, 1)
-  } else {
-    selectedStatusFilters.value.push(status)
-  }
-}
-
-// 根据状态获取房屋列表
-const getHousesByStatus = (status) => {
-  return props.myHouses.filter(house => house.status === status)
-}
-
-// 获取状态百分比
-const getStatusPercentage = (statusType) => {
-  const total = props.statistics.totalHouses || 1
-  let count = 0
-  
-  switch (statusType) {
-    case 'available':
-      count = props.statistics.availableHouses || 0
-      break
-    case 'rented':
-      count = props.statistics.rentedHouses || 0
-      break
-    case 'offline':
-      count = props.statistics.offlineHouses || 0
-      break
-    case 'pre-rent':
-      count = props.statistics.preRentHouses || 0
-      break
-  }
-  
-  return `${(count / total * 100).toFixed(1)}%`
-}
 
 // 获取房屋完整地址
 const getHouseFullAddress = (house) => {
@@ -545,39 +495,165 @@ const getStatusBtnClass = (status) => {
   width: 100%;
 }
 
-.page-header {
+/* 翻转开关样式 */
+.flip-switch-container {
+  --card-width: 110px;
+  --card-height: 120px;
+  --switch-bg: rgba(255, 255, 255, 0.1);
+  --switch-border-color: rgba(255, 255, 255, 0.2);
+  --text-color: #000000;  /* 改为黑色文字 */
+  --inactive-text-color: #333333;  /* 改为深灰色 */
+  --icon-shadow-color: rgba(0, 0, 0, 0.3);
+  --card-bg: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.1)
+  );
+  --highlight-color: #64ffda;
+
+  display: grid;
+  place-content: center;
+  min-height: 100%;
+  font-family: "Poppins", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.flip-switch {
   display: flex;
-  justify-content: space-between;
+  position: relative;
+  width: calc(var(--card-width) * 4);
+  height: var(--card-height);
+  background: var(--switch-bg);
+  border-radius: 20px;
+  border: 1px solid var(--switch-border-color);
+  box-shadow:
+    0 8px 32px 0 rgba(31, 38, 135, 0.37),
+    inset 0 4px 8px rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  perspective: 1000px;
+}
+
+.flip-switch input[type="radio"] {
+  display: none;
+}
+
+.flip-switch .switch-button {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #e9ecef;
-}
-
-.page-header h2 {
-  margin: 0;
-  color: #2c3e50;
-  font-size: 1.8rem;
-}
-
-.header-actions {
-  display: flex;
-  gap: 1rem;
-}
-
-.refresh-btn {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 8px;
+  justify-content: center;
+  gap: 8px;
   cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s;
-  background-color: #6c757d;
-  color: white;
+  z-index: 2;
+  color: var(--inactive-text-color);
+  transition: all 0.3s ease;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
 }
 
-.refresh-btn:hover {
-  background-color: #5a6268;
+.flip-switch .switch-button:hover {
+  color: var(--text-color);
+}
+
+.flip-switch .switch-button:hover svg {
+  transform: translateY(-3px);
+  filter: drop-shadow(0 4px 6px var(--icon-shadow-color)) brightness(1.2);
+}
+
+.flip-switch .switch-button svg {
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  filter: drop-shadow(0 2px 3px var(--icon-shadow-color));
+  width: 24px;
+  height: 24px;
+}
+
+.flip-switch .switch-button span {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.flip-switch .status-count {
+  font-size: 18px;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.flip-switch #switch-available:checked ~ [for="switch-available"],
+.flip-switch #switch-rented:checked ~ [for="switch-rented"],
+.flip-switch #switch-offline:checked ~ [for="switch-offline"],
+.flip-switch #switch-pre-rent:checked ~ [for="switch-pre-rent"] {
+  color: var(--text-color);
+  text-shadow: 0 0 8px rgba(100, 255, 218, 0.5);
+}
+
+.flip-switch .switch-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--card-width);
+  height: var(--card-height);
+  z-index: 1;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.flip-switch .card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  background: var(--card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.2),
+    inset 0 2px 4px rgba(255, 255, 255, 0.1);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.flip-switch #switch-available:checked ~ .switch-card {
+  transform: translateX(0%);
+}
+
+.flip-switch #switch-rented:checked ~ .switch-card {
+  transform: translateX(100%);
+}
+
+.flip-switch #switch-offline:checked ~ .switch-card {
+  transform: translateX(200%);
+}
+
+.flip-switch #switch-pre-rent:checked ~ .switch-card {
+  transform: translateX(300%);
+}
+
+.flip-switch #switch-available:checked ~ [for="switch-available"]::after,
+.flip-switch #switch-rented:checked ~ [for="switch-rented"]::after,
+.flip-switch #switch-offline:checked ~ [for="switch-offline"]::after,
+.flip-switch #switch-pre-rent:checked ~ [for="switch-pre-rent"]::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  width: 30px;
+  height: 3px;
+  background: var(--highlight-color);
+  border-radius: 2px;
+  animation: glow 1.5s infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 5px var(--highlight-color);
+  }
+  to {
+    box-shadow:
+      0 0 15px var(--highlight-color),
+      0 0 25px var(--highlight-color);
+  }
 }
 
 /* 状态筛选器样式 */
@@ -886,18 +962,43 @@ const getStatusBtnClass = (status) => {
   padding: 1.25rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   transition: transform 0.3s, box-shadow 0.3s;
-  border-left: 4px solid #28a745;
+  position: relative;
+  overflow: hidden;
+}
+
+.status-house-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(40, 167, 69, 0.3), rgba(40, 167, 69, 0.1));
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 3px 0 0 3px;
+}
+
+.status-house-card.house-0::before {
+  background: linear-gradient(135deg, rgba(40, 167, 69, 0.3), rgba(40, 167, 69, 0.1));
+}
+
+.status-house-card.house-1::before {
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.3), rgba(220, 53, 69, 0.1));
+}
+
+.status-house-card.house-2::before {
+  background: linear-gradient(135deg, rgba(108, 117, 125, 0.3), rgba(108, 117, 125, 0.1));
+}
+
+.status-house-card.house-3::before {
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.3), rgba(255, 193, 7, 0.1));
 }
 
 .status-house-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
-
-.status-house-card.house-0 { border-left-color: #28a745; }
-.status-house-card.house-1 { border-left-color: #dc3545; }
-.status-house-card.house-2 { border-left-color: #6c757d; }
-.status-house-card.house-3 { border-left-color: #ffc107; }
 
 .house-main-info {
   display: flex;
@@ -1003,73 +1104,127 @@ const getStatusBtnClass = (status) => {
 
 .house-actions {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.75rem;
   justify-content: flex-end;
 }
 
 .action-btn {
-  padding: 0.5rem 0.75rem;
-  border: none;
-  border-radius: 6px;
+  padding: 0.75rem 1.25rem;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
   cursor: pointer;
   font-weight: 600;
-  transition: all 0.3s;
-  font-size: 0.8rem;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  font-size: 0.9rem;
   white-space: nowrap;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #000000;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.1),
+    inset 0 2px 4px rgba(255, 255, 255, 0.1);
+}
+
+.action-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(100, 255, 218, 0.1);
+  z-index: -1;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+
+.action-btn:hover::after {
+  transform: translateX(0);
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 6px 20px rgba(0, 0, 0, 0.15),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
+  border-color: rgba(100, 255, 218, 0.5);
+}
+
+.action-btn:active {
+  transform: translateY(0);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.1),
+    inset 0 1px 2px rgba(255, 255, 255, 0.1);
 }
 
 .edit-btn {
-  background-color: #17a2b8;
-  color: white;
+  background: linear-gradient(135deg, rgba(23, 162, 184, 0.1), rgba(19, 132, 150, 0.1));
+  border-color: rgba(23, 162, 184, 0.3);
 }
 
 .edit-btn:hover {
-  background-color: #138496;
+  background: linear-gradient(135deg, rgba(23, 162, 184, 0.2), rgba(19, 132, 150, 0.2));
+  border-color: rgba(23, 162, 184, 0.6);
 }
 
 .detail-btn {
-  background-color: #6c757d;
-  color: white;
+  background: linear-gradient(135deg, rgba(108, 117, 125, 0.1), rgba(90, 98, 104, 0.1));
+  border-color: rgba(108, 117, 125, 0.3);
 }
 
 .detail-btn:hover {
-  background-color: #5a6268;
+  background: linear-gradient(135deg, rgba(108, 117, 125, 0.2), rgba(90, 98, 104, 0.2));
+  border-color: rgba(108, 117, 125, 0.6);
 }
 
 .status-btn {
-  color: white;
+  background: linear-gradient(135deg, rgba(100, 255, 218, 0.1), rgba(100, 255, 218, 0.05));
+  border-color: rgba(100, 255, 218, 0.3);
+}
+
+.status-btn:hover {
+  background: linear-gradient(135deg, rgba(100, 255, 218, 0.2), rgba(100, 255, 218, 0.1));
+  border-color: rgba(100, 255, 218, 0.6);
 }
 
 .btn-offline {
-  background-color: #dc3545;
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.1), rgba(200, 35, 51, 0.05));
+  border-color: rgba(220, 53, 69, 0.3);
 }
 
 .btn-offline:hover {
-  background-color: #c82333;
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.2), rgba(200, 35, 51, 0.1));
+  border-color: rgba(220, 53, 69, 0.6);
 }
 
 .btn-available {
-  background-color: #28a745;
+  background: linear-gradient(135deg, rgba(40, 167, 69, 0.1), rgba(33, 136, 56, 0.05));
+  border-color: rgba(40, 167, 69, 0.3);
 }
 
 .btn-available:hover {
-  background-color: #218838;
+  background: linear-gradient(135deg, rgba(40, 167, 69, 0.2), rgba(33, 136, 56, 0.1));
+  border-color: rgba(40, 167, 69, 0.6);
 }
 
 .btn-online {
-  background-color: #17a2b8;
+  background: linear-gradient(135deg, rgba(23, 162, 184, 0.1), rgba(19, 132, 150, 0.05));
+  border-color: rgba(23, 162, 184, 0.3);
 }
 
 .btn-online:hover {
-  background-color: #138496;
+  background: linear-gradient(135deg, rgba(23, 162, 184, 0.2), rgba(19, 132, 150, 0.1));
+  border-color: rgba(23, 162, 184, 0.6);
 }
 
 .btn-default {
-  background-color: #6c757d;
+  background: linear-gradient(135deg, rgba(108, 117, 125, 0.1), rgba(90, 98, 104, 0.05));
+  border-color: rgba(108, 117, 125, 0.3);
 }
 
 .btn-default:hover {
-  background-color: #5a6268;
+  background: linear-gradient(135deg, rgba(108, 117, 125, 0.2), rgba(90, 98, 104, 0.1));
+  border-color: rgba(108, 117, 125, 0.6);
 }
 
 .no-houses-in-group {
@@ -1356,7 +1511,6 @@ const getStatusBtnClass = (status) => {
   .house-actions {
     flex-wrap: wrap;
   }
-
 
 @media (max-width: 480px) {
   .status-cards {

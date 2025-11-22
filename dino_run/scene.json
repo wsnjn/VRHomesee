@@ -1,0 +1,906 @@
+{
+	"camera" : 
+	{
+		"center" : "0.00000 0.00000 -1.00000",
+		"eye" : "0.00000 0.00000 0.00000",
+		"up" : "0.00000 1.00000 0.00000"
+	},
+	"general" : 
+	{
+		"ambientcolor" : "0.30000 0.30000 0.30000",
+		"bloom" : false,
+		"bloomhdrfeather" : 0.1,
+		"bloomhdriterations" : 8,
+		"bloomhdrscatter" : 1.619,
+		"bloomhdrstrength" : 2.0,
+		"bloomhdrthreshold" : 1.0,
+		"bloomstrength" : 2.0,
+		"bloomthreshold" : 0.64999998,
+		"camerafade" : true,
+		"cameraparallax" : false,
+		"cameraparallaxamount" : 0.5,
+		"cameraparallaxdelay" : 0.1,
+		"cameraparallaxmouseinfluence" : 0.0,
+		"camerapreview" : true,
+		"camerashake" : false,
+		"camerashakeamplitude" : 0.5,
+		"camerashakeroughness" : 1.0,
+		"camerashakespeed" : 3.0,
+		"clearcolor" : "0.70000 0.70000 0.70000",
+		"clearenabled" : true,
+		"farz" : 10000.0,
+		"fov" : 50.0,
+		"hdr" : false,
+		"nearz" : 0.0099999998,
+		"norecompile" : true,
+		"orthogonalprojection" : 
+		{
+			"height" : 193,
+			"width" : 343
+		},
+		"skylightcolor" : "0.30000 0.30000 0.30000",
+		"zoom" : 1.0
+	},
+	"objects" : 
+	[
+		{
+			"effects" : 
+			[
+				{
+					"file" : "effects/scroll/effect.json",
+					"id" : 67,
+					"name" : "",
+					"passes" : 
+					[
+						{
+							"constantshadervalues" : 
+							{
+								"repeat" : "5.5 1",
+								"speedx" : 0.1,
+								"speedy" : 0
+							},
+							"id" : 68
+						}
+					],
+					"visible" : true
+				}
+			],
+			"id" : 60,
+			"image" : "models/background_layer_0.json",
+			"name" : "bgm_0",
+			"origin" : "171.50000 96.50000 0.00000",
+			"scale" : "5.37800 1.00000 1.00000",
+			"size" : "64.00000 193.00000",
+			"visible" : false
+		},
+		{
+			"id" : 55,
+			"image" : "models/background_layer_1.json",
+			"name" : "bgm_1",
+			"origin" : 
+			{
+				"script" : "'use strict';\n\n/**\n * @param {Vec3} value\n */\nexport function update(value) {\n\tvalue.x -= engine.frametime * 10;\n\tif (value.x < -50) {\n\t\tvalue.x = 450;\n\t}\n\treturn value;\n}\n",
+				"value" : "206.33000 57.95600 0.00000"
+			},
+			"size" : "80.00000 88.00000",
+			"visible" : false
+		},
+		{
+			"effects" : 
+			[
+				{
+					"file" : "effects/scroll/effect.json",
+					"id" : 76,
+					"name" : "",
+					"passes" : 
+					[
+						{
+							"constantshadervalues" : 
+							{
+								"repeat" : "0.86 1",
+								"speedx" : 0.30000001,
+								"speedy" : 0
+							},
+							"id" : 77
+						}
+					],
+					"visible" : true
+				}
+			],
+			"id" : 71,
+			"image" : "models/background_layer_2.json",
+			"name" : "bgm_2",
+			"origin" : "171.50000 6.84300 0.00000",
+			"scale" : "1.34800 1.00000 1.00000",
+			"size" : "256.00000 14.00000",
+			"visible" : false
+		},
+		{
+			"effects" : 
+			[
+				{
+					"file" : "effects/scroll/effect.json",
+					"id" : 96,
+					"name" : "",
+					"passes" : 
+					[
+						{
+							"constantshadervalues" : 
+							{
+								"repeat" : "1 1",
+								"speedx" : 0.059999999,
+								"speedy" : 0
+							},
+							"id" : 97
+						}
+					],
+					"visible" : true
+				}
+			],
+			"id" : 91,
+			"image" : "models/b1_0.json",
+			"name" : "bg1_0",
+			"origin" : "171.50000 96.50000 0.00000",
+			"scale" : "1.30000 1.30000 1.30000",
+			"size" : "272.00000 160.00000"
+		},
+		{
+			"effects" : 
+			[
+				{
+					"file" : "effects/scroll/effect.json",
+					"id" : 110,
+					"name" : "",
+					"passes" : 
+					[
+						{
+							"constantshadervalues" : 
+							{
+								"repeat" : "1 1",
+								"speedx" : 0.059999999,
+								"speedy" : 0
+							},
+							"id" : 111
+						}
+					],
+					"visible" : true
+				}
+			],
+			"id" : 106,
+			"image" : "models/bg1_2.json",
+			"name" : "bg1_2",
+			"origin" : "162.81200 102.70300 0.00000",
+			"scale" : "1.13800 1.13800 1.13800",
+			"size" : "544.00000 160.00000"
+		},
+		{
+			"effects" : 
+			[
+				{
+					"file" : "effects/scroll/effect.json",
+					"id" : 103,
+					"name" : "",
+					"passes" : 
+					[
+						{
+							"constantshadervalues" : 
+							{
+								"repeat" : "1 1",
+								"speedx" : 0.12,
+								"speedy" : 0
+							},
+							"id" : 104
+						}
+					],
+					"visible" : true
+				}
+			],
+			"id" : 99,
+			"image" : "models/bg1_1.json",
+			"name" : "bg1_1",
+			"origin" : "171.50000 96.50000 0.00000",
+			"scale" : "1.30000 1.30000 1.30000",
+			"size" : "272.00000 160.00000"
+		},
+		{
+			"effects" : 
+			[
+				{
+					"file" : "effects/scroll/effect.json",
+					"id" : 117,
+					"name" : "",
+					"passes" : 
+					[
+						{
+							"constantshadervalues" : 
+							{
+								"repeat" : "1 1",
+								"speedx" : 0.16,
+								"speedy" : 0
+							},
+							"id" : 118
+						}
+					],
+					"visible" : true
+				}
+			],
+			"id" : 113,
+			"image" : "models/bg1_3.json",
+			"name" : "bg1_3",
+			"origin" : "162.81200 90.45900 0.00000",
+			"size" : "544.00000 160.00000"
+		},
+		{
+			"effects" : 
+			[
+				{
+					"file" : "effects/scroll/effect.json",
+					"id" : 83,
+					"name" : "",
+					"passes" : 
+					[
+						{
+							"constantshadervalues" : 
+							{
+								"repeat" : "14 1",
+								"speedx" : 0.30000001,
+								"speedy" : 0
+							},
+							"id" : 86
+						}
+					],
+					"visible" : true
+				}
+			],
+			"id" : 72,
+			"image" : "models/grass_ground.json",
+			"name" : "grass_ground",
+			"origin" : "171.50000 7.75400 0.00000",
+			"scale" : "10.82100 0.50000 0.50000",
+			"size" : "32.00000 32.00000"
+		},
+		{
+			"effects" : 
+			[
+				{
+					"file" : "effects/scroll/effect.json",
+					"id" : 134,
+					"name" : "",
+					"passes" : 
+					[
+						{
+							"constantshadervalues" : 
+							{
+								"repeat" : "1 1",
+								"speedx" : 0.059999999,
+								"speedy" : 0
+							},
+							"id" : 135
+						}
+					],
+					"visible" : true
+				}
+			],
+			"id" : 130,
+			"image" : "models/bg2_0.json",
+			"name" : "bg2_0",
+			"origin" : "171.50000 96.50000 0.00000",
+			"size" : "384.00000 224.00000",
+			"visible" : false
+		},
+		{
+			"effects" : 
+			[
+				{
+					"file" : "effects/scroll/effect.json",
+					"id" : 142,
+					"name" : "",
+					"passes" : 
+					[
+						{
+							"constantshadervalues" : 
+							{
+								"repeat" : "1.44 1",
+								"speedx" : 0.1,
+								"speedy" : 0
+							},
+							"id" : 143
+						}
+					],
+					"visible" : true
+				}
+			],
+			"id" : 137,
+			"image" : "models/bg2_1.json",
+			"name" : "bg2_1",
+			"origin" : "171.50000 96.50000 0.00000",
+			"scale" : "2.33000 1.00000 1.00000",
+			"size" : "160.00000 224.00000",
+			"visible" : false
+		},
+		{
+			"effects" : 
+			[
+				{
+					"file" : "effects/scroll/effect.json",
+					"id" : 149,
+					"name" : "",
+					"passes" : 
+					[
+						{
+							"constantshadervalues" : 
+							{
+								"repeat" : "1 1",
+								"speedx" : 0.23999999,
+								"speedy" : 0
+							},
+							"id" : 150
+						}
+					],
+					"visible" : true
+				}
+			],
+			"id" : 145,
+			"image" : "models/bg2_2.json",
+			"name" : "bg2_2",
+			"origin" : "171.50000 96.50000 0.00000",
+			"size" : "384.00000 224.00000",
+			"visible" : false
+		},
+		{
+			"effects" : 
+			[
+				{
+					"file" : "effects/scroll/effect.json",
+					"id" : 236,
+					"name" : "",
+					"passes" : 
+					[
+						{
+							"constantshadervalues" : 
+							{
+								"repeat" : "1 1",
+								"speedx" : 0.02,
+								"speedy" : 0
+							},
+							"id" : 237
+						}
+					],
+					"visible" : true
+				}
+			],
+			"id" : 232,
+			"image" : "models/bg3_0.json",
+			"name" : "bg3_0",
+			"origin" : "171.50000 96.50000 0.00000",
+			"scale" : "1.29100 1.29100 1.29100",
+			"size" : "272.00000 160.00000",
+			"visible" : false
+		},
+		{
+			"effects" : 
+			[
+				{
+					"file" : "effects/scroll/effect.json",
+					"id" : 250,
+					"name" : "",
+					"passes" : 
+					[
+						{
+							"constantshadervalues" : 
+							{
+								"repeat" : "1 1",
+								"speedx" : 0.07,
+								"speedy" : 0
+							},
+							"id" : 251
+						}
+					],
+					"visible" : true
+				}
+			],
+			"id" : 246,
+			"image" : "models/bg3_2.json",
+			"name" : "bg3_2",
+			"origin" : "171.50000 87.38200 0.00000",
+			"scale" : "1.65900 1.65900 1.65900",
+			"size" : "213.00000 142.00000",
+			"visible" : false
+		},
+		{
+			"effects" : 
+			[
+				{
+					"file" : "effects/scroll/effect.json",
+					"id" : 243,
+					"name" : "",
+					"passes" : 
+					[
+						{
+							"constantshadervalues" : 
+							{
+								"repeat" : "1 1",
+								"speedx" : 0.1,
+								"speedy" : 0
+							},
+							"id" : 244
+						}
+					],
+					"visible" : true
+				}
+			],
+			"id" : 239,
+			"image" : "models/bg3_1.json",
+			"name" : "bg3_1",
+			"origin" : "171.50000 96.50000 0.00000",
+			"scale" : "1.30400 1.30400 1.30400",
+			"size" : "272.00000 150.00000",
+			"visible" : false
+		},
+		{
+			"effects" : 
+			[
+				{
+					"file" : "effects/scroll/effect.json",
+					"id" : 257,
+					"name" : "",
+					"passes" : 
+					[
+						{
+							"constantshadervalues" : 
+							{
+								"repeat" : "1 1",
+								"speedx" : 0.14,
+								"speedy" : 0
+							},
+							"id" : 258
+						}
+					],
+					"visible" : true
+				}
+			],
+			"id" : 253,
+			"image" : "models/bg3_3.json",
+			"name" : "bg3_3",
+			"origin" : "171.50000 63.67300 0.00000",
+			"scale" : "1.30600 1.30600 1.30600",
+			"size" : "272.00000 104.00000",
+			"visible" : false
+		},
+		{
+			"effects" : 
+			[
+				{
+					"file" : "effects/scroll/effect.json",
+					"id" : 264,
+					"name" : "",
+					"passes" : 
+					[
+						{
+							"constantshadervalues" : 
+							{
+								"repeat" : "4.77 1",
+								"speedx" : 0.28,
+								"speedy" : 0
+							},
+							"id" : 265
+						}
+					],
+					"visible" : true
+				}
+			],
+			"id" : 260,
+			"image" : "models/bg3_4.json",
+			"name" : "bg3_4",
+			"origin" : "171.50000 -10.29600 0.00000",
+			"scale" : "5.45900 1.00000 1.00000",
+			"size" : "64.00000 48.00000",
+			"visible" : false
+		},
+		{
+			"id" : 267,
+			"image" : "models/bg4_0.json",
+			"name" : "bg4_0",
+			"origin" : "171.50000 96.50000 0.00000",
+			"size" : "384.00000 216.00000",
+			"visible" : false
+		},
+		{
+			"effects" : 
+			[
+				{
+					"file" : "effects/scroll/effect.json",
+					"id" : 282,
+					"name" : "",
+					"passes" : 
+					[
+						{
+							"constantshadervalues" : 
+							{
+								"repeat" : "1 1",
+								"speedx" : 0.059999999,
+								"speedy" : 0
+							},
+							"id" : 283
+						}
+					],
+					"visible" : true
+				}
+			],
+			"id" : 278,
+			"image" : "models/bg4_2.json",
+			"name" : "bg4_2",
+			"origin" : "171.50000 96.50000 0.00000",
+			"size" : "384.00000 216.00000",
+			"visible" : false
+		},
+		{
+			"effects" : 
+			[
+				{
+					"file" : "effects/scroll/effect.json",
+					"id" : 275,
+					"name" : "",
+					"passes" : 
+					[
+						{
+							"constantshadervalues" : 
+							{
+								"repeat" : "1 1",
+								"speedx" : 0.12,
+								"speedy" : 0
+							},
+							"id" : 276
+						}
+					],
+					"visible" : true
+				}
+			],
+			"id" : 271,
+			"image" : "models/bg4_1.json",
+			"name" : "bg4_1",
+			"origin" : "171.50000 96.50000 0.00000",
+			"size" : "384.00000 216.00000",
+			"visible" : false
+		},
+		{
+			"effects" : 
+			[
+				{
+					"file" : "effects/scroll/effect.json",
+					"id" : 289,
+					"name" : "",
+					"passes" : 
+					[
+						{
+							"constantshadervalues" : 
+							{
+								"repeat" : "1 1",
+								"speedx" : 0.16,
+								"speedy" : 0
+							},
+							"id" : 290
+						}
+					],
+					"visible" : true
+				}
+			],
+			"id" : 285,
+			"image" : "models/bg4_3.json",
+			"name" : "bg4_3",
+			"origin" : "171.50000 96.50000 0.00000",
+			"size" : "384.00000 216.00000",
+			"visible" : false
+		},
+		{
+			"effects" : 
+			[
+				{
+					"file" : "effects/scroll/effect.json",
+					"id" : 296,
+					"name" : "",
+					"passes" : 
+					[
+						{
+							"constantshadervalues" : 
+							{
+								"repeat" : "1 1",
+								"speedx" : 0.18000001,
+								"speedy" : 0
+							},
+							"id" : 297
+						}
+					],
+					"visible" : true
+				}
+			],
+			"id" : 292,
+			"image" : "models/bg4_4.json",
+			"name" : "bg4_4",
+			"origin" : "171.50000 119.17800 0.00000",
+			"size" : "384.00000 216.00000",
+			"visible" : false
+		},
+		{
+			"effects" : 
+			[
+				{
+					"file" : "effects/scroll/effect.json",
+					"id" : 303,
+					"name" : "",
+					"passes" : 
+					[
+						{
+							"constantshadervalues" : 
+							{
+								"repeat" : "14 1",
+								"speedx" : 0.25,
+								"speedy" : 0
+							},
+							"id" : 304
+						}
+					],
+					"visible" : true
+				}
+			],
+			"id" : 299,
+			"image" : "models/bg4_ground.json",
+			"name" : "bg4_ground",
+			"origin" : "171.50000 -3.42900 0.00000",
+			"scale" : "22.12100 1.00000 1.00000",
+			"size" : "16.00000 64.00000",
+			"visible" : false
+		},
+		{
+			"id" : 28,
+			"image" : "models/mario_walk_1.json",
+			"name" : "mario_walk_1",
+			"origin" : "107.09500 22.87200 0.00000",
+			"size" : "24.00000 24.00000",
+			"visible" : 
+			{
+				"script" : "'use strict';\n\nlet coinAsset = engine.registerAsset('models/coin_0.json');\nlet coinAssetFx = engine.registerAsset('particles/coinget.json');\nlet jumpSoundLayerName = 'jump';\nlet coinSoundLayerName = 'coin';\nlet coins = [];\nvar coinFx;\nvar coinTimer = 3.0;\nvar jumpVelocity = 0.0;\nvar initialPosition;\nvar marioOrigin;\nvar labelCoins;\nvar labelTop;\nvar shouldFollow = true;\n\nvar dinos = {};\nvar currentDino;\nvar postProcessIndex;\n\nvar coinCount = 0;\nvar lastTop = 0;\n\nvar backgrounds = {\n\tmario: ['bgm_0', 'bgm_1', 'bgm_2'],\n\tmountains: ['bg1_0', 'bg1_1', 'bg1_2', 'bg1_3', 'bg1_4', 'grass_ground'],\n\tcountry: ['bg2_0', 'bg2_1', 'bg2_2'],\n\tglacier: ['bg4_0', 'bg4_1', 'bg4_2', 'bg4_3', 'bg4_4', 'bg4_ground'],\n\tindustrial: ['bg3_0', 'bg3_1', 'bg3_2', 'bg3_3', 'bg3_4']\n};\n\nlet fnConvertLayers = (n) => { return thisScene.getLayer(n); };\nlet fnHideLayers = (n) => { return n.visible = false; };\nlet fnShowLayers = (n) => { return n.visible = true; };\n\nlet fnFormatScore = (count) => { return ('0000' + count).slice(-5); }\nlet fnFormatHighscore = (count) => { return 'HI ' + ('0000' + count).slice(-5); }\n\n// var changetimer = 0;\n// var scenePreset = -1;\n// var scenePresets = [{\n// \tbg: 'mountains',\n// \tdino: 'vita'\n// }, {\n// \tbg: 'mario',\n// \tdino: 'doux'\n// }, {\n// \tbg: 'country',\n// \tdino: 'mort'\n// }, {\n// \tbg: 'industrial',\n// \tdino: 'tard'\n// }, {\n// \tbg: 'glacier',\n// \tdino: 'doux'\n// }];\n// function animateChanges() {\n// \tchangetimer -= engine.frametime;\n// \tif (changetimer > 0) {\n// \t\treturn;\n// \t}\n// \tchangetimer = 5;\n\n// \t++scenePreset;\n// \tif (scenePreset >= scenePresets.length) {\n// \t\tscenePreset = 0;\n// \t}\n\n// \tlet propOverride = {\n// \t\tlevel: scenePresets[scenePreset].bg,\n// \t\tdino: scenePresets[scenePreset].dino\n// \t};\n// \tapplyUserProperties(propOverride);\n// }\n\n/**\n * @param {ICursorEvent} event\n */\nexport function cursorDown(event) {\n\t// Mario is on the ground and should jump now\n\tif (currentDino.walk.visible) {\n\t\tthisScene.getLayer(jumpSoundLayerName).play();\n\t\tjumpVelocity = 700;\n\t\t// Hide the walk sprite, show the jump sprite\n\t\tcurrentDino.walk.visible = false;\n\t\tcurrentDino.jump.visible = true;\n\t}\n}\n\n/**\n * @param {Boolean} value\n */\nexport function update() {\n\t//animateChanges();\n\n\t// Only read this property once here\n\tlet dt = engine.frametime;\n\n\t// Make all coins move\n\tcoins.forEach((coin) => {\n\t\tvar origin = coin.origin;\n\t\torigin.x -= dt * 50;\n\n\t\t// Check distance to mario for pickup\n\t\tlet distanceMarioSqr = marioOrigin.subtract(origin).lengthSqr();\n\t\tlet marioCollected = distanceMarioSqr < 400;\n\t\tif (marioCollected) {\n\t\t\t// Play the pickup coin sound\n\t\t\tthisScene.getLayer(coinSoundLayerName).play();\n\n\t\t\t// Remove the old coin particles\n\t\t\tif (coinFx) {\n\t\t\t\tthisScene.destroyLayer(coinFx);\n\t\t\t}\n\n\t\t\t// Create new coin particles\n\t\t\tcoinFx = thisScene.createLayer(coinAssetFx);\n\t\t\tcoinFx.origin = origin;\n\n\t\t\t++coinCount;\n\t\t\tlabelCoins.text = fnFormatScore(coinCount);\n\n\t\t\tif (coinCount > lastTop) {\n\t\t\t\tlastTop = coinCount;\n\t\t\t\tlabelTop.text = fnFormatHighscore(lastTop);\n\t\t\t\tlocalStorage.set('highscore', coinCount, localStorage.LOCATION_GLOBAL);\n\t\t\t}\n\t\t}\n\n\t\t// Coin went out of bounds, delete it\n\t\tif (origin.x < -10 || marioCollected) {\n\t\t\tthisScene.destroyLayer(coin);\n\t\t\tcoins.splice(coins.indexOf(coin), 1);\n\t\t} else {\n\t\t\t// Coin still visible, just move it\n\t\t\tcoin.origin = origin;\n\t\t}\n\t});\n\n\t// Create new coins\n\tcoinTimer -= dt;\n\tif (coinTimer < 0.0) {\n\t\tcoinTimer = 5.0;\n\n\t\t// Timer ran out, create a coin\n\t\tlet newCoin = thisScene.createLayer(coinAsset);\n\t\tthisScene.sortLayer(newCoin, postProcessIndex);\n\t\tlet origin = new Vec3(360, 90 + 30 * Math.random(), 0);\n\t\tnewCoin.origin = origin;\n\n\t\tcoins.push(newCoin);\n\t}\n\n\t// Mario is moving upwards\n\tif (jumpVelocity > 50.0) {\n\t\tmarioOrigin.y += jumpVelocity * dt;\n\t\t// Apply air friction\n\t\tjumpVelocity -= jumpVelocity * dt;\n\t}\n\n\tlet isInAir = marioOrigin.y > initialPosition.y + 1;\n\tif (isInAir) {\n\t\t// Apply gravity\n\t\tmarioOrigin.y -= 350.0 * dt;\n\t\tif (marioOrigin.y < initialPosition.y) {\n\t\t\t// Mario landed\n\t\t\tmarioOrigin.y = initialPosition.y;\n\n\t\t\t// Show the walk sprite, hide the jump sprite\n\t\t\tcurrentDino.walk.visible = true;\n\t\t\tcurrentDino.jump.visible = false;\n\t\t\tjumpVelocity = 0;\n\t\t}\n\t}\n\n\t// Check horizontal distance to cursor\n\tlet mouseDelta = (shouldFollow ? input.cursorWorldPosition.x : initialPosition.x) - marioOrigin.x;\n\tlet absMouseDelta = Math.abs(mouseDelta);\n\tif (absMouseDelta > 1) {\n\t\t// Move mario towards the cursor\n\t\tlet mouseSign = Math.sign(mouseDelta);\n\t\tmarioOrigin.x += Math.min(isInAir ? 30 : 10, absMouseDelta) * dt * mouseSign;\n\t}\n\n\t// Update the mario walk and jump sprite\n\tcurrentDino.jump.origin = marioOrigin;\n\tcurrentDino.walk.origin = marioOrigin;\n\tthisLayer.origin = marioOrigin;\n}\n\n/**\n * @param {Boolean} value\n */\nexport function init(value) {\n\tinitialPosition = thisLayer.origin;\n\tmarioOrigin = thisLayer.origin;\n\tpostProcessIndex = thisScene.getLayerIndex('postprocess');\n\n\tlabelCoins = thisScene.getLayer('label_coins');\n\tlabelTop = thisScene.getLayer('label_top');\n\tlastTop = localStorage.get('highscore', localStorage.LOCATION_GLOBAL) || 0;\n\tlabelTop.text = fnFormatHighscore(lastTop);\n\n\tdinos.vita = {\n\t\twalk: thisLayer,\n\t\tjump: thisScene.getLayer('vita_jump')\n\t};\n\tdinos.doux = {\n\t\twalk: thisScene.getLayer('doux_walk'),\n\t\tjump: thisScene.getLayer('doux_jump')\n\t};\n\tdinos.mort = {\n\t\twalk: thisScene.getLayer('mort_walk'),\n\t\tjump: thisScene.getLayer('mort_jump')\n\t};\n\tdinos.tard = {\n\t\twalk: thisScene.getLayer('tard_walk'),\n\t\tjump: thisScene.getLayer('tard_jump')\n\t};\n\n\tcurrentDino = dinos.vita;\n\t// console.log('init');\n\n\t//jumpLayer = thisScene.getLayer('mario_jump');\n\t//jumpLayer.origin = marioOrigin;\n\t//jumpLayer.visible = false;\n\t// applyUserProperties(engine.userProperties);\n\n\tbackgrounds.mario = backgrounds.mario.map(fnConvertLayers);\n\tbackgrounds.industrial = backgrounds.industrial.map(fnConvertLayers);\n\tbackgrounds.country = backgrounds.country.map(fnConvertLayers);\n\tbackgrounds.glacier = backgrounds.glacier.map(fnConvertLayers);\n\tbackgrounds.mountains = backgrounds.mountains.map(fnConvertLayers);\n\n\t// backgrounds.mario.forEach(fnHideLayers);\n\t// backgrounds.industrial.forEach(fnHideLayers);\n\t// backgrounds.country.forEach(fnHideLayers);\n\t// backgrounds.glacier.forEach(fnHideLayers);\n\t// backgrounds.mountains.forEach(fnHideLayers);\n}\n\n/**\n * @param {Object} userProperties\n */\nexport function applyUserProperties(userProperties) {\n\t// console.log(userProperties, userProperties.dino);\n\tif (userProperties.dino) {\n\t\tcurrentDino.walk.visible = false;\n\t\tcurrentDino.jump.visible = false;\n\t\tcurrentDino = dinos[userProperties.dino] || dinos.vita;\n\t\tcurrentDino.walk.visible = true;\n\t\tcurrentDino.jump.visible = false;\n\t}\n\n\tif (userProperties.level) {\n\t\tbackgrounds.mario.forEach(fnHideLayers);\n\t\tbackgrounds.industrial.forEach(fnHideLayers);\n\t\tbackgrounds.country.forEach(fnHideLayers);\n\t\tbackgrounds.glacier.forEach(fnHideLayers);\n\t\tbackgrounds.mountains.forEach(fnHideLayers);\n\n\t\tbackgrounds[userProperties.level].forEach(fnShowLayers);\n\t}\n\n\tif (typeof userProperties.follow_cursor !== 'undefined') {\n\t\tshouldFollow = userProperties.follow_cursor;\n\t}\n}\n",
+				"value" : true
+			}
+		},
+		{
+			"id" : 43,
+			"image" : "models/vita_jump_0.json",
+			"name" : "vita_jump",
+			"origin" : "68.11600 63.16600 0.00000",
+			"size" : "24.00000 24.00000",
+			"visible" : false
+		},
+		{
+			"id" : 34,
+			"maxtime" : 5.0,
+			"mintime" : 1.0,
+			"muteineditor" : false,
+			"name" : "jump",
+			"origin" : "64.00000 16.00000 0.00000",
+			"playbackmode" : "single",
+			"sound" : [ "sounds/dino_jump.wav" ],
+			"startsilent" : true,
+			"volume" : 1.0
+		},
+		{
+			"id" : 48,
+			"maxtime" : 5.0,
+			"mintime" : 1.0,
+			"muteineditor" : false,
+			"name" : "coin",
+			"origin" : "64.00000 32.00000 0.00000",
+			"playbackmode" : "single",
+			"sound" : [ "sounds/coin2.wav" ],
+			"startsilent" : true,
+			"volume" : 1.0
+		},
+		{
+			"id" : 95,
+			"image" : "models/doux_walk.json",
+			"name" : "doux_walk",
+			"origin" : "107.28700 39.02300 0.00000",
+			"size" : "24.00000 24.00000",
+			"visible" : false
+		},
+		{
+			"id" : 93,
+			"image" : "models/doux_jump.json",
+			"name" : "doux_jump",
+			"origin" : "68.00500 82.86900 0.00000",
+			"size" : "24.00000 24.00000",
+			"visible" : false
+		},
+		{
+			"id" : 109,
+			"image" : "models/tard_walk.json",
+			"name" : "tard_walk",
+			"origin" : "108.08200 57.24100 0.00000",
+			"size" : "24.00000 24.00000",
+			"visible" : false
+		},
+		{
+			"id" : 116,
+			"image" : "models/tard_jump.json",
+			"name" : "tard_jump",
+			"origin" : "68.48700 103.88200 0.00000",
+			"size" : "24.00000 24.00000",
+			"visible" : false
+		},
+		{
+			"id" : 122,
+			"image" : "models/mort_walk.json",
+			"name" : "mort_walk",
+			"origin" : "109.42400 74.68900 0.00000",
+			"size" : "24.00000 24.00000",
+			"visible" : false
+		},
+		{
+			"id" : 126,
+			"image" : "models/mort_jump.json",
+			"name" : "mort_jump",
+			"origin" : "70.50000 127.03500 0.00000",
+			"size" : "24.00000 24.00000",
+			"visible" : false
+		},
+		{
+			"effects" : 
+			[
+				{
+					"file" : "effects/scroll/effect.json",
+					"id" : 153,
+					"name" : "",
+					"passes" : 
+					[
+						{
+							"constantshadervalues" : 
+							{
+								"repeat" : "1 1",
+								"speedx" : 0.30000001,
+								"speedy" : 0
+							},
+							"id" : 154
+						}
+					],
+					"visible" : true
+				}
+			],
+			"id" : 138,
+			"image" : "models/bg1_4.json",
+			"name" : "bg1_4",
+			"origin" : "162.81200 54.26000 0.00000",
+			"size" : "544.00000 160.00000",
+			"visible" : false
+		},
+		{
+			"effects" : 
+			[
+				{
+					"file" : "effects/godrays/effect.json",
+					"id" : 371,
+					"name" : "",
+					"passes" : 
+					[
+						{
+							"constantshadervalues" : 
+							{
+								"noiseamount" : 0.40000001,
+								"noisescale" : 3.0,
+								"noisesmoothness" : 0.2,
+								"noisespeed" : 0.15000001,
+								"raythreshold" : 0.72000003
+							},
+							"id" : 372
+						},
+						{
+							"constantshadervalues" : 
+							{
+								"center" : "0.5 0",
+								"color" : "1 1 1",
+								"rayintensity" : 0.67000002,
+								"raylength" : 0.40000001
+							},
+							"id" : 375
+						},
+						{
+							"constantshadervalues" : 
+							{
+								"blurscale" : "1.3 1.3"
+							},
+							"id" : 376
+						},
+						{
+							"combos" : 
+							{
+								"VERTICAL" : 1
+							},
+							"constantshadervalues" : 
+							{
+								"blurscale" : "1.3 1.3"
+							},
+							"id" : 377
+						},
+						{
+							"id" : 378
+						}
+					],
+					"visible" : 
+					{
+						"script" : "'use strict';\n\n/**\n * @param {Object} userProperties\n */\nexport function applyUserProperties(userProperties) {\n\tif (userProperties.level) {\n\t\tlet matDownsample = thisObject.getMaterial(0);\n\t\tlet matCast = thisObject.getMaterial(1);\n\t\tswitch (userProperties.level) {\n\t\t\tcase 'mountains':\n\t\t\t\tmatDownsample.raythreshold = 0.52;\n\t\t\t\tmatCast.rayintensity = 0.4;\n\t\t\t\tbreak;\n\t\t\tcase 'industrial':\n\t\t\t\tmatDownsample.raythreshold = 0.31;\n\t\t\t\tmatCast.rayintensity = 0.6;\n\t\t\t\tbreak;\n\t\t\tcase 'glacier':\n\t\t\tcase 'country':\n\t\t\t\tmatDownsample.raythreshold = 0.79;\n\t\t\t\tmatCast.rayintensity = 0.6;\n\t\t\t\tbreak;\n\t\t\tcase 'mario':\n\t\t\t\tmatDownsample.raythreshold = 0.78;\n\t\t\t\tmatCast.rayintensity = 0.3;\n\t\t\t\tbreak;\n\t\t}\n\t}\n}\n",
+						"value" : true
+					}
+				}
+			],
+			"id" : 361,
+			"image" : "models/util/fullscreenlayer.json",
+			"name" : "postprocess",
+			"parallaxDepth" : "0.00000 0.00000",
+			"visible" : 
+			{
+				"user" : "god_rays",
+				"value" : true
+			}
+		},
+		{
+			"anchor" : "topright",
+			"backgroundbrightness" : 1.0,
+			"backgroundcolor" : "0.00000 0.00000 0.00000",
+			"blockalign" : false,
+			"color" : "1.00000 0.96100 0.44300",
+			"depthtest" : "enabled",
+			"font" : "fonts/Segment7Standard.otf",
+			"horizontalalign" : "right",
+			"id" : 231,
+			"limitrows" : false,
+			"limituseellipsis" : false,
+			"limitwidth" : false,
+			"maxrows" : 1,
+			"maxwidth" : 500.0,
+			"name" : "label_coins",
+			"opaquebackground" : false,
+			"origin" : "341.42999 185.12900 0.00000",
+			"padding" : 0,
+			"pointsize" : 64.0,
+			"scale" : "0.05700 0.05700 0.05700",
+			"size" : "780.00000 291.00000",
+			"text" : "00000",
+			"verticalalign" : "center",
+			"visible" : 
+			{
+				"user" : "show_score",
+				"value" : true
+			}
+		},
+		{
+			"anchor" : "topright",
+			"backgroundbrightness" : 1.0,
+			"backgroundcolor" : "0.00000 0.00000 0.00000",
+			"blockalign" : false,
+			"color" : "1.00000 0.96100 0.44300",
+			"depthtest" : "enabled",
+			"font" : "fonts/Segment7Standard.otf",
+			"horizontalalign" : "right",
+			"id" : 177,
+			"limitrows" : false,
+			"limituseellipsis" : false,
+			"limitwidth" : false,
+			"maxrows" : 1,
+			"maxwidth" : 500.0,
+			"name" : "label_top",
+			"opaquebackground" : false,
+			"origin" : "341.42999 172.88385 0.00000",
+			"padding" : 0,
+			"pointsize" : 32.0,
+			"scale" : "0.05700 0.05700 0.05700",
+			"size" : "390.00000 145.00000",
+			"text" : "00000",
+			"verticalalign" : "center",
+			"visible" : 
+			{
+				"user" : "show_score",
+				"value" : true
+			}
+		}
+	],
+	"version" : 0
+}

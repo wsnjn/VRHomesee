@@ -12,6 +12,8 @@ const API_BASE_URL = 'http://localhost:8080/api'
 const appointments = ref([])
 const loadingAppointments = ref(false)
 const selectedStatusFilter = ref('all') // all, 0, 1, 2, 3, 4, 5
+const expandedAppointments = ref({}) // 存储每个预约项的展开状态
+const searchQuery = ref('') // 搜索查询
 
 // 状态筛选选项
 const statusFilters = [
@@ -100,9 +102,23 @@ const formatDateTime = (dateTimeString) => {
   return date.toLocaleString('zh-CN')
 }
 
+// 搜索后的租约列表
+const searchedAppointments = computed(() => {
+  if (!searchQuery.value) {
+    return appointments.value
+  }
+  
+  const query = searchQuery.value.toLowerCase()
+  return appointments.value.filter(appointment => {
+    // 搜索预约编号
+    const appointmentNumber = appointment.appointmentNumber ? appointment.appointmentNumber.toLowerCase() : ''
+    return appointmentNumber.includes(query)
+  })
+})
+
 // 筛选后的租约列表
 const filteredAppointments = computed(() => {
-  return appointments.value
+  return searchedAppointments.value
 })
 
 // 状态筛选变化处理
@@ -163,6 +179,11 @@ const updateAppointmentStatus = async (appointmentId, newStatus) => {
   }
 }
 
+// 切换预约项的展开/折叠状态
+const toggleAppointment = (appointmentId) => {
+  expandedAppointments.value[appointmentId] = !expandedAppointments.value[appointmentId]
+}
+
 // 页面加载时获取数据
 onMounted(() => {
   loadAppointments()
@@ -174,6 +195,19 @@ onMounted(() => {
     <div class="page-header">
       <h2>租约列表</h2>
       <div class="header-actions">
+        <div class="search-wrapper">
+          <div class="container">
+            <div class="search-container">
+              <input class="input" type="text" placeholder="搜索预约编号..." v-model="searchQuery">
+              <svg viewBox="0 0 24 24" class="search__icon">
+                <g>
+                  <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z">
+                  </path>
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
         <button @click="loadAppointments" class="refresh-btn" :disabled="loadingAppointments">
           {{ loadingAppointments ? '刷新中...' : '刷新' }}
         </button>
@@ -209,22 +243,29 @@ onMounted(() => {
         </div>
       </div>
 
-      <div v-else class="appointments-list">
+        <div v-else class="appointments-list">
         <div v-for="appointment in filteredAppointments" :key="appointment.id" class="appointment-item">
-          <div class="appointment-header">
+          <div class="appointment-header" @click="toggleAppointment(appointment.id)">
             <div class="appointment-number">
               <strong>预约编号：</strong>{{ appointment.appointmentNumber }}
             </div>
-            <div 
-              class="appointment-status clickable-status" 
-              :class="getStatusClass(appointment.status)"
-              @click="showStatusModal(appointment)"
-            >
-              {{ getAppointmentStatusText(appointment.status) }}
+            <div class="header-right">
+              <div 
+                class="appointment-status clickable-status" 
+                :class="getStatusClass(appointment.status)"
+                @click.stop="showStatusModal(appointment)"
+              >
+                {{ getAppointmentStatusText(appointment.status) }}
+              </div>
+              <div class="expand-icon" :class="{ expanded: expandedAppointments[appointment.id] }">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M8 10.586L3.707 6.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414L8 10.586z"/>
+                </svg>
+              </div>
             </div>
           </div>
 
-          <div class="appointment-content">
+          <div v-if="expandedAppointments[appointment.id]" class="appointment-content">
 
             <!-- 用户信息 -->
             <div class="info-section">
@@ -396,39 +437,142 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #e9ecef;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgb(179, 208, 253) 0%, rgb(164, 202, 248) 100%);
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(79, 156, 232, 0.3);
 }
 
 .page-header h2 {
   margin: 0;
-  color: #2c3e50;
-  font-size: 1.8rem;
+  color: white;
+  font-size: 2rem;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .header-actions {
   display: flex;
   gap: 1rem;
+  align-items: center;
+}
+
+.search-wrapper {
+  margin-right: 1rem;
+}
+
+.container {
+  position: relative;
+  background: linear-gradient(135deg, rgb(179, 208, 253) 0%, rgb(164, 202, 248) 100%);
+  border-radius: 1000px;
+  padding: 10px;
+  display: grid;
+  place-content: center;
+  z-index: 0;
+  max-width: 320px;
+  margin: 0 5px;
+  width: 320px;
+}
+
+.search-container {
+  position: relative;
+  width: 100%;
+  border-radius: 50px;
+  background: linear-gradient(135deg, rgb(218, 232, 247) 0%, rgb(214, 229, 247) 100%);
+  padding: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.search-container::after, .search-container::before {
+  content: "";
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  position: absolute;
+}
+
+.search-container::before {
+  top: -1px;
+  left: -1px;
+  background: linear-gradient(0deg, rgb(218, 232, 247) 0%, rgb(255, 255, 255) 100%);
+  z-index: -1;
+}
+
+.search-container::after {
+  bottom: -1px;
+  right: -1px;
+  background: linear-gradient(0deg, rgb(163, 206, 255) 0%, rgb(211, 232, 255) 100%);
+  box-shadow: rgba(79, 156, 232, 0.7019607843) 3px 3px 5px 0px, rgba(79, 156, 232, 0.7019607843) 5px 5px 20px 0px;
+  z-index: -2;
+}
+
+.input {
+  padding: 10px;
+  width: calc(100% - 70px);
+  background: linear-gradient(135deg, rgb(218, 232, 247) 0%, rgb(214, 229, 247) 100%);
+  border: none;
+  color: #9EBCD9;
+  font-size: 16px;
+  border-radius: 50px;
+  margin-left: 8px;
+}
+
+.input:focus {
+  outline: none;
+  background: linear-gradient(135deg, rgb(239, 247, 255) 0%, rgb(214, 229, 247) 100%);
+}
+
+.search__icon {
+  width: 20px;
+  aspect-ratio: 1;
+  border-left: 2px solid white;
+  border-top: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+  border-radius: 50%;
+  padding-left: 8px;
+  margin-right: 8px;
+}
+
+.search__icon:hover {
+  border-left: 3px solid white;
+}
+
+.search__icon path {
+  fill: white;
 }
 
 .refresh-btn {
-  background-color: #17a2b8;
-  color: white;
-  border: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  border-radius: 8px;
+  border: none;
+  border-radius: 12px;
   cursor: pointer;
   font-weight: 600;
-  transition: background-color 0.3s;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(79, 156, 232, 0.3);
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgb(149, 185, 240) 0%, rgb(119, 162, 224) 100%);
+  color: white;
 }
 
 .refresh-btn:hover:not(:disabled) {
-  background-color: #138496;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(79, 156, 232, 0.4);
+  background: linear-gradient(135deg, rgb(139, 175, 230) 0%, rgb(109, 152, 214) 100%);
 }
 
 .refresh-btn:disabled {
-  background-color: #6c757d;
+  background: linear-gradient(135deg, rgb(149, 185, 240) 0%, rgb(119, 162, 224) 100%);
   cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.refresh-btn:active {
+  transform: translateY(0);
 }
 
 /* 状态筛选器样式 */
@@ -540,12 +684,36 @@ onMounted(() => {
   margin-bottom: 1rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid #f8f9fa;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.appointment-header:hover {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: -1rem -1rem 0 -1rem;
 }
 
 .appointment-number {
   font-weight: 600;
   color: #2c3e50;
   font-size: 1rem;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.expand-icon {
+  transition: transform 0.3s ease;
+  color: #6c757d;
+}
+
+.expand-icon.expanded {
+  transform: rotate(180deg);
 }
 
 .clickable-status {

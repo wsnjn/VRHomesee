@@ -3,10 +3,11 @@
     <!-- 顶部导航栏 -->
     <nav class="navbar">
       <div class="nav-brand">
-        <h2>房屋租赁管理系统 - 房东管理端</h2>
+        <h2>房东管理端</h2>
+        <span class="user-info">房东: {{ currentUser }}</span>
       </div>
       <div class="nav-links">
-        <span class="user-info">房东: {{ currentUser }}</span>
+        <router-link to="/" class="client-link">切换到客户端</router-link>
         <button @click="logout" class="logout-btn">退出登录</button>
       </div>
     </nav>
@@ -21,21 +22,33 @@
               :class="{ active: activeTab === 'my-houses' }"
               @click="switchTab('my-houses')"
             >
-              <span class="menu-icon">🏠</span>
+              <span class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                  <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8h5z"/>
+                </svg>
+              </span>
               我的房屋
             </li>
             <li 
               :class="{ active: activeTab === 'house-status' }"
               @click="switchTab('house-status')"
             >
-              <span class="menu-icon">📈</span>
+              <span class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                  <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99l1.5 1.5z"/>
+                </svg>
+              </span>
               房屋状态
             </li>
             <li 
               :class="{ active: activeTab === 'add-house' }"
               @click="switchTab('add-house')"
             >
-              <span class="menu-icon">➕</span>
+              <span class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                  <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                </svg>
+              </span>
               添加房屋
             </li>
           </ul>
@@ -48,49 +61,34 @@
               :class="{ active: activeTab === 'tenant-management' }"
               @click="switchTab('tenant-management')"
             >
-              <span class="menu-icon">📋</span>
+              <span class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                  <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                </svg>
+              </span>
               租约列表
             </li>
             <li 
               :class="{ active: activeTab === 'tenant-matching' }"
               @click="switchTab('tenant-matching')"
             >
-              <span class="menu-icon">🤝</span>
+              <span class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+              </span>
               租客匹配
-            </li>
-            <li 
-              :class="{ active: activeTab === 'rent-payment' }"
-              @click="switchTab('rent-payment')"
-            >
-              <span class="menu-icon">💰</span>
-              租金管理
             </li>
             <li 
               :class="{ active: activeTab === 'maintenance' }"
               @click="switchTab('maintenance')"
             >
-              <span class="menu-icon">🔧</span>
+              <span class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                  <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                </svg>
+              </span>
               维修报修
-            </li>
-          </ul>
-        </div>
-
-        <div class="menu-section">
-          <h3>数据统计</h3>
-          <ul class="menu-list">
-            <li 
-              :class="{ active: activeTab === 'dashboard' }"
-              @click="switchTab('dashboard')"
-            >
-              <span class="menu-icon">📊</span>
-              数据概览
-            </li>
-            <li 
-              :class="{ active: activeTab === 'income-stats' }"
-              @click="switchTab('income-stats')"
-            >
-              <span class="menu-icon">💵</span>
-              收入统计
             </li>
           </ul>
         </div>
@@ -98,13 +96,6 @@
 
       <!-- 主内容区域 -->
       <div class="main-content">
-        <!-- 数据概览 -->
-        <div v-if="activeTab === 'dashboard'">
-          <landlord-dashboard 
-            :statistics="statistics"
-            :expiringContracts="expiringContracts"
-          />
-        </div>
 
         <!-- 我的房屋 -->
         <div v-if="activeTab === 'my-houses'">
@@ -151,27 +142,11 @@
           <landlord-tenant-matching :userPhone="userPhone" />
         </div>
 
-        <!-- 租金管理 -->
-        <div v-if="activeTab === 'rent-payment'">
-          <placeholder-page 
-            title="租金管理"
-            message="租金收付管理功能开发中..."
-          />
-        </div>
-
         <!-- 维修报修 -->
         <div v-if="activeTab === 'maintenance'">
           <placeholder-page 
             title="维修报修"
             message="维修工单管理功能开发中..."
-          />
-        </div>
-
-        <!-- 收入统计 -->
-        <div v-if="activeTab === 'income-stats'">
-          <placeholder-page 
-            title="收入统计"
-            message="收入数据分析功能开发中..."
           />
         </div>
       </div>
@@ -185,7 +160,6 @@ import { useRouter } from 'vue-router'
 import axios from 'axios'
 
 // 导入组件
-import LandlordDashboard from './components/LandlordDashboard.vue'
 import MyHouses from './components/MyHouses.vue'
 import HouseStatus from './components/HouseStatus.vue'
 import AddHouse from './components/AddHouse.vue'
@@ -209,7 +183,7 @@ const router = useRouter()
 const API_BASE_URL = 'http://localhost:8080/api'
 
 // 响应式数据
-const activeTab = ref('dashboard')
+const activeTab = ref('my-houses')
 const currentUser = ref('')
 const userPhone = ref('')
 const statistics = ref({})
@@ -672,11 +646,18 @@ onMounted(async () => {
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
-  background-color: rgba(40, 167, 69, 0.95);
-  color: white;
+  background-color: #494949;
+  color: #ffffff;
   z-index: 100;
   backdrop-filter: blur(10px);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid #ffffff;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
 }
 
 .nav-brand h2 {
@@ -689,6 +670,21 @@ onMounted(async () => {
   display: flex;
   gap: 1rem;
   align-items: center;
+}
+
+.client-link {
+  color: white;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  transition: all 0.3s;
+  font-weight: 500;
+}
+
+.client-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 .user-info {
@@ -764,159 +760,22 @@ onMounted(async () => {
 }
 
 .menu-icon {
-  font-size: 1.1rem;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-icon svg {
+  width: 100%;
+  height: 100%;
 }
 
 .main-content {
   flex: 1;
   padding: 2rem;
   overflow-y: auto;
-}
-
-/* 数据概览样式 */
-.dashboard {
-  max-width: 1200px;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-.stat-card {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-}
-
-.stat-icon {
-  font-size: 2.5rem;
-  opacity: 0.8;
-}
-
-.stat-info h3 {
-  margin: 0 0 0.5rem 0;
-  font-size: 2rem;
-  color: #2c3e50;
-}
-
-.stat-info p {
-  margin: 0;
-  color: #6c757d;
-  font-size: 0.9rem;
-}
-
-.charts-section {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-}
-
-.chart-card {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.chart-card h3 {
-  margin: 0 0 1rem 0;
-  color: #2c3e50;
-  font-size: 1.2rem;
-}
-
-.chart-placeholder {
-  min-height: 200px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: #6c757d;
-  border: 2px dashed #e9ecef;
-  border-radius: 8px;
-  padding: 1rem;
-}
-
-.status-list {
-  width: 100%;
-}
-
-.status-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #f8f9fa;
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-}
-
-.status-rented { background-color: #28a745; }
-.status-vacant { background-color: #ffc107; }
-.status-maintenance { background-color: #dc3545; }
-
-.expiring-list {
-  max-height: 300px;
-  overflow-y: auto;
-}
-
-.expiring-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  border-bottom: 1px solid #f8f9fa;
-  transition: background-color 0.3s;
-}
-
-.expiring-item:hover {
-  background-color: #f8f9fa;
-}
-
-.contract-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.contract-info strong {
-  color: #2c3e50;
-}
-
-.contract-info span {
-  color: #6c757d;
-  font-size: 0.9rem;
-}
-
-.days-left {
-  background: #fff3cd;
-  color: #856404;
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.no-data {
-  text-align: center;
-  color: #6c757d;
-  padding: 2rem;
 }
 
 .page-placeholder {
@@ -934,1193 +793,5 @@ onMounted(async () => {
 
 .page-placeholder p {
   color: #6c757d;
-}
-
-/* 我的房屋页面样式 */
-.my-houses {
-  width: 100%;
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #e9ecef;
-}
-
-.page-header h2 {
-  margin: 0;
-  color: #2c3e50;
-  font-size: 1.8rem;
-}
-
-.header-actions {
-  display: flex;
-  gap: 1rem;
-}
-
-.refresh-btn, .add-btn {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s;
-}
-
-.refresh-btn {
-  background-color: #6c757d;
-  color: white;
-}
-
-.refresh-btn:hover {
-  background-color: #5a6268;
-}
-
-.add-btn {
-  background-color: #28a745;
-  color: white;
-}
-
-.add-btn:hover {
-  background-color: #218838;
-}
-
-/* 房屋列表表格样式 */
-.houses-table-container {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
-}
-
-.loading {
-  text-align: center;
-  padding: 3rem;
-  color: #6c757d;
-  font-size: 1.1rem;
-}
-
-.no-houses {
-  padding: 4rem 2rem;
-}
-
-.empty-state {
-  text-align: center;
-  max-width: 400px;
-  margin: 0 auto;
-}
-
-.empty-icon {
-  font-size: 4rem;
-  display: block;
-  margin-bottom: 1rem;
-}
-
-.empty-state h3 {
-  margin: 0 0 1rem 0;
-  color: #2c3e50;
-}
-
-.empty-state p {
-  color: #6c757d;
-  margin-bottom: 2rem;
-}
-
-.add-first-btn {
-  background-color: #28a745;
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: background-color 0.3s;
-}
-
-.add-first-btn:hover {
-  background-color: #218838;
-}
-
-.houses-table {
-  width: 100%;
-}
-
-.houses-table-content {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.houses-table-content th {
-  background-color: #f8f9fa;
-  padding: 1rem;
-  text-align: left;
-  font-weight: 600;
-  color: #2c3e50;
-  border-bottom: 2px solid #e9ecef;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.houses-table-content td {
-  padding: 1rem;
-  border-bottom: 1px solid #f8f9fa;
-  vertical-align: top;
-}
-
-.house-row {
-  transition: background-color 0.3s;
-}
-
-.house-row:hover {
-  background-color: #f8f9fa;
-}
-
-.house-row:last-child td {
-  border-bottom: none;
-}
-
-/* 房屋状态行样式 */
-.house-available {
-  border-left: 4px solid #28a745;
-}
-
-.house-rented {
-  border-left: 4px solid #dc3545;
-}
-
-.house-offline {
-  border-left: 4px solid #6c757d;
-}
-
-.house-pre-rent {
-  border-left: 4px solid #ffc107;
-}
-
-.house-unknown {
-  border-left: 4px solid #6c757d;
-}
-
-/* 表格单元格样式 */
-.address-cell {
-  min-width: 200px;
-}
-
-.address-info strong {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: #2c3e50;
-  font-size: 1rem;
-}
-
-.address-details {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  font-size: 0.85rem;
-  color: #6c757d;
-}
-
-.address-details span {
-  background: #f8f9fa;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-}
-
-.info-cell {
-  min-width: 180px;
-}
-
-.house-basic-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.info-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.9rem;
-}
-
-.info-label {
-  color: #6c757d;
-  font-weight: 500;
-  min-width: 50px;
-}
-
-.info-value {
-  color: #2c3e50;
-  font-weight: 600;
-  text-align: right;
-}
-
-.price-cell {
-  min-width: 150px;
-}
-
-.price-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.main-price {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.main-price strong {
-  color: #dc3545;
-  font-size: 1.1rem;
-}
-
-.rental-type {
-  background: #28a745;
-  color: white;
-  padding: 0.25rem 0.5rem;
-  border-radius: 8px;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.utility-prices {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  font-size: 0.8rem;
-  color: #6c757d;
-}
-
-.status-cell {
-  min-width: 80px;
-}
-
-.house-status {
-  padding: 0.5rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  white-space: nowrap;
-  display: inline-block;
-  text-align: center;
-  min-width: 60px;
-}
-
-.status-available {
-  background-color: #d4edda;
-  color: #155724;
-}
-
-.status-rented {
-  background-color: #f8d7da;
-  color: #721c24;
-}
-
-.status-offline {
-  background-color: #e2e3e5;
-  color: #383d41;
-}
-
-.status-pre-rent {
-  background-color: #fff3cd;
-  color: #856404;
-}
-
-.status-unknown {
-  background-color: #e2e3e5;
-  color: #383d41;
-}
-
-.actions-cell {
-  min-width: 180px;
-}
-
-.house-actions {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.action-btn {
-  padding: 0.5rem 0.75rem;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s;
-  font-size: 0.8rem;
-  white-space: nowrap;
-}
-
-.edit-btn {
-  background-color: #17a2b8;
-  color: white;
-}
-
-.edit-btn:hover {
-  background-color: #138496;
-}
-
-.detail-btn {
-  background-color: #6c757d;
-  color: white;
-}
-
-.detail-btn:hover {
-  background-color: #5a6268;
-}
-
-.status-btn {
-  color: white;
-}
-
-.btn-offline {
-  background-color: #dc3545;
-}
-
-.btn-offline:hover {
-  background-color: #c82333;
-}
-
-.btn-available {
-  background-color: #28a745;
-}
-
-.btn-available:hover {
-  background-color: #218838;
-}
-
-.btn-online {
-  background-color: #17a2b8;
-}
-
-.btn-online:hover {
-  background-color: #138496;
-}
-
-.btn-default {
-  background-color: #6c757d;
-}
-
-.btn-default:hover {
-  background-color: #5a6268;
-}
-
-.house-card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  padding: 1.5rem;
-  transition: transform 0.3s, box-shadow 0.3s;
-  border-left: 4px solid #28a745;
-}
-
-.house-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-}
-
-/* 房屋状态样式 */
-.house-available {
-  border-left-color: #28a745;
-}
-
-.house-rented {
-  border-left-color: #dc3545;
-}
-
-.house-offline {
-  border-left-color: #6c757d;
-}
-
-.house-pre-rent {
-  border-left-color: #ffc107;
-}
-
-.house-unknown {
-  border-left-color: #6c757d;
-}
-
-.house-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
-}
-
-.house-title {
-  margin: 0;
-  font-size: 1.2rem;
-  color: #2c3e50;
-  line-height: 1.4;
-  flex: 1;
-  margin-right: 1rem;
-}
-
-.house-status {
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.status-available {
-  background-color: #d4edda;
-  color: #155724;
-}
-
-.status-rented {
-  background-color: #f8d7da;
-  color: #721c24;
-}
-
-.status-offline {
-  background-color: #e2e3e5;
-  color: #383d41;
-}
-
-.status-pre-rent {
-  background-color: #fff3cd;
-  color: #856404;
-}
-
-.status-unknown {
-  background-color: #e2e3e5;
-  color: #383d41;
-}
-
-.house-info {
-  margin-bottom: 1rem;
-}
-
-.info-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 0.5rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid #f8f9fa;
-}
-
-.info-row:last-child {
-  border-bottom: none;
-  margin-bottom: 0;
-}
-
-.info-label {
-  color: #6c757d;
-  font-weight: 500;
-}
-
-.info-value {
-  color: #2c3e50;
-  font-weight: 600;
-}
-
-.house-price {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-  padding: 1rem;
-  background: #f8f9fa;
-  border-radius: 8px;
-}
-
-.price {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #dc3545;
-}
-
-.rental-type {
-  background: #28a745;
-  color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.house-actions {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.action-btn {
-  flex: 1;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s;
-  font-size: 0.9rem;
-}
-
-.edit-btn {
-  background-color: #17a2b8;
-  color: white;
-}
-
-.edit-btn:hover {
-  background-color: #138496;
-}
-
-.detail-btn {
-  background-color: #6c757d;
-  color: white;
-}
-
-.detail-btn:hover {
-  background-color: #5a6268;
-}
-
-.status-btn {
-  color: white;
-}
-
-.btn-offline {
-  background-color: #dc3545;
-}
-
-.btn-offline:hover {
-  background-color: #c82333;
-}
-
-.btn-available {
-  background-color: #28a745;
-}
-
-.btn-available:hover {
-  background-color: #218838;
-}
-
-.btn-online {
-  background-color: #17a2b8;
-}
-
-.btn-online:hover {
-  background-color: #138496;
-}
-
-.btn-default {
-  background-color: #6c757d;
-}
-
-.btn-default:hover {
-  background-color: #5a6268;
-}
-
-/* 模态框样式 */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 1rem;
-}
-
-.modal-content {
-  background: white;
-  border-radius: 12px;
-  width: 100%;
-  max-width: 600px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem;
-  border-bottom: 1px solid #e9ecef;
-}
-
-.modal-header h3 {
-  margin: 0;
-  color: #2c3e50;
-}
-
-.close-btn {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: #6c757d;
-  padding: 0;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.close-btn:hover {
-  color: #dc3545;
-}
-
-.modal-body {
-  padding: 1.5rem;
-}
-
-.modal-footer {
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  padding: 1.5rem;
-  border-top: 1px solid #e9ecef;
-}
-
-.cancel-btn, .confirm-btn {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s;
-}
-
-.cancel-btn {
-  background-color: #6c757d;
-  color: white;
-}
-
-.cancel-btn:hover {
-  background-color: #5a6268;
-}
-
-.confirm-btn {
-  background-color: #28a745;
-  color: white;
-}
-
-.confirm-btn:hover {
-  background-color: #218838;
-}
-
-.confirm-btn:disabled {
-  background-color: #6c757d;
-  cursor: not-allowed;
-}
-
-/* 房屋状态页面样式 */
-.house-status-page {
-  width: 100%;
-}
-
-.status-overview {
-  margin-bottom: 2rem;
-}
-
-.status-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-.status-card {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.status-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-}
-
-.status-icon {
-  font-size: 2.5rem;
-  opacity: 0.8;
-}
-
-.status-info h3 {
-  margin: 0 0 0.5rem 0;
-  font-size: 2rem;
-  color: #2c3e50;
-}
-
-.status-info p {
-  margin: 0;
-  color: #6c757d;
-  font-size: 0.9rem;
-}
-
-/* 状态卡片颜色 */
-.status-available {
-  border-left: 4px solid #28a745;
-}
-
-.status-rented {
-  border-left: 4px solid #dc3545;
-}
-
-.status-offline {
-  border-left: 4px solid #6c757d;
-}
-
-.status-pre-rent {
-  border-left: 4px solid #ffc107;
-}
-
-.status-charts {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-}
-
-.chart-section {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.chart-section h3 {
-  margin: 0 0 1rem 0;
-  color: #2c3e50;
-  font-size: 1.2rem;
-}
-
-.status-distribution {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.distribution-bar {
-  width: 100%;
-  height: 30px;
-  background: #f8f9fa;
-  border-radius: 15px;
-  overflow: hidden;
-  display: flex;
-}
-
-.distribution-segment {
-  height: 100%;
-  transition: width 0.3s ease;
-}
-
-.distribution-segment.available {
-  background: #28a745;
-}
-
-.distribution-segment.rented {
-  background: #dc3545;
-}
-
-.distribution-segment.offline {
-  background: #6c757d;
-}
-
-.distribution-segment.pre-rent {
-  background: #ffc107;
-}
-
-.distribution-legend {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.9rem;
-  color: #6c757d;
-}
-
-.legend-color {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-}
-
-.legend-color.available {
-  background: #28a745;
-}
-
-.legend-color.rented {
-  background: #dc3545;
-}
-
-.legend-color.offline {
-  background: #6c757d;
-}
-
-.legend-color.pre-rent {
-  background: #ffc107;
-}
-
-.status-details {
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-.status-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.status-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  background: #f8f9fa;
-  border-radius: 8px;
-  transition: background-color 0.3s;
-}
-
-.status-item:hover {
-  background: #e9ecef;
-}
-
-.house-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  flex: 1;
-}
-
-.house-info strong {
-  color: #2c3e50;
-  font-size: 0.95rem;
-}
-
-.house-price {
-  color: #dc3545;
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-
-/* 状态筛选器样式 */
-.status-filter {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  margin-bottom: 2rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.filter-title {
-  font-weight: 600;
-  color: #2c3e50;
-  white-space: nowrap;
-}
-
-.filter-buttons {
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-.filter-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border: 2px solid #e9ecef;
-  border-radius: 20px;
-  background: white;
-  color: #6c757d;
-  cursor: pointer;
-  transition: all 0.3s;
-  font-weight: 500;
-}
-
-.filter-btn:hover {
-  border-color: #28a745;
-  color: #28a745;
-}
-
-.filter-btn.active {
-  border-color: #28a745;
-  background: #28a745;
-  color: white;
-}
-
-.filter-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-}
-
-.dot-0 { background-color: #28a745; }
-.dot-1 { background-color: #dc3545; }
-.dot-2 { background-color: #6c757d; }
-.dot-3 { background-color: #ffc107; }
-
-/* 状态分组样式 */
-.status-groups {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.status-group {
-  background: #f8f9fa;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.group-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 1.5rem;
-  color: white;
-  font-weight: 600;
-}
-
-.group-header h4 {
-  margin: 0;
-  font-size: 1.1rem;
-}
-
-.group-count {
-  background: rgba(255, 255, 255, 0.2);
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.9rem;
-}
-
-.header-0 { background: #28a745; }
-.header-1 { background: #dc3545; }
-.header-2 { background: #6c757d; }
-.header-3 { background: #ffc107; color: #856404; }
-
-.group-houses {
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-/* 状态房屋卡片样式 */
-.status-house-card {
-  background: white;
-  border-radius: 8px;
-  padding: 1.25rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  transition: transform 0.3s, box-shadow 0.3s;
-  border-left: 4px solid #28a745;
-}
-
-.status-house-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-}
-
-.status-house-card.house-0 { border-left-color: #28a745; }
-.status-house-card.house-1 { border-left-color: #dc3545; }
-.status-house-card.house-2 { border-left-color: #6c757d; }
-.status-house-card.house-3 { border-left-color: #ffc107; }
-
-.house-main-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
-  gap: 1rem;
-}
-
-.house-address {
-  flex: 1;
-}
-
-.house-address strong {
-  display: block;
-  color: #2c3e50;
-  font-size: 1.1rem;
-  margin-bottom: 0.25rem;
-  line-height: 1.4;
-}
-
-.house-community {
-  color: #6c757d;
-  font-size: 0.9rem;
-}
-
-.house-price-status {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.5rem;
-  min-width: 120px;
-}
-
-.house-price {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #dc3545;
-}
-
-.house-details {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-  padding: 1rem;
-  background: #f8f9fa;
-  border-radius: 6px;
-}
-
-.detail-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.9rem;
-}
-
-.detail-label {
-  color: #6c757d;
-  font-weight: 500;
-}
-
-.detail-value {
-  color: #2c3e50;
-  font-weight: 600;
-}
-
-.house-actions {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
-}
-
-.no-houses-in-group {
-  text-align: center;
-  padding: 2rem;
-  color: #6c757d;
-  font-style: italic;
-  background: white;
-  border-radius: 8px;
-}
-
-/* 响应式设计 */
-@media (max-width: 1024px) {
-  .charts-section {
-    grid-template-columns: 1fr;
-  }
-  
-  .status-charts {
-    grid-template-columns: 1fr;
-  }
-  
-  .house-details {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .admin-container {
-    flex-direction: column;
-  }
-  
-  .sidebar {
-    width: 100%;
-    border-right: none;
-    border-bottom: 1px solid #e9ecef;
-  }
-  
-  .stats-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-  
-  .status-cards {
-    grid-template-columns: 1fr 1fr;
-  }
-  
-  .distribution-legend {
-    grid-template-columns: 1fr;
-  }
-  
-  .status-filter {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .filter-buttons {
-    width: 100%;
-  }
-  
-  .house-main-info {
-    flex-direction: column;
-  }
-  
-  .house-price-status {
-    flex-direction: row;
-    justify-content: space-between;
-    width: 100%;
-    align-items: center;
-  }
-  
-  .house-details {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 480px) {
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .status-cards {
-    grid-template-columns: 1fr;
-  }
-  
-  .navbar {
-    padding: 1rem;
-  }
-  
-  .main-content {
-    padding: 1rem;
-  }
-  
-  .filter-buttons {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .filter-btn {
-    justify-content: center;
-  }
-  
-  .house-actions {
-    flex-wrap: wrap;
-  }
-  
-  .house-actions .action-btn {
-    flex: 1;
-    min-width: 80px;
-  }
 }
 </style>

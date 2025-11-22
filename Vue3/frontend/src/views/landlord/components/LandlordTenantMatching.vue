@@ -559,16 +559,24 @@ onMounted(() => {
 
 .page-header {
   margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgb(179, 208, 253) 0%, rgb(164, 202, 248) 100%);
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(79, 156, 232, 0.3);
 }
 
 .page-header h2 {
   margin: 0;
-  color: #2c3e50;
+  color: white;
+  font-size: 2rem;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .page-description {
-  color: #6c757d;
+  color: rgba(255, 255, 255, 0.9);
   margin: 0.5rem 0 0 0;
+  font-size: 1rem;
 }
 
 .matching-container {

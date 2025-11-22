@@ -165,76 +165,97 @@ const buttonChars = computed(() => {
         
         <form @submit.prevent="handleSubmit">
           <!-- 登录表单 -->
-          <div v-if="isLogin" class="form-group">
-            <label for="phone">手机号</label>
+          <div v-if="isLogin" class="field">
+            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M13.106 7.222c0-2.967-2.249-5.032-5.482-5.032-3.35 0-5.646 2.318-5.646 5.702 0 3.493 2.235 5.708 5.762 5.708.862 0 1.689-.123 2.304-.335v-.862c-.43.199-1.354.328-2.29.328-2.926 0-4.813-1.88-4.813-4.798 0-2.844 1.921-4.881 4.594-4.881 2.735 0 4.608 1.688 4.608 4.156 0 1.682-.554 2.769-1.416 2.769-.492 0-.772-.28-.772-.76V5.206H8.923v.834h-.11c-.266-.595-.881-.964-1.6-.964-1.4 0-2.378 1.162-2.378 2.823 0 1.737.957 2.906 2.379 2.906.8 0 1.415-.39 1.709-1.087h.11c.081.67.703 1.148 1.503 1.148 1.572 0 2.57-1.415 2.57-3.643zm-7.177.704c0-1.197.54-1.907 1.456-1.907.93 0 1.524.738 1.524 1.907S8.308 9.84 7.371 9.84c-.895 0-1.442-.725-1.442-1.914z"></path>
+            </svg>
             <input 
               type="text" 
               id="phone" 
               v-model="formData.phone" 
+              class="input-field"
               required
               placeholder="请输入手机号"
             >
           </div>
-          <div v-if="isLogin" class="form-group">
-            <label for="password">密码</label>
+          <div v-if="isLogin" class="field">
+            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"></path>
+            </svg>
             <input 
               type="password" 
               id="password" 
               v-model="formData.password" 
+              class="input-field"
               required
               placeholder="请输入密码"
             >
           </div>
           
           <!-- 注册表单 -->
-          <div v-if="!isLogin" class="form-group">
-            <label for="username">用户名</label>
+          <div v-if="!isLogin" class="field">
+            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M13.106 7.222c0-2.967-2.249-5.032-5.482-5.032-3.35 0-5.646 2.318-5.646 5.702 0 3.493 2.235 5.708 5.762 5.708.862 0 1.689-.123 2.304-.335v-.862c-.43.199-1.354.328-2.29.328-2.926 0-4.813-1.88-4.813-4.798 0-2.844 1.921-4.881 4.594-4.881 2.735 0 4.608 1.688 4.608 4.156 0 1.682-.554 2.769-1.416 2.769-.492 0-.772-.28-.772-.76V5.206H8.923v.834h-.11c-.266-.595-.881-.964-1.6-.964-1.4 0-2.378 1.162-2.378 2.823 0 1.737.957 2.906 2.379 2.906.8 0 1.415-.39 1.709-1.087h.11c.081.67.703 1.148 1.503 1.148 1.572 0 2.57-1.415 2.57-3.643zm-7.177.704c0-1.197.54-1.907 1.456-1.907.93 0 1.524.738 1.524 1.907S8.308 9.84 7.371 9.84c-.895 0-1.442-.725-1.442-1.914z"></path>
+            </svg>
             <input 
               type="text" 
               id="username" 
               v-model="formData.username" 
               @blur="checkUsername"
+              class="input-field"
               required
               placeholder="请输入用户名"
             >
           </div>
-          <div v-if="!isLogin" class="form-group">
-            <label for="realName">真实姓名</label>
+          <div v-if="!isLogin" class="field">
+            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"></path>
+            </svg>
             <input 
               type="text" 
               id="realName" 
               v-model="formData.realName" 
+              class="input-field"
               required
               placeholder="请输入真实姓名"
             >
           </div>
-          <div v-if="!isLogin" class="form-group">
-            <label for="phone">手机号</label>
+          <div v-if="!isLogin" class="field">
+            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M13.106 7.222c0-2.967-2.249-5.032-5.482-5.032-3.35 0-5.646 2.318-5.646 5.702 0 3.493 2.235 5.708 5.762 5.708.862 0 1.689-.123 2.304-.335v-.862c-.43.199-1.354.328-2.29.328-2.926 0-4.813-1.88-4.813-4.798 0-2.844 1.921-4.881 4.594-4.881 2.735 0 4.608 1.688 4.608 4.156 0 1.682-.554 2.769-1.416 2.769-.492 0-.772-.28-.772-.76V5.206H8.923v.834h-.11c-.266-.595-.881-.964-1.6-.964-1.4 0-2.378 1.162-2.378 2.823 0 1.737.957 2.906 2.379 2.906.8 0 1.415-.39 1.709-1.087h.11c.081.67.703 1.148 1.503 1.148 1.572 0 2.57-1.415 2.57-3.643zm-7.177.704c0-1.197.54-1.907 1.456-1.907.93 0 1.524.738 1.524 1.907S8.308 9.84 7.371 9.84c-.895 0-1.442-.725-1.442-1.914z"></path>
+            </svg>
             <input 
               type="text" 
               id="phone" 
               v-model="formData.phone" 
               @blur="checkPhone"
+              class="input-field"
               required
               placeholder="请输入手机号"
             >
           </div>
-          <div v-if="!isLogin" class="form-group">
-            <label for="password">密码</label>
+          <div v-if="!isLogin" class="field">
+            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"></path>
+            </svg>
             <input 
               type="password" 
               id="password" 
               v-model="formData.password" 
+              class="input-field"
               required
               placeholder="请输入密码"
             >
           </div>
-          <div v-if="!isLogin" class="form-group">
-            <label for="confirmPassword">确认密码</label>
+          <div v-if="!isLogin" class="field">
+            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"></path>
+            </svg>
             <input 
               type="password" 
               id="confirmPassword" 
               v-model="formData.confirmPassword" 
+              class="input-field"
               required
               placeholder="请再次输入密码"
             >
@@ -249,15 +270,19 @@ const buttonChars = computed(() => {
           >
             处理中...
           </button>
-          <!-- 非加载状态使用btn-1动画按钮 -->
+          <!-- 非加载状态使用新样式按钮 -->
           <button 
             v-else 
             type="submit" 
-            class="btn-1"
+            class="animated-button"
           >
-            <span class="original">{{ isLogin ? '登录' : '注册' }}</span>
-            <div class="letters">
-              <span v-for="(char, index) in buttonChars" :key="index">{{ char }}</span>
+            <div class="bgContainer">
+              <span>{{ isLogin ? '登录' : '注册' }}</span>
+            </div>
+            <div class="arrowContainer">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 12H20M20 12L14 6M20 12L14 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
             </div>
           </button>
         </form>
@@ -327,29 +352,38 @@ const buttonChars = computed(() => {
   font-size: 0.9rem;
 }
 
-.form-group {
+.field {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  border-radius: 25px;
+  padding: 0.6em;
+  border: none;
+  outline: none;
+  color: #333;
+  background-color: #f5f5f5;
+  box-shadow: inset 2px 5px 10px rgba(0, 0, 0, 0.1);
   margin-bottom: 1rem;
 }
 
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
+.input-icon {
+  height: 1.3em;
+  width: 1.3em;
+  fill: #333;
 }
 
-.form-group input {
-  width: 90%;
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-  transition: border-color 0.3s;
-}
-
-.form-group input:focus {
+.input-field {
+  background: none;
+  border: none;
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  width: 100%;
+  color: #333;
+  font-size: 1rem;
+}
+
+.input-field::placeholder {
+  color: #666;
 }
 
 .submit-btn {
@@ -391,5 +425,106 @@ const buttonChars = computed(() => {
 
 .toggle-btn:hover {
   color: #0056b3;
+}
+
+.animated-button {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 1em 0em 1em 1em;
+  background-color: yellow;
+  cursor: pointer;
+  box-shadow: 4px 6px 0px black;
+  border: 4px solid;
+  border-radius: 15px;
+  position: relative;
+  overflow: hidden;
+  z-index: 100;
+  transition: box-shadow 250ms, transform 250ms, filter 50ms;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.animated-button:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 3px 0px black;
+}
+
+.animated-button:active {
+  filter: saturate(0.75);
+}
+
+.animated-button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: pink;
+  z-index: -1;
+  transform: translateX(-100%);
+  transition: transform 250ms;
+}
+
+.animated-button:hover::after {
+  transform: translateX(0);
+}
+
+.bgContainer {
+  position: relative;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  overflow: hidden;
+  max-width: 35%;
+  font-size: 2em;
+  font-weight: 600;
+}
+
+.bgContainer span {
+  position: relative;
+  transform: translateX(-100%);
+  transition: all 250ms;
+}
+
+.animated-button:hover .bgContainer > span {
+  transform: translateX(0);
+}
+
+.arrowContainer {
+  padding: 1em;
+  margin-inline-end: 1em;
+  border: 4px solid;
+  border-radius: 50%;
+  background-color: pink;
+  position: relative;
+  overflow: hidden;
+  transition: transform 250ms, background-color 250ms;
+  z-index: 100;
+}
+
+.arrowContainer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-color: yellow;
+  transform: translateX(-100%);
+  z-index: -1;
+  transition: transform 250ms ease-in-out;
+}
+
+.animated-button:hover .arrowContainer::after {
+  transform: translateX(0);
+}
+
+.animated-button:hover .arrowContainer {
+  transform: translateX(5px);
+}
+
+.animated-button:active .arrowContainer {
+  transform: translateX(8px);
+}
+
+.arrowContainer svg {
+  vertical-align: middle;
 }
 </style>

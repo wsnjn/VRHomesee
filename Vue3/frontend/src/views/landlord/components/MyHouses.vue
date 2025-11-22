@@ -3,8 +3,32 @@
     <div class="page-header">
       <h2>我的房屋</h2>
       <div class="header-actions">
-        <button @click="emit('refresh')" class="refresh-btn">刷新</button>
-        <button @click="showAddHouse = true" class="add-btn">添加房屋</button>
+        <div class="search-wrapper">
+          <div class="container">
+            <div class="search-container">
+              <input class="input" type="text" placeholder="搜索房屋..." v-model="searchQuery">
+              <svg viewBox="0 0 24 24" class="search__icon">
+                <g>
+                  <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z">
+                  </path>
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <button @click="emit('refresh')" class="refresh-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+          </svg>
+          刷新
+        </button>
+        <button @click="showAddHouse = true" class="add-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+          </svg>
+          添加房屋
+        </button>
+      </div>
     </div>
 
     <!-- 编辑房屋模态框 -->
@@ -274,7 +298,6 @@
         </div>
       </div>
     </div>
-  </div>
 
     <!-- 房屋列表表格 -->
     <div class="houses-table-container">
@@ -290,7 +313,17 @@
       </div>
 
       <div v-else class="houses-table">
-        <table class="houses-table-content">
+        <!-- 搜索结果提示 -->
+        <div v-if="searchQuery && filteredHouses.length === 0" class="search-no-results">
+          <div class="no-results-message">
+            <span class="no-results-icon">🔍</span>
+            <h4>没有找到匹配的房屋</h4>
+            <p>请尝试使用其他关键词搜索，或清空搜索框查看所有房屋</p>
+            <button @click="searchQuery = ''" class="clear-search-btn">清空搜索</button>
+          </div>
+        </div>
+        
+        <table class="houses-table-content" v-if="filteredHouses.length > 0">
           <thead>
             <tr>
               <th>地址信息</th>
@@ -302,7 +335,7 @@
           </thead>
           <tbody>
             <tr 
-              v-for="house in myHouses" 
+              v-for="house in filteredHouses" 
               :key="house.id" 
               class="house-row"
               :class="getHouseStatusClass(house.status)"
@@ -346,7 +379,7 @@
                 <div class="price-info">
                   <div class="main-price">
                     <strong>{{ house.rentPrice }} 元/月</strong>
-                    <span class="rental-type">{{ getRentalTypeText(house.rentalType) }}</span>
+                  <span class="rental-type" :class="'rental-type-' + house.rentalType">{{ getRentalTypeText(house.rentalType) }}</span>
                   </div>
                   <div class="utility-prices">
                     <span v-if="house.waterPrice">水费: {{ house.waterPrice }}元/吨</span>
@@ -591,7 +624,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps, defineEmits } from 'vue'
+import { ref, defineProps, defineEmits, computed } from 'vue'
 import axios from 'axios'
 
 const API_BASE_URL = 'http://localhost:8080/api'
@@ -622,6 +655,31 @@ const showAddHouse = ref(false)
 const showEditHouse = ref(false)
 const editingHouse = ref(null)
 const updatingHouse = ref(false)
+
+// 搜索功能
+const searchQuery = ref('')
+const filteredHouses = computed(() => {
+  if (!searchQuery.value) {
+    return props.myHouses
+  }
+  
+  const query = searchQuery.value.toLowerCase()
+  return props.myHouses.filter(house => {
+    // 搜索地址信息
+    const address = getHouseFullAddress(house).toLowerCase()
+    // 搜索小区名称
+    const communityName = house.communityName ? house.communityName.toLowerCase() : ''
+    // 搜索房屋状态
+    const statusText = getStatusText(house.status).toLowerCase()
+    // 搜索租赁类型
+    const rentalTypeText = getRentalTypeText(house.rentalType).toLowerCase()
+    
+    return address.includes(query) || 
+           communityName.includes(query) || 
+           statusText.includes(query) ||
+           rentalTypeText.includes(query)
+  })
+})
 
 // 房屋详情相关
 const showHouseDetail = ref(false)
@@ -868,6 +926,49 @@ const getStatusBtnClass = (status) => {
   return classMap[status] || 'btn-default'
 }
 
+// 切换房屋状态
+const toggleHouseStatus = async (house) => {
+  if (!house.id) return
+  
+  const currentStatus = house.status
+  let newStatus
+  
+  // 根据当前状态确定新状态
+  switch (currentStatus) {
+    case 0: // 可租 -> 下架
+      newStatus = 2
+      break
+    case 1: // 已租 -> 可租
+      newStatus = 0
+      break
+    case 2: // 下架 -> 可租
+      newStatus = 0
+      break
+    case 3: // 预租 -> 可租
+      newStatus = 0
+      break
+    default:
+      return
+  }
+  
+  try {
+    const response = await axios.put(`${API_BASE_URL}/landlord/house/${house.id}`, {
+      status: newStatus
+    })
+    
+    if (response.data.success) {
+      alert('房屋状态更新成功！')
+      // 重新加载房屋列表
+      emit('refresh')
+    } else {
+      alert(`更新失败: ${response.data.message}`)
+    }
+  } catch (error) {
+    console.error('更新房屋状态失败:', error)
+    alert('更新房屋状态失败，请稍后重试')
+  }
+}
+
 // 打开房屋详情
 const openHouseDetail = async (house) => {
   showHouseDetail.value = true
@@ -961,46 +1062,154 @@ const formatDate = (dateString) => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #e9ecef;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgb(179, 208, 253) 0%, rgb(164, 202, 248) 100%);
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(79, 156, 232, 0.3);
 }
 
 .page-header h2 {
   margin: 0;
-  color: #2c3e50;
-  font-size: 1.8rem;
+  color: white;
+  font-size: 2rem;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .header-actions {
   display: flex;
   gap: 1rem;
+  align-items: center;
+}
+
+.search-wrapper {
+  margin-right: 1rem;
+}
+
+.container {
+  position: relative;
+  background: linear-gradient(135deg, rgb(179, 208, 253) 0%, rgb(164, 202, 248) 100%);
+  border-radius: 1000px;
+  padding: 10px;
+  display: grid;
+  place-content: center;
+  z-index: 0;
+  max-width: 320px;
+  margin: 0 5px;
+  width: 320px;
+}
+
+.search-container {
+  position: relative;
+  width: 100%;
+  border-radius: 50px;
+  background: linear-gradient(135deg, rgb(218, 232, 247) 0%, rgb(214, 229, 247) 100%);
+  padding: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.search-container::after, .search-container::before {
+  content: "";
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  position: absolute;
+}
+
+.search-container::before {
+  top: -1px;
+  left: -1px;
+  background: linear-gradient(0deg, rgb(218, 232, 247) 0%, rgb(255, 255, 255) 100%);
+  z-index: -1;
+}
+
+.search-container::after {
+  bottom: -1px;
+  right: -1px;
+  background: linear-gradient(0deg, rgb(163, 206, 255) 0%, rgb(211, 232, 255) 100%);
+  box-shadow: rgba(79, 156, 232, 0.7019607843) 3px 3px 5px 0px, rgba(79, 156, 232, 0.7019607843) 5px 5px 20px 0px;
+  z-index: -2;
+}
+
+.input {
+  padding: 10px;
+  width: calc(100% - 70px);
+  background: linear-gradient(135deg, rgb(218, 232, 247) 0%, rgb(214, 229, 247) 100%);
+  border: none;
+  color: #9EBCD9;
+  font-size: 16px;
+  border-radius: 50px;
+  margin-left: 8px;
+}
+
+.input:focus {
+  outline: none;
+  background: linear-gradient(135deg, rgb(239, 247, 255) 0%, rgb(214, 229, 247) 100%);
+}
+
+.search__icon {
+  width: 20px;
+  aspect-ratio: 1;
+  border-left: 2px solid white;
+  border-top: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+  border-radius: 50%;
+  padding-left: 8px;
+  margin-right: 8px;
+}
+
+.search__icon:hover {
+  border-left: 3px solid white;
+}
+
+.search__icon path {
+  fill: white;
 }
 
 .refresh-btn, .add-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
   font-weight: 600;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(79, 156, 232, 0.3);
+  position: relative;
+  overflow: hidden;
 }
 
 .refresh-btn {
-  background-color: #6c757d;
+  background: linear-gradient(135deg, rgb(149, 185, 240) 0%, rgb(119, 162, 224) 100%);
   color: white;
 }
 
 .refresh-btn:hover {
-  background-color: #5a6268;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(79, 156, 232, 0.4);
+  background: linear-gradient(135deg, rgb(139, 175, 230) 0%, rgb(109, 152, 214) 100%);
+}
+
+.refresh-btn:active {
+  transform: translateY(0);
 }
 
 .add-btn {
-  background-color: #28a745;
+  background: linear-gradient(135deg, rgb(102, 187, 106) 0%, rgb(76, 175, 80) 100%);
   color: white;
 }
 
 .add-btn:hover {
-  background-color: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+  background: linear-gradient(135deg, rgb(92, 177, 96) 0%, rgb(66, 165, 70) 100%);
+}
+
+.add-btn:active {
+  transform: translateY(0);
 }
 
 /* 房屋列表表格样式 */
@@ -1157,7 +1366,6 @@ const formatDate = (dateString) => {
 
 .info-item {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   font-size: 0.9rem;
 }
@@ -1166,12 +1374,14 @@ const formatDate = (dateString) => {
   color: #6c757d;
   font-weight: 500;
   min-width: 50px;
+  text-align: left;
 }
 
 .info-value {
   color: #2c3e50;
   font-weight: 600;
-  text-align: right;
+  text-align: left;
+  margin-left: 0.5rem;
 }
 
 .price-cell {
@@ -1196,12 +1406,32 @@ const formatDate = (dateString) => {
 }
 
 .rental-type {
-  background: #28a745;
-  color: white;
   padding: 0.25rem 0.5rem;
   border-radius: 8px;
   font-size: 0.75rem;
   font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.rental-type-0 {
+  background: linear-gradient(135deg, rgb(239, 115, 158)0%, rgb(119, 162, 224) 100%);
+  color: white;
+}
+
+.rental-type-1 {
+  background: linear-gradient(135deg, rgb(153, 187, 102) 0%, rgb(76, 175, 80) 100%);
+  color: white;
+}
+
+.rental-type-2 {
+  background: linear-gradient(135deg, rgb(255, 193, 7) 0%, rgb(255, 152, 0) 100%);
+  color: white;
+}
+
+.rental-type:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .utility-prices {
@@ -1265,30 +1495,50 @@ const formatDate = (dateString) => {
 .action-btn {
   padding: 0.5rem 0.75rem;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
   font-size: 0.8rem;
   white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(79, 156, 232, 0.3);
+  position: relative;
+  overflow: hidden;
+  width: 80px;
+  text-align: center;
+}
+
+.action-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 100%);
+  z-index: 1;
 }
 
 .edit-btn {
-  background-color: #17a2b8;
+  background: linear-gradient(135deg, rgb(149, 185, 240) 0%, rgb(119, 162, 224) 100%);
   color: white;
 }
 
 .edit-btn:hover {
-  background-color: #138496;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79, 156, 232, 0.4);
+  background: linear-gradient(135deg, rgb(139, 175, 230) 0%, rgb(109, 152, 214) 100%);
 }
 
 .detail-btn {
-  background-color: #6c757d;
+  background: linear-gradient(135deg, rgb(102, 187, 106) 0%, rgb(76, 175, 80) 100%);
   color: white;
 }
 
 .detail-btn:hover {
-  background-color: #5a6268;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+  background: linear-gradient(135deg, rgb(92, 177, 96) 0%, rgb(66, 165, 70) 100%);
 }
 
 .status-btn {
@@ -1296,35 +1546,43 @@ const formatDate = (dateString) => {
 }
 
 .btn-offline {
-  background-color: #dc3545;
+  background: linear-gradient(135deg, rgb(255, 107, 107) 0%, rgb(220, 53, 69) 100%);
 }
 
 .btn-offline:hover {
-  background-color: #c82333;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+  background: linear-gradient(135deg, rgb(245, 97, 97) 0%, rgb(200, 35, 51) 100%);
 }
 
 .btn-available {
-  background-color: #28a745;
+  background: linear-gradient(135deg, rgb(102, 187, 106) 0%, rgb(76, 175, 80) 100%);
 }
 
 .btn-available:hover {
-  background-color: #218838;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+  background: linear-gradient(135deg, rgb(92, 177, 96) 0%, rgb(66, 165, 70) 100%);
 }
 
 .btn-online {
-  background-color: #17a2b8;
+  background: linear-gradient(135deg, rgb(149, 185, 240) 0%, rgb(119, 162, 224) 100%);
 }
 
 .btn-online:hover {
-  background-color: #138496;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79, 156, 232, 0.4);
+  background: linear-gradient(135deg, rgb(139, 175, 230) 0%, rgb(109, 152, 214) 100%);
 }
 
 .btn-default {
-  background-color: #6c757d;
+  background: linear-gradient(135deg, rgb(149, 185, 240) 0%, rgb(119, 162, 224) 100%);
 }
 
 .btn-default:hover {
-  background-color: #5a6268;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79, 156, 232, 0.4);
+  background: linear-gradient(135deg, rgb(139, 175, 230) 0%, rgb(109, 152, 214) 100%);
 }
 
 /* 模态框样式 */
@@ -1343,56 +1601,68 @@ const formatDate = (dateString) => {
 }
 
 .modal-content {
-  background: white;
-  border-radius: 12px;
+  background: linear-gradient(135deg, rgb(255, 255, 255) 0%, rgb(248, 250, 255) 100%);
+  border-radius: 16px;
   width: 100%;
-  max-width: 600px;
+  max-width: 800px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 15px 40px rgba(79, 156, 232, 0.3);
+  border: 1px solid rgba(179, 208, 253, 0.5);
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem;
-  border-bottom: 1px solid #e9ecef;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid rgba(179, 208, 253, 0.3);
+  background: linear-gradient(135deg, rgb(179, 208, 253) 0%, rgb(164, 202, 248) 100%);
+  border-radius: 16px 16px 0 0;
 }
 
 .modal-header h3 {
   margin: 0;
-  color: #2c3e50;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .close-btn {
-  background: none;
-  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid white;
+  border-radius: 50%;
   font-size: 1.5rem;
   cursor: pointer;
-  color: #6c757d;
+  color: white;
   padding: 0;
-  width: 30px;
-  height: 30px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .close-btn:hover {
-  color: #dc3545;
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .modal-body {
-  padding: 1.5rem;
+  padding: 2rem;
 }
 
 .modal-footer {
   display: flex;
   gap: 1rem;
   justify-content: flex-end;
-  padding: 1.5rem;
-  border-top: 1px solid #e9ecef;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid rgba(179, 208, 253, 0.3);
+  background: rgba(248, 250, 255, 0.8);
 }
 
 .cancel-btn, .confirm-btn {
@@ -1401,30 +1671,36 @@ const formatDate = (dateString) => {
   border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(79, 156, 232, 0.3);
 }
 
 .cancel-btn {
-  background-color: #6c757d;
+  background: linear-gradient(135deg, rgb(149, 185, 240) 0%, rgb(119, 162, 224) 100%);
   color: white;
 }
 
 .cancel-btn:hover {
-  background-color: #5a6268;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79, 156, 232, 0.4);
+  background: linear-gradient(135deg, rgb(139, 175, 230) 0%, rgb(109, 152, 214) 100%);
 }
 
 .confirm-btn {
-  background-color: #28a745;
+  background: linear-gradient(135deg, rgb(102, 187, 106) 0%, rgb(76, 175, 80) 100%);
   color: white;
 }
 
 .confirm-btn:hover {
-  background-color: #218838;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+  background: linear-gradient(135deg, rgb(92, 177, 96) 0%, rgb(66, 165, 70) 100%);
 }
 
 .confirm-btn:disabled {
-  background-color: #6c757d;
+  background: linear-gradient(135deg, rgb(149, 185, 240) 0%, rgb(119, 162, 224) 100%);
   cursor: not-allowed;
+  transform: none;
 }
 
 /* 表单样式 */
