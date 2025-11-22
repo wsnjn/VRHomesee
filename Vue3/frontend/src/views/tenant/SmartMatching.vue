@@ -242,10 +242,13 @@ export default {
         /* 身体上下弹跳动画 */
         @keyframes bodyBounce {
             0% {
-                transform: translateY(0);
+                transform: translateY(-20px);
+            }
+            50% {
+                transform: translateY(-10px);
             }
             100% {
-                transform: translateY(-20px);
+                transform: translateY(0px);
             }
         }
         
@@ -490,6 +493,87 @@ export default {
         #o14 { grid-area: o14; background-color: transparent;   }
         #o15 { grid-area: o15; background-color: transparent;   }
         
+        /* 腿部动画关键帧 - 实现像素移动（保持原有颜色） */
+        @keyframes legWalk {
+            0% {
+                /* 初始状态 */
+                transform: translate(0, 0);
+            }
+            25% {
+                /* 开始移动 */
+                transform: translate(-1px, -1px);
+            }
+            50% {
+                /* 移动到位 */
+                transform: translate(-6.67px, -6.67px);
+            }
+            75% {
+                /* 准备返回 */
+                transform: translate(-1px, -1px);
+            }
+            100% {
+                /* 返回原位 */
+                transform: translate(0, 0);
+            }
+        }
+        
+        /* 为需要移动的像素添加动画（保持原有颜色） */
+        #n5, #n6, #n7, #n9, #n10, #n11,
+        #o5, #o6, #o7, #o9, #o10, #o11 {
+            animation: legWalk 1s infinite;
+        }
+
+        /* 为特定像素添加颜色变化动画（不移动） */
+        @keyframes colorChangeM5 {
+            0%, 25% {
+                background-color: #205722; /* 深绿色 */
+            }
+            50%,75%, 100% {
+                background-color: #4CAF50; /* 浅绿色 */
+            }
+        }
+
+        @keyframes colorChangeM7 {
+            0%,25% {
+                background-color: #4CAF50; /* 浅绿色 */
+            }
+            50%,75%, 100% {
+                background-color: #205722; /* 深绿色 */
+            }
+        }
+
+        @keyframes colorChangeM9 {
+            0%, 25% {
+                background-color: #205722; /* 深绿色 */
+            }
+            50%,75%, 100% {
+                background-color: #4CAF50; /* 浅绿色 */
+            }
+        }
+
+        @keyframes colorChangeM11 {
+            0%, 25% {
+                background-color: #4CAF50; /* 浅绿色 */
+            }
+            50%,75%, 100% {
+                background-color: #205722; /* 深绿色 */
+            }
+        }
+
+        /* 应用颜色变化动画到特定像素（不移动） */
+        #m5 {
+            animation: colorChangeM5 1s infinite;
+        }
+        #m7 {
+            animation: colorChangeM7 1s infinite;
+        }
+        #m9 {
+            animation: colorChangeM9 1s infinite;
+        }
+        #m11 {
+            animation: colorChangeM11 1s infinite;
+        }
+
         /* 阴影效果 */
         #shadow {
             background-color: rgba(0, 0, 0, 0.3);
@@ -500,6 +584,18 @@ export default {
             filter: blur(10px);
             top: 80%;
             left: 0;
+            animation: shadowMovement 0.5s infinite alternate;
+        }
+        
+        @keyframes shadowMovement {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: scale(0.9);
+                opacity: 0.3;
+            }
         }
         
         /* 响应式设计 */
