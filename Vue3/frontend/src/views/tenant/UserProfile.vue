@@ -370,24 +370,57 @@ const uploadAvatar = async () => {
 
     <!-- 用户信息内容 -->
     <div v-else-if="user" class="profile-content">
-      <!-- 头像卡片 -->
-      <div class="info-card avatar-card">
-        <h3 class="card-title">头像设置</h3>
-        <div class="avatar-section">
-          <div class="avatar-preview">
-            <img :src="getAvatarUrl()" id="avatar-preview" alt="用户头像" class="avatar-image">
-          </div>
-          <div class="avatar-actions">
-            <div class="file-input-container">
-              <input 
-                type="file" 
-                id="avatar-input"
-                accept="image/*" 
-                @change="handleAvatarSelect" 
-                class="file-input"
-                :disabled="avatarUploading"
+      <!-- 左侧：头像卡片 -->
+      <div class="left-column">
+        <div class="info-card avatar-card">
+          <h3 class="card-title">头像设置</h3>
+          <div class="avatar-section">
+            <div class="avatar-preview">
+              <img :src="getAvatarUrl()" id="avatar-preview" alt="用户头像" class="avatar-image">
+            </div>
+            <div class="avatar-actions">
+              <div class="file-input-container">
+                <input 
+                  type="file" 
+                  id="avatar-input"
+                  accept="image/*" 
+                  @change="handleAvatarSelect" 
+                  class="file-input"
+                  :disabled="avatarUploading"
+                >
+                <label for="avatar-input" class="button select-avatar-button">
+                  <div class="outline"></div>
+                  <div class="state state--default">
+                    <div class="icon">
+                      <svg
+                        width="1em"
+                        height="1em"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M14.2199 21.63C13.0399 21.63 11.3699 20.8 10.0499 16.83L9.32988 14.67L7.16988 13.95C3.20988 12.63 2.37988 10.96 2.37988 9.78001C2.37988 8.61001 3.20988 6.93001 7.16988 5.60001L15.6599 2.77001C17.7799 2.06001 19.5499 2.27001 20.6399 3.35001C21.7299 4.43001 21.9399 6.21001 21.2299 8.33001L18.3999 16.82C17.0699 20.8 15.3999 21.63 14.2199 21.63ZM7.63988 7.03001C4.85988 7.96001 3.86988 9.06001 3.86988 9.78001C3.86988 10.5 4.85988 11.6 7.63988 12.52L10.1599 13.36C10.3799 13.43 10.5599 13.61 10.6299 13.83L11.4699 16.35C12.3899 19.13 13.4999 20.12 14.2199 20.12C14.9399 20.12 16.0399 19.13 16.9699 16.35L19.7999 7.86001C20.3099 6.32001 20.2199 5.06001 19.5699 4.41001C18.9199 3.76001 17.6599 3.68001 16.1299 4.19001L7.63988 7.03001Z"
+                        ></path>
+                        <path
+                          d="M10.11 14.4C9.92005 14.4 9.73005 14.33 9.58005 14.18C9.29005 13.89 9.29005 13.41 9.58005 13.12L13.16 9.53C13.45 9.24 13.93 9.24 14.22 9.53C14.51 9.82 14.51 10.3 14.22 10.59L10.64 14.18C10.5 14.33 10.3 14.4 10.11 14.4Z"
+                        ></path>
+                      </svg>
+                    </div>
+                    <p>
+                      <span style="--i:0">{{ avatarFile ? '重' : '选' }}</span>
+                      <span style="--i:1">{{ avatarFile ? '新' : '择' }}</span>
+                      <span style="--i:2">{{ avatarFile ? '选' : '头' }}</span>
+                      <span style="--i:3">{{ avatarFile ? '择' : '像' }}</span>
+                    </p>
+                  </div>
+                </label>
+              </div>
+              <button 
+                @click="uploadAvatar" 
+                :disabled="!avatarFile || avatarUploading" 
+                class="button upload-avatar-button"
               >
-              <label for="avatar-input" class="button select-avatar-button">
                 <div class="outline"></div>
                 <div class="state state--default">
                   <div class="icon">
@@ -407,274 +440,243 @@ const uploadAvatar = async () => {
                     </svg>
                   </div>
                   <p>
-                    <span style="--i:0">{{ avatarFile ? '重' : '选' }}</span>
-                    <span style="--i:1">{{ avatarFile ? '新' : '择' }}</span>
-                    <span style="--i:2">{{ avatarFile ? '选' : '头' }}</span>
-                    <span style="--i:3">{{ avatarFile ? '择' : '像' }}</span>
+                    <span style="--i:0">{{ avatarUploading ? '上' : '上' }}</span>
+                    <span style="--i:1">{{ avatarUploading ? '传' : '传' }}</span>
+                    <span style="--i:2">{{ avatarUploading ? '中' : '头' }}</span>
+                    <span style="--i:3">{{ avatarUploading ? '...' : '像' }}</span>
                   </p>
                 </div>
-              </label>
+              </button>
             </div>
-            <button 
-              @click="uploadAvatar" 
-              :disabled="!avatarFile || avatarUploading" 
-              class="button upload-avatar-button"
-            >
-              <div class="outline"></div>
-              <div class="state state--default">
-                <div class="icon">
-                  <svg
-                    width="1em"
-                    height="1em"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M14.2199 21.63C13.0399 21.63 11.3699 20.8 10.0499 16.83L9.32988 14.67L7.16988 13.95C3.20988 12.63 2.37988 10.96 2.37988 9.78001C2.37988 8.61001 3.20988 6.93001 7.16988 5.60001L15.6599 2.77001C17.7799 2.06001 19.5499 2.27001 20.6399 3.35001C21.7299 4.43001 21.9399 6.21001 21.2299 8.33001L18.3999 16.82C17.0699 20.8 15.3999 21.63 14.2199 21.63ZM7.63988 7.03001C4.85988 7.96001 3.86988 9.06001 3.86988 9.78001C3.86988 10.5 4.85988 11.6 7.63988 12.52L10.1599 13.36C10.3799 13.43 10.5599 13.61 10.6299 13.83L11.4699 16.35C12.3899 19.13 13.4999 20.12 14.2199 20.12C14.9399 20.12 16.0399 19.13 16.9699 16.35L19.7999 7.86001C20.3099 6.32001 20.2199 5.06001 19.5699 4.41001C18.9199 3.76001 17.6599 3.68001 16.1299 4.19001L7.63988 7.03001Z"
-                    ></path>
-                    <path
-                      d="M10.11 14.4C9.92005 14.4 9.73005 14.33 9.58005 14.18C9.29005 13.89 9.29005 13.41 9.58005 13.12L13.16 9.53C13.45 9.24 13.93 9.24 14.22 9.53C14.51 9.82 14.51 10.3 14.22 10.59L10.64 14.18C10.5 14.33 10.3 14.4 10.11 14.4Z"
-                    ></path>
-                  </svg>
-                </div>
-                <p>
-                  <span style="--i:0">{{ avatarUploading ? '上' : '上' }}</span>
-                  <span style="--i:1">{{ avatarUploading ? '传' : '传' }}</span>
-                  <span style="--i:2">{{ avatarUploading ? '中' : '头' }}</span>
-                  <span style="--i:3">{{ avatarUploading ? '...' : '像' }}</span>
-                </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧：信息网格 -->
+      <div class="right-column">
+        <!-- 基本信息卡片 -->
+        <div class="info-card">
+          <h3 class="card-title">基本信息</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>用户名：</label>
+              <span>{{ user.username }}</span>
+            </div>
+            <div class="info-item">
+              <label>真实姓名：</label>
+              <div v-if="!isEditing || editingField !== 'realName'" 
+                   class="editable-field" 
+                   @click="startEditField('realName')">
+                {{ getFieldDisplayValue('realName') }}
               </div>
-            </button>
-          </div>
-          <div class="avatar-tips">
-            <p>支持 JPG、PNG 格式，大小不超过 2MB</p>
+              <input v-else v-model="editForm.realName" class="edit-input" type="text" placeholder="请输入真实姓名">
+            </div>
+            <div class="info-item">
+              <label>手机号：</label>
+              <span>{{ user.phone }}</span>
+            </div>
+            <div class="info-item">
+              <label>用户类型：</label>
+              <span>{{ userTypeMap[user.userType] || '未知' }}</span>
+            </div>
+            <div class="info-item">
+              <label>注册时间：</label>
+              <span>{{ formatDateTime(user.registerTime) }}</span>
+            </div>
+            <div class="info-item">
+              <label>最后登录：</label>
+              <span>{{ user.lastLoginTime ? formatDateTime(user.lastLoginTime) : '从未登录' }}</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- 基本信息卡片 -->
-      <div class="info-card">
-        <h3 class="card-title">基本信息</h3>
-        <div class="info-grid">
-          <div class="info-item">
-            <label>用户名：</label>
-            <span>{{ user.username }}</span>
-          </div>
-          <div class="info-item">
-            <label>真实姓名：</label>
-            <div v-if="!isEditing || editingField !== 'realName'" 
-                 class="editable-field" 
-                 @click="startEditField('realName')">
-              {{ getFieldDisplayValue('realName') }}
+        <!-- 身份信息卡片 -->
+        <div class="info-card">
+          <h3 class="card-title">身份信息</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>性别：</label>
+              <div v-if="!isEditing || editingField !== 'gender'" 
+                   class="editable-field" 
+                   @click="startEditField('gender')">
+                {{ getFieldDisplayValue('gender') }}
+              </div>
+              <select v-else v-model="editForm.gender" class="edit-input">
+                <option value="0">未知</option>
+                <option value="1">男</option>
+                <option value="2">女</option>
+              </select>
             </div>
-            <input v-else v-model="editForm.realName" class="edit-input" type="text" placeholder="请输入真实姓名">
-          </div>
-          <div class="info-item">
-            <label>手机号：</label>
-            <span>{{ user.phone }}</span>
-          </div>
-          <div class="info-item">
-            <label>用户类型：</label>
-            <span>{{ userTypeMap[user.userType] || '未知' }}</span>
-          </div>
-          <div class="info-item">
-            <label>注册时间：</label>
-            <span>{{ formatDateTime(user.registerTime) }}</span>
-          </div>
-          <div class="info-item">
-            <label>最后登录：</label>
-            <span>{{ user.lastLoginTime ? formatDateTime(user.lastLoginTime) : '从未登录' }}</span>
+            <div class="info-item">
+              <label>生日：</label>
+              <div v-if="!isEditing || editingField !== 'birthday'" 
+                   class="editable-field" 
+                   @click="startEditField('birthday')">
+                {{ getFieldDisplayValue('birthday') }}
+              </div>
+              <input v-else v-model="editForm.birthday" class="edit-input" type="date">
+            </div>
+            <div class="info-item">
+              <label>身份证号：</label>
+              <div v-if="!isEditing || editingField !== 'idCard'" 
+                   class="editable-field" 
+                   @click="startEditField('idCard')">
+                {{ getFieldDisplayValue('idCard') }}
+              </div>
+              <input v-else v-model="editForm.idCard" class="edit-input" type="text" placeholder="请输入身份证号">
+            </div>
+            <div class="info-item">
+              <label>实名认证：</label>
+              <span :class="{ 'certified': user.isCertified === 1, 'not-certified': user.isCertified !== 1 }">
+                {{ getFieldDisplayValue('isCertified') }}
+              </span>
+            </div>
+            <div class="info-item" v-if="user.isCertified === 1">
+              <label>认证时间：</label>
+              <span>{{ formatDateTime(user.certificationTime) }}</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- 身份信息卡片 -->
-      <div class="info-card">
-        <h3 class="card-title">身份信息</h3>
-        <div class="info-grid">
-          <div class="info-item">
-            <label>性别：</label>
-            <div v-if="!isEditing || editingField !== 'gender'" 
-                 class="editable-field" 
-                 @click="startEditField('gender')">
-              {{ getFieldDisplayValue('gender') }}
+        <!-- 联系信息卡片 -->
+        <div class="info-card">
+          <h3 class="card-title">联系信息</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>邮箱：</label>
+              <div v-if="!isEditing || editingField !== 'email'" 
+                   class="editable-field" 
+                   @click="startEditField('email')">
+                {{ getFieldDisplayValue('email') }}
+              </div>
+              <input v-else v-model="editForm.email" class="edit-input" type="email" placeholder="请输入邮箱">
             </div>
-            <select v-else v-model="editForm.gender" class="edit-input">
-              <option value="0">未知</option>
-              <option value="1">男</option>
-              <option value="2">女</option>
-            </select>
-          </div>
-          <div class="info-item">
-            <label>生日：</label>
-            <div v-if="!isEditing || editingField !== 'birthday'" 
-                 class="editable-field" 
-                 @click="startEditField('birthday')">
-              {{ getFieldDisplayValue('birthday') }}
+            <div class="info-item">
+              <label>微信号：</label>
+              <div v-if="!isEditing || editingField !== 'wechat'" 
+                   class="editable-field" 
+                   @click="startEditField('wechat')">
+                {{ getFieldDisplayValue('wechat') }}
+              </div>
+              <input v-else v-model="editForm.wechat" class="edit-input" type="text" placeholder="请输入微信号">
             </div>
-            <input v-else v-model="editForm.birthday" class="edit-input" type="date">
-          </div>
-          <div class="info-item">
-            <label>身份证号：</label>
-            <div v-if="!isEditing || editingField !== 'idCard'" 
-                 class="editable-field" 
-                 @click="startEditField('idCard')">
-              {{ getFieldDisplayValue('idCard') }}
+            <div class="info-item">
+              <label>QQ号：</label>
+              <div v-if="!isEditing || editingField !== 'qq'" 
+                   class="editable-field" 
+                   @click="startEditField('qq')">
+                {{ getFieldDisplayValue('qq') }}
+              </div>
+              <input v-else v-model="editForm.qq" class="edit-input" type="text" placeholder="请输入QQ号">
             </div>
-            <input v-else v-model="editForm.idCard" class="edit-input" type="text" placeholder="请输入身份证号">
-          </div>
-          <div class="info-item">
-            <label>实名认证：</label>
-            <span :class="{ 'certified': user.isCertified === 1, 'not-certified': user.isCertified !== 1 }">
-              {{ getFieldDisplayValue('isCertified') }}
-            </span>
-          </div>
-          <div class="info-item" v-if="user.isCertified === 1">
-            <label>认证时间：</label>
-            <span>{{ formatDateTime(user.certificationTime) }}</span>
           </div>
         </div>
-      </div>
 
-      <!-- 联系信息卡片 -->
-      <div class="info-card">
-        <h3 class="card-title">联系信息</h3>
-        <div class="info-grid">
-          <div class="info-item">
-            <label>邮箱：</label>
-            <div v-if="!isEditing || editingField !== 'email'" 
-                 class="editable-field" 
-                 @click="startEditField('email')">
-              {{ getFieldDisplayValue('email') }}
+        <!-- 职业信息卡片 -->
+        <div class="info-card">
+          <h3 class="card-title">职业信息</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>职业：</label>
+              <div v-if="!isEditing || editingField !== 'job'" 
+                   class="editable-field" 
+                   @click="startEditField('job')">
+                {{ getFieldDisplayValue('job') }}
+              </div>
+              <input v-else v-model="editForm.job" class="edit-input" type="text" placeholder="请输入职业">
             </div>
-            <input v-else v-model="editForm.email" class="edit-input" type="email" placeholder="请输入邮箱">
-          </div>
-          <div class="info-item">
-            <label>微信号：</label>
-            <div v-if="!isEditing || editingField !== 'wechat'" 
-                 class="editable-field" 
-                 @click="startEditField('wechat')">
-              {{ getFieldDisplayValue('wechat') }}
+            <div class="info-item">
+              <label>工作单位：</label>
+              <div v-if="!isEditing || editingField !== 'company'" 
+                   class="editable-field" 
+                   @click="startEditField('company')">
+                {{ getFieldDisplayValue('company') }}
+              </div>
+              <input v-else v-model="editForm.company" class="edit-input" type="text" placeholder="请输入工作单位">
             </div>
-            <input v-else v-model="editForm.wechat" class="edit-input" type="text" placeholder="请输入微信号">
-          </div>
-          <div class="info-item">
-            <label>QQ号：</label>
-            <div v-if="!isEditing || editingField !== 'qq'" 
-                 class="editable-field" 
-                 @click="startEditField('qq')">
-              {{ getFieldDisplayValue('qq') }}
+            <div class="info-item">
+              <label>月收入：</label>
+              <div v-if="!isEditing || editingField !== 'monthlyIncome'" 
+                   class="editable-field" 
+                   @click="startEditField('monthlyIncome')">
+                {{ getFieldDisplayValue('monthlyIncome') }}
+              </div>
+              <input v-else v-model="editForm.monthlyIncome" class="edit-input" type="number" placeholder="请输入月收入">
             </div>
-            <input v-else v-model="editForm.qq" class="edit-input" type="text" placeholder="请输入QQ号">
           </div>
         </div>
-      </div>
 
-      <!-- 职业信息卡片 -->
-      <div class="info-card">
-        <h3 class="card-title">职业信息</h3>
-        <div class="info-grid">
-          <div class="info-item">
-            <label>职业：</label>
-            <div v-if="!isEditing || editingField !== 'job'" 
-                 class="editable-field" 
-                 @click="startEditField('job')">
-              {{ getFieldDisplayValue('job') }}
+        <!-- 租房偏好卡片 -->
+        <div class="info-card">
+          <h3 class="card-title">租房偏好</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>最低预算：</label>
+              <div v-if="!isEditing || editingField !== 'rentalBudgetMin'" 
+                   class="editable-field" 
+                   @click="startEditField('rentalBudgetMin')">
+                {{ getFieldDisplayValue('rentalBudgetMin') }}
+              </div>
+              <input v-else v-model="editForm.rentalBudgetMin" class="edit-input" type="number" placeholder="请输入最低预算">
             </div>
-            <input v-else v-model="editForm.job" class="edit-input" type="text" placeholder="请输入职业">
-          </div>
-          <div class="info-item">
-            <label>工作单位：</label>
-            <div v-if="!isEditing || editingField !== 'company'" 
-                 class="editable-field" 
-                 @click="startEditField('company')">
-              {{ getFieldDisplayValue('company') }}
+            <div class="info-item">
+              <label>最高预算：</label>
+              <div v-if="!isEditing || editingField !== 'rentalBudgetMax'" 
+                   class="editable-field" 
+                   @click="startEditField('rentalBudgetMax')">
+                {{ getFieldDisplayValue('rentalBudgetMax') }}
+              </div>
+              <input v-else v-model="editForm.rentalBudgetMax" class="edit-input" type="number" placeholder="请输入最高预算">
             </div>
-            <input v-else v-model="editForm.company" class="edit-input" type="text" placeholder="请输入工作单位">
-          </div>
-          <div class="info-item">
-            <label>月收入：</label>
-            <div v-if="!isEditing || editingField !== 'monthlyIncome'" 
-                 class="editable-field" 
-                 @click="startEditField('monthlyIncome')">
-              {{ getFieldDisplayValue('monthlyIncome') }}
+            <div class="info-item full-width">
+              <label>偏好区域：</label>
+              <div v-if="!isEditing || editingField !== 'preferredDistricts'" 
+                   class="editable-field" 
+                   @click="startEditField('preferredDistricts')">
+                {{ getFieldDisplayValue('preferredDistricts') }}
+              </div>
+              <input v-else v-model="editForm.preferredDistricts" class="edit-input" type="text" placeholder="请输入偏好区域">
             </div>
-            <input v-else v-model="editForm.monthlyIncome" class="edit-input" type="number" placeholder="请输入月收入">
+            <div class="info-item full-width">
+              <label>租房需求：</label>
+              <div v-if="!isEditing || editingField !== 'houseRequirements'" 
+                   class="editable-field" 
+                   @click="startEditField('houseRequirements')">
+                {{ getFieldDisplayValue('houseRequirements') }}
+              </div>
+              <textarea v-else v-model="editForm.houseRequirements" class="edit-textarea" placeholder="请输入租房需求"></textarea>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- 租房偏好卡片 -->
-      <div class="info-card">
-        <h3 class="card-title">租房偏好</h3>
-        <div class="info-grid">
-          <div class="info-item">
-            <label>最低预算：</label>
-            <div v-if="!isEditing || editingField !== 'rentalBudgetMin'" 
-                 class="editable-field" 
-                 @click="startEditField('rentalBudgetMin')">
-              {{ getFieldDisplayValue('rentalBudgetMin') }}
+        <!-- 账户状态卡片 -->
+        <div class="info-card">
+          <h3 class="card-title">账户状态</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>账户状态：</label>
+              <span :class="{
+                'status-active': user.status === 1,
+                'status-inactive': user.status === 2,
+                'status-disabled': user.status === 0
+              }">
+                {{ getFieldDisplayValue('status') }}
+              </span>
             </div>
-            <input v-else v-model="editForm.rentalBudgetMin" class="edit-input" type="number" placeholder="请输入最低预算">
-          </div>
-          <div class="info-item">
-            <label>最高预算：</label>
-            <div v-if="!isEditing || editingField !== 'rentalBudgetMax'" 
-                 class="editable-field" 
-                 @click="startEditField('rentalBudgetMax')">
-              {{ getFieldDisplayValue('rentalBudgetMax') }}
+            <div class="info-item">
+              <label>信用分：</label>
+              <span :class="{
+                'credit-high': user.creditScore >= 80,
+                'credit-medium': user.creditScore >= 60 && user.creditScore < 80,
+                'credit-low': user.creditScore < 60
+              }">
+                {{ user.creditScore }}分
+              </span>
             </div>
-            <input v-else v-model="editForm.rentalBudgetMax" class="edit-input" type="number" placeholder="请输入最高预算">
-          </div>
-          <div class="info-item full-width">
-            <label>偏好区域：</label>
-            <div v-if="!isEditing || editingField !== 'preferredDistricts'" 
-                 class="editable-field" 
-                 @click="startEditField('preferredDistricts')">
-              {{ getFieldDisplayValue('preferredDistricts') }}
+            <div class="info-item">
+              <label>最后更新：</label>
+              <span>{{ formatDateTime(user.updatedTime) }}</span>
             </div>
-            <input v-else v-model="editForm.preferredDistricts" class="edit-input" type="text" placeholder="请输入偏好区域">
-          </div>
-          <div class="info-item full-width">
-            <label>租房需求：</label>
-            <div v-if="!isEditing || editingField !== 'houseRequirements'" 
-                 class="editable-field" 
-                 @click="startEditField('houseRequirements')">
-              {{ getFieldDisplayValue('houseRequirements') }}
-            </div>
-            <textarea v-else v-model="editForm.houseRequirements" class="edit-textarea" placeholder="请输入租房需求"></textarea>
-          </div>
-        </div>
-      </div>
-
-      <!-- 账户状态卡片 -->
-      <div class="info-card">
-        <h3 class="card-title">账户状态</h3>
-        <div class="info-grid">
-          <div class="info-item">
-            <label>账户状态：</label>
-            <span :class="{
-              'status-active': user.status === 1,
-              'status-inactive': user.status === 2,
-              'status-disabled': user.status === 0
-            }">
-              {{ getFieldDisplayValue('status') }}
-            </span>
-          </div>
-          <div class="info-item">
-            <label>信用分：</label>
-            <span :class="{
-              'credit-high': user.creditScore >= 80,
-              'credit-medium': user.creditScore >= 60 && user.creditScore < 80,
-              'credit-low': user.creditScore < 60
-            }">
-              {{ user.creditScore }}分
-            </span>
-          </div>
-          <div class="info-item">
-            <label>最后更新：</label>
-            <span>{{ formatDateTime(user.updatedTime) }}</span>
           </div>
         </div>
       </div>
@@ -690,47 +692,31 @@ const uploadAvatar = async () => {
 
 <style scoped>
 .user-profile-container {
-  min-height: 100vh;
-  background: #ffffff;
-  padding-bottom: 2rem;
-  position: relative;
+  height: 100vh;
+  background: #f0f2f5;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
+  padding: 0.5rem 1.5rem;
   background-color: #ffffff;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  border-bottom: 1px solid #e0e0e0;
-  position: sticky;
-  top: 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   z-index: 100;
+  flex-shrink: 0;
+  height: 60px; /* Fixed height for calculation */
 }
 
 .nav-center h2 {
   margin: 0;
   color: #2c3e50;
   font-weight: 600;
-  font-size: 1.5rem;
-}
-
-.back-btn {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 25px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-}
-
-.back-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  font-size: 1.2rem;
+  font-family: "Galano Grotesque", Poppins, Montserrat, sans-serif;
 }
 
 .action-buttons {
@@ -738,128 +724,135 @@ const uploadAvatar = async () => {
   gap: 0.75rem;
 }
 
-.cancel-btn {
-  background: #6c757d;
-  color: white;
+.cancel-btn, .save-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 14px;
   border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 25px;
   cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  font-family: "Galano Grotesque", Poppins, Montserrat, sans-serif;
 }
 
-.cancel-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+.cancel-btn {
+  background: #e7e7e7;
+  color: #666;
 }
 
 .save-btn {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: #667eea;
   color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 25px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-}
-
-.save-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-}
-
-.save-btn:disabled {
-  background: #6c757d;
-  transform: none;
-  box-shadow: none;
-  cursor: not-allowed;
 }
 
 .message {
-  padding: 1rem 2rem;
-  margin: 1rem 2rem;
-  border-radius: 12px;
+  position: absolute;
+  top: 4rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.5rem 1.5rem;
+  border-radius: 14px;
   font-weight: 500;
-  text-align: center;
+  z-index: 200;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .message.success {
-  background: rgba(40, 167, 69, 0.1);
+  background: #d4edda;
   color: #155724;
-  border: 2px solid rgba(40, 167, 69, 0.3);
 }
 
 .message.error {
-  background: rgba(220, 53, 69, 0.1);
+  background: #f8d7da;
   color: #721c24;
-  border: 2px solid rgba(220, 53, 69, 0.3);
 }
 
 .loading-section {
   text-align: center;
   padding: 3rem;
   color: #666;
-  font-size: 1.2rem;
 }
 
+/* Layout Styles */
 .profile-content {
+  flex: 1;
   padding: 1rem;
-  margin: 0;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
   gap: 1rem;
+  overflow: hidden; /* Prevent outer scroll, let grid handle it if needed */
   width: 100%;
   box-sizing: border-box;
 }
 
-.info-card {
-  background: white;
-  border-radius: 8px;
-  padding: 1.25rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e0e0e0;
-  transition: all 0.2s ease;
-  height: fit-content;
+.left-column {
+  width: 260px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
 }
 
-.info-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+.right-column {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 Columns */
+  grid-template-rows: repeat(2, 1fr);    /* 2 Rows */
+  gap: 1rem;
+  height: 100%; /* Fill the available height */
+}
+
+/* Theme Variables matching the button */
+.info-card {
+  --neutral-1: #f7f8f7;
+  --neutral-2: #e7e7e7;
+  --radius: 14px;
+
+  background: linear-gradient(to bottom right, var(--neutral-1), var(--neutral-2));
+  border-radius: var(--radius);
+  padding: 1rem;
+  box-shadow: 
+    0 0.5px 0.5px 1px rgba(255, 255, 255, 0.5),
+    0 4px 10px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  font-family: "Galano Grotesque", Poppins, Montserrat, sans-serif;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; /* Allow scroll inside card if content is too big */
 }
 
 .avatar-card {
-  text-align: center;
-  grid-column: 1 / -1;
+  height: 100%; /* Fill left column height */
+  align-items: center;
+  justify-content: center;
 }
 
 .card-title {
-  margin: 0 0 1rem 0;
+  margin: 0 0 0.75rem 0;
   color: #2c3e50;
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 600;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  width: 100%;
+  flex-shrink: 0;
 }
 
 .avatar-section {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem;
+  width: 100%;
+  flex: 1;
+  justify-content: center;
 }
 
 .avatar-preview {
-  width: 80px;
-  height: 80px;
+  width: 180px;
+  height: 180px;
   border-radius: 50%;
   overflow: hidden;
-  border: 3px solid #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 4px solid #fff;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .avatar-image {
@@ -870,121 +863,69 @@ const uploadAvatar = async () => {
 
 .avatar-actions {
   display: flex;
-  gap: 0.75rem;
+  gap: 1rem;
+  flex-direction: column;
+  width: 100%;
   align-items: center;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.file-input-container {
-  position: relative;
-}
-
-.file-input {
-  display: none;
-}
-
-.file-input-label {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-  font-size: 0.9rem;
-}
-
-.file-input-label:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-.upload-btn {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-  font-size: 0.9rem;
-}
-
-.upload-btn:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-.upload-btn:disabled {
-  background: #6c757d;
-  transform: none;
-  box-shadow: none;
-  cursor: not-allowed;
-}
-
-.avatar-tips {
-  color: #6c757d;
-  font-size: 0.8rem;
-  text-align: center;
 }
 
 .info-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+  justify-content: space-evenly; /* Distribute items evenly */
 }
 
 .info-item {
   display: flex;
-  flex-direction: column;
-  padding: 0.75rem;
-  background: #f8f9fa;
-  border-radius: 6px;
-  border: 1px solid #e9ecef;
+  flex-direction: row; /* Horizontal layout for items to save vertical space */
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.8rem;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
 }
 
 .info-item label {
   font-weight: 600;
-  color: #495057;
-  margin-bottom: 0.25rem;
-  font-size: 0.85rem;
+  color: #666;
+  font-size: 0.8rem;
+  margin: 0;
+  flex-shrink: 0;
 }
 
-.info-item span {
+.info-item span, .editable-field {
   color: #2c3e50;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 500;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 60%;
 }
 
 .editable-field {
-  color: #2c3e50;
-  font-size: 1rem;
-  font-weight: 500;
-  padding: 0.25rem 0;
   cursor: pointer;
-  border-bottom: 2px dashed transparent;
-  transition: all 0.3s ease;
-  border-radius: 4px;
+  transition: color 0.2s;
 }
 
 .editable-field:hover {
-  background: rgba(102, 126, 234, 0.1);
-  border-bottom: 2px dashed #667eea;
-  padding: 0.25rem 0.5rem;
+  color: #667eea;
 }
 
 .edit-input, .edit-textarea {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #e9ecef;
+  width: 60%;
+  padding: 0.2rem 0.4rem;
+  border: 1px solid #ddd;
   border-radius: 6px;
   font-size: 0.9rem;
-  transition: all 0.3s ease;
   background: white;
+  font-family: inherit;
+  text-align: right;
 }
 
 .edit-input:focus, .edit-textarea:focus {
@@ -994,131 +935,53 @@ const uploadAvatar = async () => {
 }
 
 .edit-textarea {
-  min-height: 60px;
-  resize: vertical;
+  min-height: 40px;
+  resize: none;
+  text-align: left;
 }
 
+/* Special handling for Rental Preferences to allow wrapping */
 .info-item.full-width {
-  grid-column: 1 / -1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
 }
 
-/* 状态样式 */
-.certified {
-  color: #155724;
+.info-item.full-width span, .info-item.full-width .editable-field {
+  text-align: left;
+  max-width: 100%;
+  white-space: normal;
+}
+
+.info-item.full-width .edit-input, .info-item.full-width .edit-textarea {
+  width: 100%;
+  text-align: left;
+}
+
+/* Status Badges - Simplified */
+.certified, .not-certified, .status-active, .status-inactive, .status-disabled, .credit-high, .credit-medium, .credit-low {
+  padding: 0.1rem 0.5rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
   font-weight: 600;
-  background: #d4edda;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  display: inline-block;
-  border: 1px solid #c3e6cb;
 }
 
-.not-certified {
-  color: #721c24;
-  font-weight: 600;
-  background: #f8d7da;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  display: inline-block;
-  border: 1px solid #f5c6cb;
+.certified, .status-active, .credit-high {
+  background: #e6fffa;
+  color: #2c7a7b;
 }
 
-.status-active {
-  color: #155724;
-  font-weight: 600;
-  background: #d4edda;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  display: inline-block;
-  border: 1px solid #c3e6cb;
+.not-certified, .status-disabled, .credit-low {
+  background: #fff5f5;
+  color: #c53030;
 }
 
-.status-inactive {
-  color: #856404;
-  font-weight: 600;
-  background: #fff3cd;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  display: inline-block;
-  border: 1px solid #ffeaa7;
+.status-inactive, .credit-medium {
+  background: #fffaf0;
+  color: #c05621;
 }
 
-.status-disabled {
-  color: #721c24;
-  font-weight: 600;
-  background: #f8d7da;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  display: inline-block;
-  border: 1px solid #f5c6cb;
-}
-
-.credit-high {
-  color: #155724;
-  font-weight: 600;
-  background: #d4edda;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  display: inline-block;
-  border: 1px solid #c3e6cb;
-}
-
-.credit-medium {
-  color: #856404;
-  font-weight: 600;
-  background: #fff3cd;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  display: inline-block;
-  border: 1px solid #ffeaa7;
-}
-
-.credit-low {
-  color: #721c24;
-  font-weight: 600;
-  background: #f8d7da;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  display: inline-block;
-  border: 1px solid #f5c6cb;
-}
-
-.not-logged-in {
-  text-align: center;
-  padding: 4rem 2rem;
-  color: #666;
-  background: white;
-  border-radius: 12px;
-  margin: 2rem;
-  border: 1px solid #e0e0e0;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
-
-.not-logged-in p {
-  margin-bottom: 2rem;
-  font-size: 1.3rem;
-  font-weight: 500;
-}
-
-.login-btn {
-  padding: 1rem 2.5rem;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-  border: none;
-  border-radius: 25px;
-  cursor: pointer;
-  font-size: 1.1rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-}
-
-.login-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-}
-
-/* 特殊按钮样式 */
+/* Special Button Styles from User Request (Preserved but sized) */
 .button {
   --primary: #667eea;
   --neutral-1: #f7f8f7;
@@ -1136,13 +999,14 @@ const uploadAvatar = async () => {
   justify-content: center;
   position: relative;
   transition: all 0.3s ease;
-  min-width: 120px;
-  padding: 12px;
-  height: 48px;
+  min-width: 100px;
+  padding: 0 12px;
+  height: 40px;
   font-family: "Galano Grotesque", Poppins, Montserrat, sans-serif;
   font-style: normal;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
+  color: #333;
 }
 
 .button:hover {
@@ -1456,60 +1320,43 @@ const uploadAvatar = async () => {
   }
 }
 
-/* 移除旧的按钮样式 */
-.back-btn,
-.file-input-label,
-.upload-btn {
-  display: none;
-}
-
-/* 特定按钮样式调整 */
-.back-button,
-.select-avatar-button,
-.upload-avatar-button {
-  min-width: 120px;
-}
-
-/* 文件输入容器调整 */
-.file-input-container {
-  position: relative;
-  display: inline-block;
-}
-
-.file-input {
-  display: none;
+/* Responsive */
+@media (max-width: 1200px) {
+  .right-column {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+  }
 }
 
 @media (max-width: 768px) {
-  .navbar {
-    padding: 1rem;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
   .profile-content {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  
+  .left-column {
+    width: 100%;
+    height: auto;
+  }
+  
+  .right-column {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    height: auto;
+  }
+  
+  .avatar-card {
+    flex-direction: row;
     padding: 1rem;
   }
   
-  .info-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  
-  .info-card {
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
+  .avatar-section {
+    flex-direction: row;
   }
   
   .avatar-actions {
-    flex-direction: column;
-    width: 100%;
-  }
-  
-  .select-avatar-button,
-  .upload-avatar-button {
-    width: 100%;
-    text-align: center;
+    margin-left: 1rem;
+    align-items: flex-start;
   }
 }
 </style>

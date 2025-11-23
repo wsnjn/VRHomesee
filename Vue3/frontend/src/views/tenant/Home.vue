@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import DinoOverlay from './DinoOverlay.vue'
 
 const router = useRouter()
 const showUserMenu = ref(false)
@@ -208,6 +209,10 @@ const formatDate = (dateString) => {
         </div>
       </div>
     </main>
+
+
+    <!-- 智能匹配小恐龙 -->
+    <DinoOverlay />
   </div>
 </template>
 
