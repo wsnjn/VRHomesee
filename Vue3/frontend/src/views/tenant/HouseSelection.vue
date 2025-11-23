@@ -12,6 +12,18 @@
 
     <!-- 筛选条件 -->
     <div class="filter-section">
+      <div class="search-row">
+        <div class="search-box">
+          <input 
+            type="text" 
+            v-model="searchQuery" 
+            placeholder="搜索小区、地址..." 
+            @keyup.enter="loadHouses"
+          />
+          <button @click="loadHouses" class="search-btn">搜索</button>
+        </div>
+      </div>
+
       <div class="filter-row">
         <div class="filter-item">
           <label for="province">省份：</label>
@@ -228,6 +240,7 @@ const rentalTypes = ref({})
 const decorationTypes = ref({})
 const elevatorOptions = ref({})
 const orientationOptions = ref({})
+const searchQuery = ref('')
 
 // 筛选条件
 const selectedProvince = ref('')
@@ -355,7 +368,8 @@ const loadHouses = async () => {
       minPrice: minPrice.value ? parseFloat(minPrice.value) : undefined,
       maxPrice: maxPrice.value ? parseFloat(maxPrice.value) : undefined,
       minArea: minArea.value ? parseFloat(minArea.value) : undefined,
-      maxArea: maxArea.value ? parseFloat(maxArea.value) : undefined
+      maxArea: maxArea.value ? parseFloat(maxArea.value) : undefined,
+      keyword: searchQuery.value || undefined
     }
 
     // 移除undefined参数
@@ -454,6 +468,7 @@ const resetFilters = () => {
   districts.value = []
   streets.value = []
   communities.value = []
+  searchQuery.value = ''
 }
 
 // 应用筛选（与自动筛选重复，但保留按钮）
@@ -599,6 +614,49 @@ onMounted(async () => {
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   border: 1px solid #f0f0f0;
+}
+
+.search-row {
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+.search-box {
+  display: flex;
+  width: 100%;
+  max-width: 600px;
+  gap: 10px;
+}
+
+.search-box input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.3s;
+}
+
+.search-box input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.search-btn {
+  padding: 0 24px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.search-btn:hover {
+  background: #0056b3;
 }
 
 .filter-row {

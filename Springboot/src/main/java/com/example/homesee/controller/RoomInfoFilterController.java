@@ -26,25 +26,25 @@ public class RoomInfoFilterController {
         try {
             // 获取所有省份列表
             List<String> provinces = roomInfoRepository.findDistinctProvinces();
-            
+
             // 租赁类型映射
             Map<String, String> rentalTypes = new HashMap<>();
             rentalTypes.put("0", "整租");
             rentalTypes.put("1", "合租");
             rentalTypes.put("2", "单间");
-            
+
             // 装修程度映射
             Map<String, String> decorationTypes = new HashMap<>();
             decorationTypes.put("1", "毛坯");
             decorationTypes.put("2", "简装");
             decorationTypes.put("3", "精装");
             decorationTypes.put("4", "豪装");
-            
+
             // 电梯选项
             Map<String, String> elevatorOptions = new HashMap<>();
             elevatorOptions.put("0", "无电梯");
             elevatorOptions.put("1", "有电梯");
-            
+
             // 朝向选项
             Map<String, String> orientationOptions = new HashMap<>();
             orientationOptions.put("南", "南");
@@ -57,7 +57,7 @@ public class RoomInfoFilterController {
             orientationOptions.put("西南", "西南");
             orientationOptions.put("东北", "东北");
             orientationOptions.put("西北", "西北");
-            
+
             response.put("provinces", provinces);
             response.put("rentalTypes", rentalTypes);
             response.put("decorationTypes", decorationTypes);
@@ -151,85 +151,99 @@ public class RoomInfoFilterController {
             @RequestParam(required = false) Double minPrice,
             @RequestParam(required = false) Double maxPrice,
             @RequestParam(required = false) Double minArea,
-            @RequestParam(required = false) Double maxArea) {
-        
+            @RequestParam(required = false) Double maxArea,
+            @RequestParam(required = false) String keyword) {
+
         try {
             List<RoomInfo> rooms = roomInfoRepository.findAll();
-            
+
             // 过滤状态为0（在租）的房屋
             rooms = rooms.stream()
                     .filter(room -> room.getStatus() == 0)
                     .collect(Collectors.toList());
-            
+
+            // 关键字搜索
+            if (keyword != null && !keyword.isEmpty()) {
+                String kw = keyword.toLowerCase();
+                rooms = rooms.stream()
+                        .filter(room -> (room.getCommunityName() != null
+                                && room.getCommunityName().toLowerCase().contains(kw)) ||
+                                (room.getProvince() != null && room.getProvince().toLowerCase().contains(kw)) ||
+                                (room.getCity() != null && room.getCity().toLowerCase().contains(kw)) ||
+                                (room.getDistrict() != null && room.getDistrict().toLowerCase().contains(kw)) ||
+                                (room.getStreet() != null && room.getStreet().toLowerCase().contains(kw)))
+                        .collect(Collectors.toList());
+            }
+
             // 根据筛选条件过滤
             if (province != null && !province.isEmpty()) {
                 rooms = rooms.stream()
                         .filter(room -> province.equals(room.getProvince()))
                         .collect(Collectors.toList());
             }
-            
+
             if (city != null && !city.isEmpty()) {
                 rooms = rooms.stream()
                         .filter(room -> city.equals(room.getCity()))
                         .collect(Collectors.toList());
             }
-            
+
             if (district != null && !district.isEmpty()) {
                 rooms = rooms.stream()
                         .filter(room -> district.equals(room.getDistrict()))
                         .collect(Collectors.toList());
             }
-            
+
             if (street != null && !street.isEmpty()) {
                 rooms = rooms.stream()
                         .filter(room -> street.equals(room.getStreet()))
                         .collect(Collectors.toList());
             }
-            
+
             if (communityName != null && !communityName.isEmpty()) {
                 rooms = rooms.stream()
                         .filter(room -> communityName.equals(room.getCommunityName()))
                         .collect(Collectors.toList());
             }
-            
+
             if (rentalType != null) {
                 rooms = rooms.stream()
                         .filter(room -> rentalType.equals(room.getRentalType()))
                         .collect(Collectors.toList());
             }
-            
+
             if (decoration != null) {
                 rooms = rooms.stream()
                         .filter(room -> decoration.equals(room.getDecoration()))
                         .collect(Collectors.toList());
             }
-            
+
             if (minPrice != null) {
                 rooms = rooms.stream()
                         .filter(room -> room.getRentPrice().compareTo(BigDecimal.valueOf(minPrice)) >= 0)
                         .collect(Collectors.toList());
             }
-            
+
             if (maxPrice != null) {
                 rooms = rooms.stream()
                         .filter(room -> room.getRentPrice().compareTo(BigDecimal.valueOf(maxPrice)) <= 0)
                         .collect(Collectors.toList());
             }
-            
+
             if (minArea != null) {
                 rooms = rooms.stream()
-                        .filter(room -> room.getRoomArea() != null && 
+                        .filter(room -> room.getRoomArea() != null &&
                                 room.getRoomArea().compareTo(BigDecimal.valueOf(minArea)) >= 0)
                         .collect(Collectors.toList());
             }
-            
+
             if (maxArea != null) {
                 rooms = rooms.stream()
-                        .filter(room -> room.getRoomArea() != null && 
+                        .filter(room -> room.getRoomArea() != null &&
                                 room.getRoomArea().compareTo(BigDecimal.valueOf(maxArea)) <= 0)
                         .collect(Collectors.toList());
             }
-            
+
             return ResponseEntity.ok(rooms);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(null);

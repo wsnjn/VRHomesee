@@ -16,7 +16,7 @@
         </div>
         <div class="message-content">
           <div class="message-bubble">
-            <p v-if="msg.content">{{ msg.content }}</p>
+            <div v-if="msg.content" v-html="msg.content" class="html-content"></div>
             <div v-if="msg.loading" class="typing-indicator">
               <span></span><span></span><span></span>
             </div>
@@ -57,13 +57,12 @@ const textarea = ref(null)
 const currentUser = ref(null)
 
 // API Configuration
-const API_KEY = 'sk-e2fdf28cd6f34468a5d80ad14e840d77'
-const API_URL = 'https://api.deepseek.com/chat/completions'
+const BACKEND_URL = 'http://localhost:8080/api/smart-matching'
 
 // User Avatar
 const userAvatar = ref('/src/assets/image/default-avatar.png')
 
-onMounted(() => {
+onMounted(async () => {
   // Load user info
   const userData = localStorage.getItem('user')
   if (userData) {
@@ -71,11 +70,38 @@ onMounted(() => {
     if (currentUser.value.avatar) {
       userAvatar.value = `/src/assets/image/${currentUser.value.avatar}`
     }
+    
+    // Fetch history
+    await fetchHistory()
+  } else {
+    // If not logged in, show greeting
+    addMessage('assistant', '您好！我是您的智能租房助手。请先登录以获取更个性化的服务。')
   }
-
-  // Initial greeting
-  addMessage('assistant', `您好${currentUser.value ? ' ' + (currentUser.value.realName || currentUser.value.username) : ''}！我是您的智能租房助手。请告诉我您的预算、偏好区域或房型要求，我会为您推荐合适的房源。`)
 })
+
+const fetchHistory = async () => {
+  if (!currentUser.value) return
+  try {
+    const response = await fetch(`${BACKEND_URL}/history/${currentUser.value.id}`)
+    if (response.ok) {
+      const history = await response.json()
+      messages.value = history.map(h => ({
+        role: h.role,
+        content: h.content,
+        timestamp: new Date(h.createdTime).getTime(),
+        loading: false
+      }))
+      
+      if (messages.value.length === 0) {
+        addMessage('assistant', `您好${currentUser.value.realName || currentUser.value.username}！我是您的智能租房助手。我已经了解了您的租房偏好，请告诉我您的具体需求，我会为您推荐合适的房源。`)
+      } else {
+        scrollToBottom()
+      }
+    }
+  } catch (error) {
+    console.error('Failed to fetch history:', error)
+  }
+}
 
 // Auto-resize textarea
 watch(userInput, () => {
@@ -115,12 +141,18 @@ const scrollToBottom = () => {
 
 const sendMessage = async () => {
   if (!userInput.value.trim() || isLoading.value) return
+  
+  if (!currentUser.value) {
+    alert('请先登录')
+    router.push('/login')
+    return
+  }
 
   const content = userInput.value.trim()
   userInput.value = ''
   if (textarea.value) textarea.value.style.height = 'auto'
 
-  // Add user message
+  // Add user message locally immediately
   addMessage('user', content)
 
   // Add loading placeholder
@@ -129,44 +161,25 @@ const sendMessage = async () => {
   const loadingMsgIndex = messages.value.length - 1
 
   try {
-    // Prepare context
-    const userContext = currentUser.value ? 
-      `当前用户: ${currentUser.value.realName || currentUser.value.username} (ID: ${currentUser.value.id}, 电话: ${currentUser.value.phone})` : 
-      '当前用户: 未登录访客'
-
-    const response = await fetch(API_URL, {
+    const response = await fetch(`${BACKEND_URL}/chat`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${API_KEY}`
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'deepseek-chat',
-        messages: [
-          {
-            role: 'system',
-            content: `你是一个专业的房屋租赁智能助手。${userContext}。
-请根据用户的需求推荐房源，或者回答关于租房的问题。
-你的回答应该专业、热情、简洁。
-如果用户询问房源，请询问他们的预算、位置偏好和户型要求。
-不要编造具体的房源ID，而是提供一般性的建议或引导用户去房源列表查看。`
-          },
-          ...messages.value.filter(m => !m.loading).map(m => ({
-            role: m.role,
-            content: m.content
-          }))
-        ],
-        stream: false
+        userId: currentUser.value.id,
+        message: content
       })
     })
 
     const data = await response.json()
     
-    // Remove loading message and add actual response
+    // Remove loading message
     messages.value.splice(loadingMsgIndex, 1)
     
-    if (data.choices && data.choices.length > 0) {
-      addMessage('assistant', data.choices[0].message.content)
+    if (data.success) {
+      const aiMsg = data.data
+      addMessage('assistant', aiMsg.content)
     } else {
       addMessage('assistant', '抱歉，我现在无法回答，请稍后再试。')
     }
@@ -288,8 +301,32 @@ const sendMessage = async () => {
   border-radius: 12px;
   background: white;
   box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-  line-height: 1.5;
+  line-height: 1.6;
   position: relative;
+  overflow-wrap: break-word;
+}
+
+.html-content :deep(p) {
+  margin: 0 0 0.5rem 0;
+}
+
+.html-content :deep(p:last-child) {
+  margin-bottom: 0;
+}
+
+.html-content :deep(a) {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.html-content :deep(a:hover) {
+  text-decoration: underline;
+}
+
+.html-content :deep(strong) {
+  color: #2c3e50;
+  font-weight: 600;
 }
 
 .user-message .message-bubble {

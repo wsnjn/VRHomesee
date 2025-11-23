@@ -143,7 +143,7 @@
                           :class="house.status === 0 ? 'rent-btn' : 'available-btn'">
                     {{ house.status === 0 ? '标记已租' : '标记可租' }}
                   </button>
-                  <button @click="showPriceDialog(house)" class="price-btn">改价</button>
+                  <button @click="showVrDialog(house)" class="vr-btn">设置VR</button>
                   <button @click="deleteHouse(house.id)" class="delete-btn">删除</button>
                 </div>
               </td>
@@ -283,22 +283,43 @@
       </div>
     </div>
 
-    <!-- 修改价格对话框 -->
-    <div v-if="showPriceDialogVisible" class="dialog-overlay">
-      <div class="dialog">
+    <!-- VR设置对话框 -->
+    <div v-if="showVrDialogVisible" class="dialog-overlay">
+      <div class="dialog vr-dialog">
         <div class="dialog-header">
-          <h3>修改房屋价格</h3>
-          <button @click="closePriceDialog" class="close-btn">×</button>
+          <h3>VR全景图管理 - {{ currentHouse?.communityName }}</h3>
+          <button @click="closeVrDialog" class="close-btn">×</button>
         </div>
         <div class="dialog-content">
-          <div class="price-form">
-            <div class="form-group">
-              <label>新的月租金(元) *</label>
-              <input v-model="priceForm.rentPrice" type="number" step="0.01" required />
+           <!-- 现有场景列表 -->
+          <div class="scene-list-manage">
+            <h4>现有场景</h4>
+            <div v-if="vrScenes.length === 0" class="no-scenes">暂无VR场景</div>
+            <div v-else class="scenes-grid">
+              <div v-for="scene in vrScenes" :key="scene.id" class="scene-card">
+                <div class="scene-preview">
+                  <!-- Display image directly? Note: src/assets might not work dynamically without import. 
+                       But we are in dev mode, let's try using the path directly or a computed property.
+                       Actually, for dynamic assets in Vite, we might need a different approach.
+                       But let's assume the backend returns a path we can use or we fix it later. -->
+                  <img :src="scene.imageUrl" :alt="scene.sceneName">
+                </div>
+                <div class="scene-info">
+                  <span>{{ scene.sceneName }}</span>
+                  <button @click="deleteVrScene(scene.id)" class="delete-icon">🗑️</button>
+                </div>
+              </div>
             </div>
-            <div class="form-actions">
-              <button @click="closePriceDialog" class="cancel-btn">取消</button>
-              <button @click="updateHousePrice" class="submit-btn">确认修改</button>
+            </div>
+          <!-- 上传新场景 -->
+          <div class="upload-section">
+            <h4>上传新场景</h4>
+            <div class="upload-form">
+              <input v-model="newSceneName" type="text" placeholder="场景名称 (如: 客厅)" class="scene-name-input" />
+              <input type="file" @change="handleFileSelect" accept="image/*" class="file-input" />
+              <button @click="uploadVrScene" :disabled="!newSceneName || !selectedFile || uploading" class="upload-btn">
+                {{ uploading ? '上传中...' : '上传' }}
+              </button>
             </div>
           </div>
         </div>
@@ -322,7 +343,12 @@ const filterRentalType = ref('')
 const searchKeyword = ref('')
 const showAddDialog = ref(false)
 const showEditDialog = ref(false)
-const showPriceDialogVisible = ref(false)
+const showVrDialogVisible = ref(false)
+const vrScenes = ref([])
+const currentHouse = ref(null)
+const newSceneName = ref('')
+const selectedFile = ref(null)
+const uploading = ref(false)
 
 // 表单数据
 const houseForm = reactive({
@@ -348,9 +374,6 @@ const houseForm = reactive({
   description: ''
 })
 
-const priceForm = reactive({
-  rentPrice: null
-})
 
 let editingHouseId = null
 
@@ -498,29 +521,84 @@ const updateHouseStatus = async (id, newStatus) => {
   }
 }
 
-// 显示价格修改对话框
-const showPriceDialog = (house) => {
-  editingHouseId = house.id
-  priceForm.rentPrice = house.rentPrice
-  showPriceDialogVisible.value = true
+// VR Dialog Logic
+const showVrDialog = async (house) => {
+  currentHouse.value = house
+  showVrDialogVisible.value = true
+  await loadVrScenes(house.id)
 }
 
-// 更新房屋价格
-const updateHousePrice = async () => {
+
+const closeVrDialog = () => {
+  showVrDialogVisible.value = false
+  currentHouse.value = null
+  vrScenes.value = []
+  newSceneName.value = ''
+  selectedFile.value = null
+}
+const loadVrScenes = async (roomId) => {
   try {
-    const response = await axios.put(`${API_BASE_URL}/rooms/${editingHouseId}/price`, priceForm)
+    const response = await axios.get(`${API_BASE_URL}/vr-scenes/${roomId}`)
     if (response.data.success) {
-      alert('房屋价格更新成功')
-      closePriceDialog()
-      refreshData()
-    } else {
-      alert('价格更新失败: ' + response.data.message)
+       vrScenes.value = response.data.data
     }
   } catch (error) {
-    console.error('更新房屋价格失败:', error)
-    alert('价格更新失败: ' + error.message)
+    console.error('Load scenes failed:', error)
   }
 }
+const handleFileSelect = (event) => {
+  selectedFile.value = event.target.files[0]
+}
+const uploadVrScene = async () => {
+  if (!currentHouse.value || !newSceneName.value || !selectedFile.value) return
+  
+  uploading.value = true
+  const formData = new FormData()
+  formData.append('roomId', currentHouse.value.id)
+  formData.append('sceneName', newSceneName.value)
+  formData.append('file', selectedFile.value)
+  try {
+    const response = await axios.post(`${API_BASE_URL}/vr-scenes/upload`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    
+    if (response.data.success) {
+      alert('上传成功')
+      newSceneName.value = ''
+      selectedFile.value = null
+      // Clear file input
+      const fileInput = document.querySelector('.file-input')
+      if (fileInput) fileInput.value = ''
+      
+      await loadVrScenes(currentHouse.value.id)
+    } else {
+       alert('上传失败: ' + response.data.message)
+    }
+  } catch (error) {
+     console.error('Upload failed:', error)
+    alert('上传失败')
+  } finally {
+    uploading.value = false
+  }
+}
+
+const deleteVrScene = async (id) => {
+  if (!confirm('确定删除该场景吗？')) return
+  
+  try {
+    const response = await axios.delete(`${API_BASE_URL}/vr-scenes/${id}`)
+    if (response.data.success) {
+      await loadVrScenes(currentHouse.value.id)
+    } else {
+      alert('删除失败')
+    }
+  } catch (error) {
+    console.error('Delete failed:', error)
+  }
+}
+
 
 // 关闭对话框
 const closeDialog = () => {
@@ -529,12 +607,6 @@ const closeDialog = () => {
   resetForm()
 }
 
-// 关闭价格对话框
-const closePriceDialog = () => {
-  showPriceDialogVisible.value = false
-  priceForm.rentPrice = null
-  editingHouseId = null
-}
 
 // 重置表单
 const resetForm = () => {
@@ -797,6 +869,89 @@ onMounted(() => {
   display: block;
   margin-bottom: 4px;
   color: #2c3e50;
+}
+
+.vr-btn {
+  background-color: #6f42c1;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.3s;
+}
+.vr-btn:hover {
+  background-color: #59359a;
+}
+.vr-dialog {
+  width: 600px;
+  max-width: 90%;
+}
+.scene-list-manage {
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 20px;
+}
+.scenes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 15px;
+  margin-top: 10px;
+}
+.scene-card {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 5px;
+  background: #f9f9f9;
+}
+.scene-preview {
+  height: 80px;
+  background: #eee;
+  margin-bottom: 5px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.scene-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.scene-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+}
+.delete-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+}
+.upload-form {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 10px;
+}
+.scene-name-input {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 150px;
+}
+.upload-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.upload-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
 }
 
 .address-detail,

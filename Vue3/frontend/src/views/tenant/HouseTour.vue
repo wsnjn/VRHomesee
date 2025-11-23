@@ -51,15 +51,20 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import VrHouseTour from '../../components/VrHouseTour.vue'
 import { houseTourData as fullHouseTourData } from '../../data/houseTourData.js'
+import axios from 'axios'
 
 const router = useRouter()
+const route = useRoute()
 const vrHouseTour = ref(null)
 const showControls = ref(true)
 const currentSceneKey = ref('1')
 const houseTourData = ref(fullHouseTourData)
+const loading = ref(true)
+
+const API_BASE_URL = 'http://localhost:8080/api'
 
 // 计算当前场景
 const currentScene = computed(() => {
@@ -80,8 +85,7 @@ const switchScene = (sceneKey) => {
 
 // 获取场景缩略图
 const getSceneThumb = (scene) => {
-  // 优先使用球面缩略图，如果没有则使用立方体缩略图
-  return scene.scene.sphereSource?.thumb || scene.scene.cubeSource?.thumb || ''
+  return scene.scene.sphereSource?.thumb || ''
 }
 
 // 切换控制面板显示
@@ -94,9 +98,52 @@ const goHome = () => {
   router.push('/')
 }
 
+// 加载VR场景数据
+const loadVrScenes = async () => {
+  const houseId = route.query.houseId
+  if (!houseId) {
+    alert('未指定房屋')
+    router.push('/')
+    return
+  }
+  try {
+    const response = await axios.get(`${API_BASE_URL}/vr-scenes/${houseId}`)
+    if (response.data.success && response.data.data.length > 0) {
+      const scenes = response.data.data
+      
+      // 转换数据格式适配 VrHouseTour 组件
+      houseTourData.value = scenes.map(scene => ({
+        scene: {
+          photo_key: scene.id.toString(),
+          title: scene.sceneName,
+          sphereSource: {
+            // Ensure URL is correct. If it's relative to src/assets, we might need to handle it.
+            // But for now, let's use the path stored in DB.
+            url: scene.imageUrl,
+            thumb: scene.imageUrl // Use same image for thumb for now
+          },
+          // Add empty levels to prevent errors if component expects it
+          levels: []
+        }
+      }))
+      // 设置初始场景
+      initialSceneKey.value = houseTourData.value[0].scene.photo_key
+      currentSceneKey.value = initialSceneKey.value
+    } else {
+      // No scenes found
+      alert('该房屋暂无VR全景图')
+      // router.push('/') // Optional: redirect or show empty state
+    }
+  } catch (error) {
+    console.error('Failed to load VR scenes:', error)
+    alert('加载VR场景失败')
+  } finally {
+    loading.value = false
+  }
+}
+
 onMounted(() => {
-  // 组件挂载后，可以在这里进行一些初始化操作
-  console.log('HouseTour页面已加载')
+  loadVrScenes()
 })
 </script>
 
