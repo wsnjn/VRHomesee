@@ -50,11 +50,9 @@ public class RoomVrSceneService {
         // A common workaround is to put them in 'public' or use a specific alias.
         // But let's follow instructions. We will store the path that Vue can try to
         // resolve or serve statically.
-        // Actually, if we modify src/assets at runtime, Vite dev server might pick it
-        // up, but in production it won't work without rebuild.
-        // BUT, for this task, we assume dev environment or that the user knows what
-        // they are doing.
-        // Let's return the path relative to project root or src.
+        // 返回前端可以直接访问的路径
+        // 在Vue开发环境中，图片应该放在public目录下，但用户要求放在src/assets
+        // 这里我们返回一个前端可以处理的相对路径
         String relativePath = "/src/assets/image/" + roomId + "/" + fileName;
 
         RoomVrScene scene = new RoomVrScene(roomId, sceneName, relativePath);
