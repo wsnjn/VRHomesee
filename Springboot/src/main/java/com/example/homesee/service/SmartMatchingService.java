@@ -92,6 +92,14 @@ public class SmartMatchingService {
         systemContent.append("   - 使用 <br> 换行。\n");
         systemContent.append("   - 使用 <strong> 加粗重要信息（如小区名、价格）。\n");
         systemContent.append("   - 不要使用Markdown格式，直接返回HTML字符串。\n");
+        systemContent.append("3. 如果用户的意图是进行页面跳转（例如：'我想看VR'，'带我去预约'），请在回答的最后附加一个隐藏的JSON指令：\n");
+        systemContent.append("   <!-- ACTION: {\"type\": \"navigate\", \"path\": \"/target-path\"} -->\n");
+        systemContent.append("   常用路径：\n");
+        systemContent.append("   - VR看房: /house-tour?houseId={id}\n");
+        systemContent.append("   - 预约看房: /appointment?houseId={id}\n");
+        systemContent.append("   - 登录: /login\n");
+        systemContent.append("   - 注册: /register\n");
+        systemContent.append("   - 个人中心: /profile\n");
 
         Map<String, String> systemMessage = new HashMap<>();
         systemMessage.put("role", "system");
