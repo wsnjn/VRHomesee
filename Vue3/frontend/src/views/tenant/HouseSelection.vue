@@ -1,217 +1,172 @@
 <template>
   <div class="house-selection">
-    <!-- 顶部导航栏 -->
-    <nav class="navbar">
-      <div class="nav-brand">
-        <h2>房屋选择</h2>
-      </div>
-      <div class="nav-links">
-        <router-link to="/" class="nav-link">返回首页</router-link>
-      </div>
-    </nav>
-
-    <!-- 筛选条件 -->
-    <div class="filter-section">
-      <div class="search-row">
-        <div class="search-box">
-          <input 
-            type="text" 
-            v-model="searchQuery" 
-            placeholder="搜索小区、地址..." 
-            @keyup.enter="loadHouses"
-          />
-          <button @click="loadHouses" class="search-btn">搜索</button>
-        </div>
-      </div>
-
-      <div class="filter-row">
-        <div class="filter-item">
-          <label for="province">省份：</label>
-          <select id="province" v-model="selectedProvince" @change="onProvinceChange">
-            <option value="">请选择省份</option>
-            <option v-for="province in provinces" :key="province" :value="province">
-              {{ province }}
-            </option>
-          </select>
-        </div>
-
-        <div class="filter-item">
-          <label for="city">城市：</label>
-          <select id="city" v-model="selectedCity" @change="onCityChange">
-            <option value="">请选择城市</option>
-            <option v-for="city in cities" :key="city" :value="city">
-              {{ city }}
-            </option>
-          </select>
-        </div>
-
-        <div class="filter-item">
-          <label for="district">区县：</label>
-          <select id="district" v-model="selectedDistrict" @change="onDistrictChange">
-            <option value="">请选择区县</option>
-            <option v-for="district in districts" :key="district" :value="district">
-              {{ district }}
-            </option>
-          </select>
-        </div>
-
-        <div class="filter-item">
-          <label for="street">街道：</label>
-          <select id="street" v-model="selectedStreet" @change="onStreetChange">
-            <option value="">请选择街道</option>
-            <option v-for="street in streets" :key="street" :value="street">
-              {{ street }}
-            </option>
-          </select>
-        </div>
-
-        <div class="filter-item">
-          <label for="community">小区：</label>
-          <select id="community" v-model="selectedCommunity" @change="onCommunityChange">
-            <option value="">请选择小区</option>
-            <option v-for="community in communities" :key="community" :value="community">
-              {{ community }}
-            </option>
-          </select>
-        </div>
-      </div>
-
-      <div class="filter-row">
-        <div class="filter-item">
-          <label for="rentalType">租赁类型：</label>
-          <select id="rentalType" v-model="selectedRentalType">
-            <option value="">全部类型</option>
-            <option v-for="(type, key) in rentalTypes" :key="key" :value="key">
-              {{ type }}
-            </option>
-          </select>
-        </div>
-
-        <div class="filter-item">
-          <label for="minPrice">最低租金：</label>
-          <input 
-            id="minPrice" 
-            type="number" 
-            v-model="minPrice" 
-            placeholder="0" 
-            min="0"
-          />
-        </div>
-
-        <div class="filter-item">
-          <label for="maxPrice">最高租金：</label>
-          <input 
-            id="maxPrice" 
-            type="number" 
-            v-model="maxPrice" 
-            placeholder="不限" 
-            min="0"
-          />
-        </div>
-
-        <div class="filter-item">
-          <label for="minArea">最小面积：</label>
-          <input 
-            id="minArea" 
-            type="number" 
-            v-model="minArea" 
-            placeholder="0" 
-            min="0"
-          />
-        </div>
-
-        <div class="filter-item">
-          <label for="maxArea">最大面积：</label>
-          <input 
-            id="maxArea" 
-            type="number" 
-            v-model="maxArea" 
-            placeholder="不限" 
-            min="0"
-          />
-        </div>
-      </div>
-
-      <div class="filter-row">
-        <div class="filter-item">
-          <label for="decoration">装修程度：</label>
-          <select id="decoration" v-model="selectedDecoration">
-            <option value="">全部</option>
-            <option v-for="(decoration, key) in decorationTypes" :key="key" :value="key">
-              {{ decoration }}
-            </option>
-          </select>
-        </div>
-
-        <div class="filter-item">
-          <label for="elevator">电梯：</label>
-          <select id="elevator" v-model="selectedElevator">
-            <option value="">全部</option>
-            <option v-for="(elevator, key) in elevatorOptions" :key="key" :value="key">
-              {{ elevator }}
-            </option>
-          </select>
-        </div>
-
-        <div class="filter-item">
-          <label for="orientation">朝向：</label>
-          <select id="orientation" v-model="selectedOrientation">
-            <option value="">全部</option>
-            <option v-for="(orientation, key) in orientationOptions" :key="key" :value="key">
-              {{ orientation }}
-            </option>
-          </select>
-        </div>
-      </div>
-
-      <div class="filter-actions">
-        <button @click="resetFilters" class="reset-btn">重置筛选</button>
-        <button @click="applyFilters" class="apply-btn">查看房屋</button>
-      </div>
+    <!-- 顶部返回栏 -->
+    <div class="page-header">
+      <button @click="router.push('/')" class="back-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        返回首页
+      </button>
+      <h1 class="page-title">挑选您的理想房源</h1>
     </div>
 
-    <!-- 加载状态 -->
-    <div v-if="loading" class="loading-section">
-      <p>正在加载数据...</p>
-    </div>
-
-    <!-- 房屋列表 -->
-    <div v-else class="house-list-section">
-      <h3>可选房屋列表 ({{ houses.length }} 套)</h3>
-      <div class="house-grid">
-        <div 
-          v-for="house in houses" 
-          :key="house.id"
-          class="house-card"
-          @click="selectHouse(house)"
-        >
-          <div class="house-image">
-            <img :src="getHouseImage(house)" :alt="house.communityName" />
+    <div class="content-wrapper">
+      <!-- 筛选条件 -->
+      <div class="filter-section">
+        <div class="search-row">
+          <div class="search-box">
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input 
+              type="text" 
+              v-model="searchQuery" 
+              placeholder="搜索小区、地址..." 
+              @keyup.enter="loadHouses"
+            />
+            <button @click="loadHouses" class="search-btn">搜索</button>
           </div>
+        </div>
+
+        <div class="filters-grid">
+          <div class="filter-group">
+            <label>区域选择</label>
+            <div class="filter-row">
+              <select v-model="selectedProvince" @change="onProvinceChange">
+                <option value="">省份</option>
+                <option v-for="province in provinces" :key="province" :value="province">{{ province }}</option>
+              </select>
+              <select v-model="selectedCity" @change="onCityChange">
+                <option value="">城市</option>
+                <option v-for="city in cities" :key="city" :value="city">{{ city }}</option>
+              </select>
+              <select v-model="selectedDistrict" @change="onDistrictChange">
+                <option value="">区县</option>
+                <option v-for="district in districts" :key="district" :value="district">{{ district }}</option>
+              </select>
+              <select v-model="selectedStreet" @change="onStreetChange">
+                <option value="">街道</option>
+                <option v-for="street in streets" :key="street" :value="street">{{ street }}</option>
+              </select>
+              <select v-model="selectedCommunity" @change="onCommunityChange">
+                <option value="">小区</option>
+                <option v-for="community in communities" :key="community" :value="community">{{ community }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <label>基本筛选</label>
+            <div class="filter-row">
+              <select v-model="selectedRentalType">
+                <option value="">租赁类型</option>
+                <option v-for="(type, key) in rentalTypes" :key="key" :value="key">{{ type }}</option>
+              </select>
+              <select v-model="selectedDecoration">
+                <option value="">装修程度</option>
+                <option v-for="(decoration, key) in decorationTypes" :key="key" :value="key">{{ decoration }}</option>
+              </select>
+              <select v-model="selectedElevator">
+                <option value="">电梯</option>
+                <option v-for="(elevator, key) in elevatorOptions" :key="key" :value="key">{{ elevator }}</option>
+              </select>
+              <select v-model="selectedOrientation">
+                <option value="">朝向</option>
+                <option v-for="(orientation, key) in orientationOptions" :key="key" :value="key">{{ orientation }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <label>价格与面积</label>
+            <div class="filter-row range-inputs">
+              <div class="range-group">
+                <input type="number" v-model="minPrice" placeholder="最低租金" min="0" />
+                <span>-</span>
+                <input type="number" v-model="maxPrice" placeholder="最高租金" min="0" />
+              </div>
+              <div class="range-group">
+                <input type="number" v-model="minArea" placeholder="最小面积" min="0" />
+                <span>-</span>
+                <input type="number" v-model="maxArea" placeholder="最大面积" min="0" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-actions">
+          <button @click="resetFilters" class="reset-btn">重置筛选</button>
+          <button @click="applyFilters" class="apply-btn">应用筛选</button>
+        </div>
+      </div>
+
+      <!-- 加载状态 -->
+      <div v-if="loading" class="loading-section">
+        <div class="spinner"></div>
+        <p>正在寻找合适房源...</p>
+      </div>
+
+      <!-- 房屋列表 -->
+      <div v-else class="house-list-section">
+        <div class="list-header">
+          <h3>发现 {{ houses.length }} 套好房</h3>
+        </div>
+        
+        <div class="house-grid">
+          <div 
+            v-for="house in houses" 
+            :key="house.id"
+            class="house-card"
+            @click="selectHouse(house)"
+          >
+            <div class="house-image-wrapper">
+              <img :src="getHouseImage(house)" :alt="house.communityName" class="house-image" />
+              <div class="house-tags">
+                <span class="tag status-tag" :class="getStatusClass(house.status)">
+                  {{ getStatusText(house.status) }}
+                </span>
+                <span class="tag type-tag">{{ getLayoutType(house.rentalType) }}</span>
+              </div>
+              <div class="hover-overlay">
+                <button @click.stop="viewHouseTour(house)" class="overlay-btn vr-btn">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h20"></path><path d="M2 12l5-5"></path><path d="M22 12l-5-5"></path><path d="M12 7v10"></path></svg>
+                  VR看房
+                </button>
+              </div>
+            </div>
+            
             <div class="house-info">
-            <div class="house-header">
-              <h4>{{ getHouseTitle(house) }}</h4>
-              <span class="house-status" :class="getStatusClass(house.status)">
-                {{ getStatusText(house.status) }}
-              </span>
-            </div>
-            <p class="house-address">{{ getHouseAddress(house) }}</p>
-            <p class="house-details">
-              {{ house.roomArea }}㎡ · {{ getLayoutType(house.rentalType) }} · {{ house.floorInfo }} · {{ getDecorationText(house.decoration) }}
-            </p>
-            <p class="house-price">{{ house.rentPrice }}元/月</p>
-            <div class="house-actions">
-              <button @click.stop="viewHouseTour(house)" class="tour-btn">VR看房</button>
-              <button 
-                @click.stop="makeAppointment(house)" 
-                class="appointment-btn"
-                :disabled="house.status !== 0"
-                :class="{ 'disabled': house.status !== 0 }"
-              >
-                {{ house.status === 0 ? '预约看房' : '已下架' }}
-              </button>
+              <h4 class="house-title">{{ getHouseTitle(house) }}</h4>
+              <p class="house-address">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                {{ getHouseAddress(house) }}
+              </p>
+              
+              <div class="house-meta">
+                <span class="meta-item">{{ house.roomArea }}㎡</span>
+                <span class="meta-divider">|</span>
+                <span class="meta-item">{{ house.floorInfo }}</span>
+                <span class="meta-divider">|</span>
+                <span class="meta-item">{{ getDecorationText(house.decoration) }}</span>
+              </div>
+              
+              <div class="house-footer">
+                <div class="price-container">
+                  <span class="price-symbol">¥</span>
+                  <span class="price-value">{{ house.rentPrice }}</span>
+                  <span class="price-unit">/月</span>
+                </div>
+                <button 
+                  @click.stop="makeAppointment(house)" 
+                  class="action-btn appointment-btn"
+                  :disabled="house.status !== 0"
+                >
+                  {{ house.status === 0 ? '预约看房' : '已下架' }}
+                </button>
+              </div>
             </div>
           </div>
+        </div>
+        
+        <div v-if="houses.length === 0" class="empty-state">
+          <p>暂无符合条件的房源，换个筛选条件试试吧</p>
         </div>
       </div>
     </div>
@@ -405,7 +360,8 @@ watch([
   minArea,
   maxArea
 ], () => {
-  loadHouses()
+  // 可以选择自动加载，或者只在点击应用时加载
+  // loadHouses()
 })
 
 // 筛选变化处理
@@ -469,9 +425,10 @@ const resetFilters = () => {
   streets.value = []
   communities.value = []
   searchQuery.value = ''
+  loadHouses()
 }
 
-// 应用筛选（与自动筛选重复，但保留按钮）
+// 应用筛选
 const applyFilters = () => {
   loadHouses()
 }
@@ -563,420 +520,498 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 .house-selection {
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background-color: #f8f9fa;
+  font-family: 'Inter', sans-serif;
+  padding-bottom: 4rem;
 }
 
-.navbar {
+.page-header {
+  background: white;
+  padding: 1.5rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
   position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 2rem;
-  background-color: rgba(44, 62, 80, 0.9);
-  color: white;
   z-index: 100;
-  backdrop-filter: blur(10px);
 }
 
-.nav-brand h2 {
-  margin: 0;
-  color: white;
-}
-
-.nav-links {
+.back-btn {
   display: flex;
-  gap: 1rem;
   align-items: center;
-}
-
-.nav-link {
-  color: white;
-  text-decoration: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  transition: background-color 0.3s;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: all 0.2s;
 }
 
-.nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+.back-btn:hover {
+  background: #f1f3f5;
+  color: #2c3e50;
 }
 
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.content-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Filter Section */
 .filter-section {
   background: white;
-  margin: 20px;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid #f0f0f0;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
 }
 
 .search-row {
-  margin-bottom: 24px;
+  margin-bottom: 2rem;
   display: flex;
   justify-content: center;
 }
 
 .search-box {
   display: flex;
+  align-items: center;
   width: 100%;
-  max-width: 600px;
-  gap: 10px;
+  max-width: 700px;
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  padding: 0.5rem;
+  transition: all 0.3s;
+}
+
+.search-box:focus-within {
+  border-color: #667eea;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+.search-icon {
+  margin-left: 1rem;
+  color: #adb5bd;
 }
 
 .search-box input {
   flex: 1;
-  padding: 12px 16px;
-  border: 2px solid #e9ecef;
-  border-radius: 8px;
-  font-size: 16px;
-  transition: all 0.3s;
+  border: none;
+  background: transparent;
+  padding: 1rem;
+  font-size: 1rem;
+  color: #2c3e50;
 }
 
 .search-box input:focus {
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
 }
 
 .search-btn {
-  padding: 0 24px;
-  background: #007bff;
+  background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
   border: none;
+  padding: 0.75rem 2rem;
   border-radius: 8px;
-  cursor: pointer;
   font-weight: 600;
-  transition: background 0.3s;
+  cursor: pointer;
+  transition: all 0.3s;
 }
 
 .search-btn:hover {
-  background: #0056b3;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.filters-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.filter-group {
+  border-bottom: 1px solid #f1f3f5;
+  padding-bottom: 1.5rem;
+}
+
+.filter-group:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.filter-group label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #adb5bd;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .filter-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 24px;
-  margin-bottom: 24px;
+  gap: 1rem;
 }
 
-.filter-item {
-  display: flex;
-  flex-direction: column;
-  min-width: 180px;
-  flex: 1;
-}
-
-.filter-item label {
-  margin-bottom: 8px;
-  font-weight: 600;
-  color: #2c3e50;
-  font-size: 14px;
-}
-
-.filter-item select,
-.filter-item input {
-  padding: 12px 16px;
-  border: 2px solid #e9ecef;
+select, .range-group input {
+  padding: 0.75rem 1rem;
+  border: 1px solid #e9ecef;
   border-radius: 8px;
-  background: white;
-  font-size: 14px;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  background-color: white;
+  color: #2c3e50;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 140px;
 }
 
-.filter-item select:focus,
-.filter-item input:focus {
+select:hover, .range-group input:hover {
+  border-color: #ced4da;
+}
+
+select:focus, .range-group input:focus {
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
-  background-color: #f8f9fa;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.filter-item select:hover,
-.filter-item input:hover {
-  border-color: #adb5bd;
+.range-inputs {
+  display: flex;
+  gap: 2rem;
 }
 
-.filter-item select {
-  appearance: none;
-  background-image: url("data:image/svg+xml;charset=US-ASCII,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'><path fill='%23666' d='M2 0L0 2h4zm0 5L0 3h4z'/></svg>");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  background-size: 12px;
-  padding-right: 40px;
+.range-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.range-group span {
+  color: #adb5bd;
+}
+
+.range-group input {
+  width: 120px;
+  min-width: auto;
 }
 
 .filter-actions {
   display: flex;
-  gap: 16px;
   justify-content: flex-end;
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid #f0f0f0;
-}
-
-.reset-btn, .apply-btn {
-  padding: 12px 32px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 15px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  position: relative;
-  overflow: hidden;
-  min-width: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #f1f3f5;
 }
 
 .reset-btn {
-  background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
-  color: white;
-  border: 2px solid #6c757d;
+  background: white;
+  border: 1px solid #dee2e6;
+  color: #666;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
 .reset-btn:hover {
-  background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
-}
-
-.reset-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(108, 117, 125, 0.3);
+  background: #f8f9fa;
+  border-color: #ced4da;
+  color: #2c3e50;
 }
 
 .apply-btn {
-  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  background: #2c3e50;
   color: white;
-  border: 2px solid #007bff;
+  border: none;
+  padding: 0.75rem 2.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
 .apply-btn:hover {
-  background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  background: #1a252f;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(44, 62, 80, 0.2);
 }
 
-.apply-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
-}
-
-/* 按钮点击效果 */
-.reset-btn::after, .apply-btn::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
-  transform: translate(-50%, -50%);
-  transition: width 0.3s, height 0.3s;
-}
-
-.reset-btn:active::after, .apply-btn:active::after {
-  width: 100px;
-  height: 100px;
-}
-
-/* 按钮禁用状态 */
-.reset-btn:disabled, .apply-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-.reset-btn:disabled:hover, .apply-btn:disabled:hover {
-  transform: none;
-  box-shadow: none;
-}
-
+/* House List */
 .house-list-section {
-  background: white;
-  margin: 20px;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 2rem;
 }
 
-.house-list-section h3 {
-  margin: 0 0 20px 0;
-  color: #333;
-  font-size: 1.5rem;
+.list-header {
+  margin-bottom: 1.5rem;
+}
+
+.list-header h3 {
+  font-size: 1.25rem;
+  color: #2c3e50;
+  font-weight: 600;
 }
 
 .house-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
+  gap: 2rem;
 }
 
 .house-card {
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: transform 0.3s, box-shadow 0.3s;
   background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 1px solid rgba(0,0,0,0.05);
 }
 
 .house-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.house-image-wrapper {
+  position: relative;
+  height: 220px;
+  overflow: hidden;
 }
 
 .house-image {
   width: 100%;
-  height: 200px;
-  overflow: hidden;
-}
-
-.house-image img {
-  width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.5s ease;
 }
 
-.house-info {
-  padding: 15px;
+.house-card:hover .house-image {
+  transform: scale(1.05);
 }
 
-.house-header {
+.house-tags {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 10px;
+  gap: 0.5rem;
 }
 
-.house-header h4 {
-  margin: 0;
-  color: #333;
-  font-size: 1.1rem;
-  flex: 1;
-  margin-right: 10px;
-}
-
-.house-status {
-  padding: 4px 8px;
-  border-radius: 12px;
+.tag {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
   font-size: 0.75rem;
   font-weight: 600;
-  white-space: nowrap;
+  backdrop-filter: blur(4px);
 }
 
-.status-available {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
+.status-tag.status-available {
+  background: rgba(46, 204, 113, 0.9);
+  color: white;
 }
 
-.status-unavailable {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
+.status-tag.status-unavailable {
+  background: rgba(149, 165, 166, 0.9);
+  color: white;
 }
 
-.status-unknown {
-  background-color: #e2e3e5;
-  color: #383d41;
-  border: 1px solid #d6d8db;
+.type-tag {
+  background: rgba(52, 152, 219, 0.9);
+  color: white;
 }
 
-.house-address {
-  color: #666;
-  font-size: 0.9rem;
-  margin: 0 0 8px 0;
-}
-
-.house-details {
-  color: #888;
-  font-size: 0.85rem;
-  margin: 0 0 8px 0;
-}
-
-.house-price {
-  color: #e74c3c;
-  font-size: 1.1rem;
-  font-weight: bold;
-  margin: 0 0 12px 0;
-}
-
-.house-actions {
+.hover-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.3);
   display: flex;
-  gap: 8px;
-  margin-top: 10px;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s;
 }
 
-.tour-btn, .appointment-btn {
-  flex: 1;
-  padding: 8px 12px;
+.house-card:hover .hover-overlay {
+  opacity: 1;
+}
+
+.overlay-btn {
+  background: white;
+  color: #2c3e50;
   border: none;
-  border-radius: 6px;
-  font-size: 0.85rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   cursor: pointer;
-  transition: all 0.3s ease;
-  text-align: center;
+  transform: translateY(10px);
+  transition: all 0.3s;
 }
 
-.tour-btn {
-  background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
-  color: white;
-  border: 1px solid #17a2b8;
-}
-
-.tour-btn:hover {
-  background: linear-gradient(135deg, #138496 0%, #117a8b 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(23, 162, 184, 0.3);
-}
-
-.appointment-btn {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-  color: white;
-  border: 1px solid #28a745;
-}
-
-.appointment-btn:hover {
-  background: linear-gradient(135deg, #20c997 0%, #1ba87e 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
-}
-
-.tour-btn:active, .appointment-btn:active {
+.house-card:hover .overlay-btn {
   transform: translateY(0);
 }
 
+.house-info {
+  padding: 1.5rem;
+}
+
+.house-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.house-address {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.house-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+.meta-divider {
+  color: #dee2e6;
+}
+
+.house-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid #f1f3f5;
+}
+
+.price-container {
+  color: #e74c3c;
+  font-weight: 700;
+  display: flex;
+  align-items: baseline;
+}
+
+.price-symbol {
+  font-size: 0.9rem;
+}
+
+.price-value {
+  font-size: 1.5rem;
+  margin: 0 2px;
+}
+
+.price-unit {
+  font-size: 0.8rem;
+  color: #999;
+  font-weight: 400;
+}
+
+.action-btn {
+  padding: 0.5rem 1.25rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.appointment-btn {
+  background: #2c3e50;
+  color: white;
+  border: none;
+}
+
+.appointment-btn:hover:not(:disabled) {
+  background: #1a252f;
+}
+
+.appointment-btn:disabled {
+  background: #e9ecef;
+  color: #adb5bd;
+  cursor: not-allowed;
+}
+
+/* Loading & Empty States */
+.loading-section, .empty-state {
+  text-align: center;
+  padding: 4rem;
+  color: #666;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 @media (max-width: 768px) {
-  .filter-row {
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  .filter-item {
-    min-width: auto;
-  }
-  
-  .house-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .navbar {
+  .page-header {
     padding: 1rem;
+  }
+  
+  .content-wrapper {
+    padding: 1rem;
+  }
+  
+  .filter-section {
+    padding: 1rem;
+  }
+  
+  .range-inputs {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .range-group input {
+    width: 100%;
   }
 }
 </style>

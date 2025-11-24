@@ -74,7 +74,8 @@ public class RoomInfoController {
 
     // 更新房屋状态
     @PutMapping("/{id}/status")
-    public ResponseEntity<Map<String, Object>> updateRoomStatus(@PathVariable Long id, @RequestBody Map<String, Object> request) {
+    public ResponseEntity<Map<String, Object>> updateRoomStatus(@PathVariable Long id,
+            @RequestBody Map<String, Object> request) {
         Map<String, Object> response = new HashMap<>();
         try {
             RoomInfo room = roomInfoRepository.findById(id).orElse(null);
@@ -157,7 +158,7 @@ public class RoomInfoController {
             // 设置创建和更新时间
             roomInfo.setCreatedTime(java.time.LocalDateTime.now());
             roomInfo.setUpdatedTime(java.time.LocalDateTime.now());
-            
+
             RoomInfo savedRoom = roomInfoRepository.save(roomInfo);
             response.put("success", true);
             response.put("message", "房屋添加成功");
@@ -242,7 +243,8 @@ public class RoomInfoController {
 
     // 更新房屋价格
     @PutMapping("/{id}/price")
-    public ResponseEntity<Map<String, Object>> updateRoomPrice(@PathVariable Long id, @RequestBody Map<String, Object> request) {
+    public ResponseEntity<Map<String, Object>> updateRoomPrice(@PathVariable Long id,
+            @RequestBody Map<String, Object> request) {
         Map<String, Object> response = new HashMap<>();
         try {
             RoomInfo room = roomInfoRepository.findById(id).orElse(null);
@@ -279,7 +281,7 @@ public class RoomInfoController {
         try {
             List<Long> ids = (List<Long>) request.get("ids");
             Integer status = (Integer) request.get("status");
-            
+
             if (ids != null && !ids.isEmpty() && status != null) {
                 List<RoomInfo> rooms = roomInfoRepository.findAllById(ids);
                 for (RoomInfo room : rooms) {
@@ -298,6 +300,30 @@ public class RoomInfoController {
         } catch (Exception e) {
             response.put("success", false);
             response.put("message", "批量更新房屋状态失败: " + e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    // 获取房屋城市分布
+    @GetMapping("/distribution/city")
+    public ResponseEntity<Map<String, Object>> getRoomCityDistribution() {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            List<Object[]> distribution = roomInfoRepository.countByCity();
+            Map<String, Long> cityMap = new HashMap<>();
+
+            for (Object[] row : distribution) {
+                String city = (String) row[0];
+                Long count = (Long) row[1];
+                cityMap.put(city, count);
+            }
+
+            response.put("success", true);
+            response.put("distribution", cityMap);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "获取城市分布失败: " + e.getMessage());
             return ResponseEntity.badRequest().body(response);
         }
     }

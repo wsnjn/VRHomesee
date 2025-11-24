@@ -48,7 +48,7 @@ const displayMessage = computed(() => currentMessage.value)
 
 onMounted(() => {
   initThree()
-  initSpeechRecognition()
+  initSpeechRecognitionWithFallback()
   startListening()
 })
 
@@ -164,11 +164,61 @@ const initSpeechRecognition = () => {
   recognition.onerror = (event) => {
     console.error("Speech error:", event.error)
     isListening = false
-    if (event.error === 'not-allowed') {
-      showPermanentMessage("请允许麦克风权限")
-    } else {
-      showTemporaryMessage("听不清楚，请重试")
+    
+    // 更详细的错误处理
+    switch (event.error) {
+      case 'not-allowed':
+        showPermanentMessage("请允许麦克风权限")
+        break
+      case 'network':
+        showTemporaryMessage("网络连接失败，请检查网络")
+        break
+      case 'audio-capture':
+        showTemporaryMessage("无法访问麦克风，请检查设备")
+        break
+      case 'no-speech':
+        showTemporaryMessage("没有检测到语音，请重试")
+        break
+      case 'aborted':
+        showTemporaryMessage("语音识别被中断")
+        break
+      case 'service-not-allowed':
+        showPermanentMessage("语音服务不可用")
+        break
+      default:
+        showTemporaryMessage("语音识别失败，请重试")
     }
+  }
+}
+
+// 备用语音识别方案 - 使用更简单的API
+const initFallbackSpeechRecognition = () => {
+  console.log("Using fallback speech recognition")
+  showTemporaryMessage("使用备用语音识别")
+  
+  // 这里可以添加第三方语音识别API的集成
+  // 例如：百度语音识别、讯飞语音识别等
+}
+
+// 手动输入备选方案
+const showManualInput = () => {
+  const userInput = prompt("语音识别不可用，请输入您的问题：")
+  if (userInput && userInput.trim()) {
+    processQuery(userInput.trim())
+  }
+}
+
+// 改进的语音识别初始化
+const initSpeechRecognitionWithFallback = () => {
+  try {
+    initSpeechRecognition()
+  } catch (error) {
+    console.error("Speech recognition init failed:", error)
+    showTemporaryMessage("语音识别初始化失败，使用手动输入")
+    // 如果语音识别失败，提供手动输入选项
+    setTimeout(() => {
+      showManualInput()
+    }, 2000)
   }
 }
 

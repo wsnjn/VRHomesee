@@ -15,7 +15,7 @@ public class MaintenanceRequest {
     @Column(name = "tenant_management_id", nullable = false)
     private Long tenantManagementId;
 
-    @Column(name = "request_title", nullable = false, length = 100)
+    @Column(name = "request_title", nullable = false)
     private String requestTitle;
 
     @Column(name = "request_description", nullable = false, columnDefinition = "TEXT")
@@ -25,7 +25,7 @@ public class MaintenanceRequest {
     private LocalDateTime requestDate;
 
     @Column(name = "request_status", nullable = false)
-    private Integer requestStatus = 0; // 0-待处理，1-处理中，2-已完成，3-已关闭
+    private Integer requestStatus = 0; // 0-Pending, 1-Processing, 2-Completed, 3-Closed
 
     @Column(name = "expected_fix_date")
     private LocalDate expectedFixDate;
@@ -33,28 +33,30 @@ public class MaintenanceRequest {
     @Column(name = "actual_fix_date")
     private LocalDate actualFixDate;
 
-    @Column(name = "repair_cost", precision = 8, scale = 2)
+    @Column(name = "repair_cost")
     private BigDecimal repairCost;
 
     @Column(name = "cost_bearer")
-    private Integer costBearer; // 费用承担方：1-房东，2-租客，3-分摊
+    private Integer costBearer; // 1-Landlord, 2-Tenant, 3-Shared
 
-    @Column(name = "created_time", nullable = false)
-    private LocalDateTime createdTime = LocalDateTime.now();
+    @Column(name = "created_time", updatable = false)
+    private LocalDateTime createdTime;
 
-    @Column(name = "updated_time", nullable = false)
-    private LocalDateTime updatedTime = LocalDateTime.now();
+    @Column(name = "updated_time")
+    private LocalDateTime updatedTime;
 
-    // 构造函数
-    public MaintenanceRequest() {
+    @PrePersist
+    protected void onCreate() {
+        createdTime = LocalDateTime.now();
+        updatedTime = LocalDateTime.now();
+        if (requestDate == null) {
+            requestDate = LocalDateTime.now();
+        }
     }
 
-    public MaintenanceRequest(Long tenantManagementId, String requestTitle, 
-                             String requestDescription, LocalDateTime requestDate) {
-        this.tenantManagementId = tenantManagementId;
-        this.requestTitle = requestTitle;
-        this.requestDescription = requestDescription;
-        this.requestDate = requestDate;
+    @PreUpdate
+    protected void onUpdate() {
+        updatedTime = LocalDateTime.now();
     }
 
     // Getters and Setters

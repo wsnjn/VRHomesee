@@ -29,17 +29,21 @@ public interface RoomInfoRepository extends JpaRepository<RoomInfo, Long>, JpaSp
 
     // 根据省份、城市和区县获取不重复的街道列表
     @Query("SELECT DISTINCT r.street FROM RoomInfo r WHERE r.province = :province AND r.city = :city AND r.district = :district AND r.street IS NOT NULL AND r.street != '' ORDER BY r.street")
-    List<String> findDistinctStreetsByProvinceAndCityAndDistrict(@Param("province") String province, @Param("city") String city, @Param("district") String district);
+    List<String> findDistinctStreetsByProvinceAndCityAndDistrict(@Param("province") String province,
+            @Param("city") String city, @Param("district") String district);
 
     // 根据省份、城市、区县和街道获取不重复的小区列表
     @Query("SELECT DISTINCT r.communityName FROM RoomInfo r WHERE r.province = :province AND r.city = :city AND r.district = :district AND r.street = :street AND r.communityName IS NOT NULL AND r.communityName != '' ORDER BY r.communityName")
-    List<String> findDistinctCommunitiesByProvinceAndCityAndDistrictAndStreet(@Param("province") String province, @Param("city") String city, @Param("district") String district, @Param("street") String street);
+    List<String> findDistinctCommunitiesByProvinceAndCityAndDistrictAndStreet(@Param("province") String province,
+            @Param("city") String city, @Param("district") String district, @Param("street") String street);
 
     // 根据省份、城市和小区名称获取房源
-    List<RoomInfo> findByProvinceAndCityAndCommunityNameAndStatusOrderByCreatedTimeDesc(String province, String city, String communityName, Integer status);
+    List<RoomInfo> findByProvinceAndCityAndCommunityNameAndStatusOrderByCreatedTimeDesc(String province, String city,
+            String communityName, Integer status);
 
     // 根据省份、城市、区县和状态获取房源
-    List<RoomInfo> findByProvinceAndCityAndDistrictAndStatusOrderByCreatedTimeDesc(String province, String city, String district, Integer status);
+    List<RoomInfo> findByProvinceAndCityAndDistrictAndStatusOrderByCreatedTimeDesc(String province, String city,
+            String district, Integer status);
 
     // 根据租赁类型和状态获取房源
     List<RoomInfo> findByRentalTypeAndStatusOrderByCreatedTimeDesc(Integer rentalType, Integer status);
@@ -49,11 +53,13 @@ public interface RoomInfoRepository extends JpaRepository<RoomInfo, Long>, JpaSp
 
     // 根据价格范围获取房源
     @Query("SELECT r FROM RoomInfo r WHERE r.rentPrice BETWEEN :minPrice AND :maxPrice AND r.status = :status ORDER BY r.createdTime DESC")
-    List<RoomInfo> findByRentPriceBetweenAndStatusOrderByCreatedTimeDesc(@Param("minPrice") Double minPrice, @Param("maxPrice") Double maxPrice, @Param("status") Integer status);
+    List<RoomInfo> findByRentPriceBetweenAndStatusOrderByCreatedTimeDesc(@Param("minPrice") Double minPrice,
+            @Param("maxPrice") Double maxPrice, @Param("status") Integer status);
 
     // 根据面积范围获取房源
     @Query("SELECT r FROM RoomInfo r WHERE r.roomArea BETWEEN :minArea AND :maxArea AND r.status = :status ORDER BY r.createdTime DESC")
-    List<RoomInfo> findByRoomAreaBetweenAndStatusOrderByCreatedTimeDesc(@Param("minArea") Double minArea, @Param("maxArea") Double maxArea, @Param("status") Integer status);
+    List<RoomInfo> findByRoomAreaBetweenAndStatusOrderByCreatedTimeDesc(@Param("minArea") Double minArea,
+            @Param("maxArea") Double maxArea, @Param("status") Integer status);
 
     // 获取所有区县（不限制省份和城市）
     @Query("SELECT DISTINCT r.district FROM RoomInfo r WHERE r.district IS NOT NULL AND r.district != '' ORDER BY r.district")
@@ -87,5 +93,10 @@ public interface RoomInfoRepository extends JpaRepository<RoomInfo, Long>, JpaSp
     long countByLandlordPhone(String landlordPhone);
 
     // 根据房东手机号和状态统计房屋数量
+    // 根据房东手机号和状态统计房屋数量
     long countByLandlordPhoneAndStatus(String landlordPhone, Integer status);
+
+    // 统计各城市的房屋数量
+    @Query("SELECT r.city, COUNT(r) FROM RoomInfo r WHERE r.city IS NOT NULL AND r.city != '' GROUP BY r.city")
+    List<Object[]> countByCity();
 }

@@ -18,22 +18,26 @@ public class TenantManagementService {
     @Autowired
     private TenantManagementRepository tenantManagementRepository;
 
+    @Autowired
+    private CommunityService communityService;
+
     /**
      * 创建租约
-     * @param contractNumber 合同编号
-     * @param roomId 房屋ID
-     * @param landlordId 房东ID
-     * @param tenantId 租客ID
+     * 
+     * @param contractNumber    合同编号
+     * @param roomId            房屋ID
+     * @param landlordId        房东ID
+     * @param tenantId          租客ID
      * @param contractStartDate 合同开始日期
-     * @param contractEndDate 合同结束日期
-     * @param monthlyRent 月租金
-     * @param depositAmount 押金金额
+     * @param contractEndDate   合同结束日期
+     * @param monthlyRent       月租金
+     * @param depositAmount     押金金额
      * @return 创建结果
      */
-    public Map<String, Object> createTenantContract(String contractNumber, Long roomId, Long landlordId, 
-                                                   Long tenantId, LocalDate contractStartDate, 
-                                                   LocalDate contractEndDate, Double monthlyRent, 
-                                                   Double depositAmount) {
+    public Map<String, Object> createTenantContract(String contractNumber, Long roomId, Long landlordId,
+            Long tenantId, LocalDate contractStartDate,
+            LocalDate contractEndDate, Double monthlyRent,
+            Double depositAmount) {
         Map<String, Object> result = new HashMap<>();
 
         try {
@@ -46,7 +50,8 @@ public class TenantManagementService {
             }
 
             // 检查房屋是否已有活跃租约
-            List<TenantManagement> activeContracts = tenantManagementRepository.findByRoomIdAndContractStatus(roomId, 1);
+            List<TenantManagement> activeContracts = tenantManagementRepository.findByRoomIdAndContractStatus(roomId,
+                    1);
             if (!activeContracts.isEmpty()) {
                 result.put("success", false);
                 result.put("message", "该房屋已有活跃租约");
@@ -55,58 +60,56 @@ public class TenantManagementService {
 
             // 创建租约
             TenantManagement contract = new TenantManagement(contractNumber, roomId, landlordId, tenantId,
-                    contractStartDate, contractEndDate, 
-                    java.math.BigDecimal.valueOf(monthlyRent), 
+                    contractStartDate, contractEndDate,
+                    java.math.BigDecimal.valueOf(monthlyRent),
                     java.math.BigDecimal.valueOf(depositAmount));
-            
+
             contract.setContractSignedTime(LocalDateTime.now());
             contract.setContractStatus(1); // 已签约
-            
+
             TenantManagement savedContract = tenantManagementRepository.save(contract);
-            
+
+            // 自动加入租客群组 (假设租客群组Type=2)
+            try {
+                List<com.example.homesee.entity.ChatGroup> tenantGroups = communityService.getAllGroups().stream()
+                        .filter(g -> g.getGroupType() == 2)
+                        .toList();
+
+                if (!tenantGroups.isEmpty()) {
+                    communityService.joinGroup(tenantGroups.get(0).getId(), tenantId, 0);
+                }
+            } catch (Exception e) {
+                System.err.println("Auto-join tenant group failed: " + e.getMessage());
+            }
+
             result.put("success", true);
             result.put("message", "租约创建成功");
             result.put("contractId", savedContract.getId());
-            
+
         } catch (Exception e) {
             result.put("success", false);
             result.put("message", "创建租约失败: " + e.getMessage());
         }
-        
+
         return result;
     }
 
     /**
      * 获取租约详情
+     * 
      * @param contractId 租约ID
      * @return 租约详情
      */
     public Map<String, Object> getContractDetail(Long contractId) {
         Map<String, Object> result = new HashMap<>();
-        
+
         try {
             Optional<TenantManagement> contractOptional = tenantManagementRepository.findById(contractId);
             if (contractOptional.isPresent()) {
                 TenantManagement contract = contractOptional.get();
-                
-                Map<String, Object> contractInfo = new HashMap<>();
-                contractInfo.put("id", contract.getId());
-                contractInfo.put("contractNumber", contract.getContractNumber());
-                contractInfo.put("roomId", contract.getRoomId());
-                contractInfo.put("landlordId", contract.getLandlordId());
-                contractInfo.put("tenantId", contract.getTenantId());
-                contractInfo.put("contractStartDate", contract.getContractStartDate());
-                contractInfo.put("contractEndDate", contract.getContractEndDate());
-                contractInfo.put("monthlyRent", contract.getMonthlyRent());
-                contractInfo.put("depositAmount", contract.getDepositAmount());
-                contractInfo.put("paymentCycle", contract.getPaymentCycle());
-                contractInfo.put("contractStatus", contract.getContractStatus());
-                contractInfo.put("rentStatus", contract.getRentStatus());
-                contractInfo.put("depositStatus", contract.getDepositStatus());
-                contractInfo.put("emergencyContact", contract.getEmergencyContact());
-                contractInfo.put("emergencyPhone", contract.getEmergencyPhone());
-                contractInfo.put("contractSignedTime", contract.getContractSignedTime());
-                
+
+                Map<String, Object> contractInfo = convertToMap(contract);
+
                 result.put("success", true);
                 result.put("contract", contractInfo);
             } else {
@@ -117,17 +120,18 @@ public class TenantManagementService {
             result.put("success", false);
             result.put("message", "获取租约详情失败: " + e.getMessage());
         }
-        
+
         return result;
     }
 
     /**
      * 获取所有租约列表
+     * 
      * @return 租约列表
      */
     public Map<String, Object> getAllContracts() {
         Map<String, Object> result = new HashMap<>();
-        
+
         try {
             List<TenantManagement> contracts = tenantManagementRepository.findAll();
             result.put("success", true);
@@ -136,18 +140,19 @@ public class TenantManagementService {
             result.put("success", false);
             result.put("message", "获取租约列表失败: " + e.getMessage());
         }
-        
+
         return result;
     }
 
     /**
      * 根据状态获取租约列表
+     * 
      * @param status 状态
      * @return 租约列表
      */
     public Map<String, Object> getContractsByStatus(Integer status) {
         Map<String, Object> result = new HashMap<>();
-        
+
         try {
             List<TenantManagement> contracts = tenantManagementRepository.findByContractStatus(status);
             result.put("success", true);
@@ -156,28 +161,29 @@ public class TenantManagementService {
             result.put("success", false);
             result.put("message", "获取租约列表失败: " + e.getMessage());
         }
-        
+
         return result;
     }
 
     /**
      * 更新租约状态
+     * 
      * @param contractId 租约ID
-     * @param status 新状态
+     * @param status     新状态
      * @return 更新结果
      */
     public Map<String, Object> updateContractStatus(Long contractId, Integer status) {
         Map<String, Object> result = new HashMap<>();
-        
+
         try {
             Optional<TenantManagement> contractOptional = tenantManagementRepository.findById(contractId);
             if (contractOptional.isPresent()) {
                 TenantManagement contract = contractOptional.get();
                 contract.setContractStatus(status);
                 contract.setUpdatedTime(LocalDateTime.now());
-                
+
                 tenantManagementRepository.save(contract);
-                
+
                 result.put("success", true);
                 result.put("message", "租约状态更新成功");
             } else {
@@ -188,28 +194,29 @@ public class TenantManagementService {
             result.put("success", false);
             result.put("message", "更新租约状态失败: " + e.getMessage());
         }
-        
+
         return result;
     }
 
     /**
      * 更新租金状态
+     * 
      * @param contractId 租约ID
      * @param rentStatus 租金状态
      * @return 更新结果
      */
     public Map<String, Object> updateRentStatus(Long contractId, Integer rentStatus) {
         Map<String, Object> result = new HashMap<>();
-        
+
         try {
             Optional<TenantManagement> contractOptional = tenantManagementRepository.findById(contractId);
             if (contractOptional.isPresent()) {
                 TenantManagement contract = contractOptional.get();
                 contract.setRentStatus(rentStatus);
                 contract.setUpdatedTime(LocalDateTime.now());
-                
+
                 tenantManagementRepository.save(contract);
-                
+
                 result.put("success", true);
                 result.put("message", "租金状态更新成功");
             } else {
@@ -220,28 +227,29 @@ public class TenantManagementService {
             result.put("success", false);
             result.put("message", "更新租金状态失败: " + e.getMessage());
         }
-        
+
         return result;
     }
 
     /**
      * 更新押金状态
-     * @param contractId 租约ID
+     * 
+     * @param contractId    租约ID
      * @param depositStatus 押金状态
      * @return 更新结果
      */
     public Map<String, Object> updateDepositStatus(Long contractId, Integer depositStatus) {
         Map<String, Object> result = new HashMap<>();
-        
+
         try {
             Optional<TenantManagement> contractOptional = tenantManagementRepository.findById(contractId);
             if (contractOptional.isPresent()) {
                 TenantManagement contract = contractOptional.get();
                 contract.setDepositStatus(depositStatus);
                 contract.setUpdatedTime(LocalDateTime.now());
-                
+
                 tenantManagementRepository.save(contract);
-                
+
                 result.put("success", true);
                 result.put("message", "押金状态更新成功");
             } else {
@@ -252,111 +260,141 @@ public class TenantManagementService {
             result.put("success", false);
             result.put("message", "更新押金状态失败: " + e.getMessage());
         }
-        
+
         return result;
     }
 
     /**
      * 获取租约统计信息
+     * 
      * @return 统计信息
      */
     public Map<String, Object> getContractStatistics() {
         Map<String, Object> result = new HashMap<>();
-        
+
         try {
             List<TenantManagement> activeContracts = tenantManagementRepository.findActiveContracts();
-            List<TenantManagement> expiringContracts = tenantManagementRepository.findExpiringContracts(LocalDate.now().plusMonths(1));
+            List<TenantManagement> expiringContracts = tenantManagementRepository
+                    .findExpiringContracts(LocalDate.now().plusMonths(1));
             List<Object[]> statusCounts = tenantManagementRepository.countByContractStatus();
-            
+
             Map<Integer, Long> statusMap = new HashMap<>();
             for (Object[] statusCount : statusCounts) {
                 statusMap.put((Integer) statusCount[0], (Long) statusCount[1]);
             }
-            
+
             result.put("success", true);
             result.put("totalContracts", tenantManagementRepository.count());
             result.put("activeContracts", activeContracts.size());
             result.put("expiringContracts", expiringContracts.size());
             result.put("statusDistribution", statusMap);
-            
+
         } catch (Exception e) {
             result.put("success", false);
             result.put("message", "获取统计信息失败: " + e.getMessage());
         }
-        
+
         return result;
     }
 
     /**
      * 获取即将到期的租约
+     * 
      * @param days 天数
      * @return 即将到期的租约列表
      */
     public Map<String, Object> getExpiringContracts(Integer days) {
         Map<String, Object> result = new HashMap<>();
-        
+
         try {
             LocalDate endDate = LocalDate.now().plusDays(days);
             List<TenantManagement> expiringContracts = tenantManagementRepository.findExpiringContracts(endDate);
-            
+
             result.put("success", true);
             result.put("contracts", expiringContracts);
-            
+
         } catch (Exception e) {
             result.put("success", false);
             result.put("message", "获取即将到期租约失败: " + e.getMessage());
         }
-        
+
         return result;
     }
 
-
     /**
      * 根据房东ID获取租约列表
+     * 
      * @param landlordId 房东ID
      * @return 租约列表
      */
     public Map<String, Object> getContractsByLandlordId(Long landlordId) {
         Map<String, Object> result = new HashMap<>();
-        
+
         try {
             List<TenantManagement> contracts = tenantManagementRepository.findByLandlordId(landlordId);
             List<Map<String, Object>> contractList = contracts.stream()
                     .map(this::convertToMap)
                     .toList();
-            
+
             result.put("success", true);
             result.put("contracts", contractList);
         } catch (Exception e) {
             result.put("success", false);
             result.put("message", "获取租约列表失败: " + e.getMessage());
         }
-        
+
         return result;
     }
 
     /**
      * 根据房东ID和状态获取租约列表
+     * 
      * @param landlordId 房东ID
-     * @param status 状态
+     * @param status     状态
      * @return 租约列表
      */
     public Map<String, Object> getContractsByLandlordIdAndStatus(Long landlordId, Integer status) {
         Map<String, Object> result = new HashMap<>();
-        
+
         try {
-            List<TenantManagement> contracts = tenantManagementRepository.findByLandlordIdAndContractStatus(landlordId, status);
+            List<TenantManagement> contracts = tenantManagementRepository.findByLandlordIdAndContractStatus(landlordId,
+                    status);
             List<Map<String, Object>> contractList = contracts.stream()
                     .map(this::convertToMap)
                     .toList();
-            
+
             result.put("success", true);
             result.put("contracts", contractList);
         } catch (Exception e) {
             result.put("success", false);
             result.put("message", "获取租约列表失败: " + e.getMessage());
         }
-        
+
+        return result;
+    }
+
+    /**
+     * 根据租客ID获取租约列表
+     * 
+     * @param tenantId 租客ID
+     * @return 租约列表
+     */
+    public Map<String, Object> getContractsByTenantId(Long tenantId) {
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            List<TenantManagement> contracts = tenantManagementRepository.findByTenantId(tenantId);
+            List<Map<String, Object>> contractList = contracts.stream()
+                    .map(this::convertToMap)
+                    .toList();
+
+            result.put("success", true);
+            result.put("contracts", contractList);
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", "获取租约列表失败: " + e.getMessage());
+        }
+
         return result;
     }
 
@@ -389,7 +427,41 @@ public class TenantManagementService {
         contractMap.put("contractSignedTime", contract.getContractSignedTime());
         contractMap.put("createdTime", contract.getCreatedTime());
         contractMap.put("updatedTime", contract.getUpdatedTime());
-        
+
         return contractMap;
+    }
+
+    /**
+     * 获取租约趋势（最近7天）
+     * 
+     * @return 日期和数量列表
+     */
+    public Map<String, Object> getContractTrends() {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
+            List<Object[]> trends = tenantManagementRepository.countByContractSignedTimeAfter(sevenDaysAgo);
+
+            Map<String, Long> trendMap = new HashMap<>();
+            // 初始化最近7天的数据为0
+            for (int i = 0; i < 7; i++) {
+                String date = LocalDate.now().minusDays(i).toString();
+                trendMap.put(date, 0L);
+            }
+
+            // 填充实际数据
+            for (Object[] row : trends) {
+                String date = row[0].toString();
+                Long count = (Long) row[1];
+                trendMap.put(date, count);
+            }
+
+            result.put("success", true);
+            result.put("trends", trendMap);
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", "获取租约趋势失败: " + e.getMessage());
+        }
+        return result;
     }
 }

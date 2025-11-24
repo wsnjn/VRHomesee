@@ -18,6 +18,7 @@ public class TenantManagementController {
 
     /**
      * 创建租约
+     * 
      * @param request 租约请求数据
      * @return 创建结果
      */
@@ -38,19 +39,19 @@ public class TenantManagementController {
             LocalDate contractStartDate = LocalDate.parse(contractStartDateStr, formatter);
             LocalDate contractEndDate = LocalDate.parse(contractEndDateStr, formatter);
 
-            return tenantManagementService.createTenantContract(contractNumber, roomId, landlordId, 
-                                                               tenantId, contractStartDate, contractEndDate, 
-                                                               monthlyRent, depositAmount);
+            return tenantManagementService.createTenantContract(contractNumber, roomId, landlordId,
+                    tenantId, contractStartDate, contractEndDate,
+                    monthlyRent, depositAmount);
         } catch (Exception e) {
             return Map.of(
-                "success", false,
-                "message", "请求参数错误: " + e.getMessage()
-            );
+                    "success", false,
+                    "message", "请求参数错误: " + e.getMessage());
         }
     }
 
     /**
      * 获取租约详情
+     * 
      * @param contractId 租约ID
      * @return 租约详情
      */
@@ -61,6 +62,7 @@ public class TenantManagementController {
 
     /**
      * 获取所有租约列表
+     * 
      * @return 租约列表
      */
     @GetMapping("/all")
@@ -70,6 +72,7 @@ public class TenantManagementController {
 
     /**
      * 根据状态获取租约列表
+     * 
      * @param status 状态
      * @return 租约列表
      */
@@ -80,66 +83,67 @@ public class TenantManagementController {
 
     /**
      * 更新租约状态
+     * 
      * @param contractId 租约ID
-     * @param request 状态更新请求
+     * @param request    状态更新请求
      * @return 更新结果
      */
     @PutMapping("/{contractId}/status")
-    public Map<String, Object> updateContractStatus(@PathVariable Long contractId, 
-                                                   @RequestBody Map<String, Object> request) {
+    public Map<String, Object> updateContractStatus(@PathVariable Long contractId,
+            @RequestBody Map<String, Object> request) {
         try {
             Integer status = Integer.valueOf(request.get("status").toString());
             return tenantManagementService.updateContractStatus(contractId, status);
         } catch (Exception e) {
             return Map.of(
-                "success", false,
-                "message", "请求参数错误: " + e.getMessage()
-            );
+                    "success", false,
+                    "message", "请求参数错误: " + e.getMessage());
         }
     }
 
     /**
      * 更新租金状态
+     * 
      * @param contractId 租约ID
-     * @param request 租金状态更新请求
+     * @param request    租金状态更新请求
      * @return 更新结果
      */
     @PutMapping("/{contractId}/rent-status")
-    public Map<String, Object> updateRentStatus(@PathVariable Long contractId, 
-                                               @RequestBody Map<String, Object> request) {
+    public Map<String, Object> updateRentStatus(@PathVariable Long contractId,
+            @RequestBody Map<String, Object> request) {
         try {
             Integer rentStatus = Integer.valueOf(request.get("rentStatus").toString());
             return tenantManagementService.updateRentStatus(contractId, rentStatus);
         } catch (Exception e) {
             return Map.of(
-                "success", false,
-                "message", "请求参数错误: " + e.getMessage()
-            );
+                    "success", false,
+                    "message", "请求参数错误: " + e.getMessage());
         }
     }
 
     /**
      * 更新押金状态
+     * 
      * @param contractId 租约ID
-     * @param request 押金状态更新请求
+     * @param request    押金状态更新请求
      * @return 更新结果
      */
     @PutMapping("/{contractId}/deposit-status")
-    public Map<String, Object> updateDepositStatus(@PathVariable Long contractId, 
-                                                  @RequestBody Map<String, Object> request) {
+    public Map<String, Object> updateDepositStatus(@PathVariable Long contractId,
+            @RequestBody Map<String, Object> request) {
         try {
             Integer depositStatus = Integer.valueOf(request.get("depositStatus").toString());
             return tenantManagementService.updateDepositStatus(contractId, depositStatus);
         } catch (Exception e) {
             return Map.of(
-                "success", false,
-                "message", "请求参数错误: " + e.getMessage()
-            );
+                    "success", false,
+                    "message", "请求参数错误: " + e.getMessage());
         }
     }
 
     /**
      * 获取租约统计信息
+     * 
      * @return 统计信息
      */
     @GetMapping("/statistics")
@@ -149,11 +153,33 @@ public class TenantManagementController {
 
     /**
      * 获取即将到期的租约
+     * 
      * @param days 天数
      * @return 即将到期的租约列表
      */
     @GetMapping("/expiring/{days}")
     public Map<String, Object> getExpiringContracts(@PathVariable Integer days) {
         return tenantManagementService.getExpiringContracts(days);
+    }
+
+    /**
+     * 根据租客ID获取租约列表
+     * 
+     * @param tenantId 租客ID
+     * @return 租约列表
+     */
+    @GetMapping("/tenant/{tenantId}")
+    public Map<String, Object> getContractsByTenantId(@PathVariable Long tenantId) {
+        return tenantManagementService.getContractsByTenantId(tenantId);
+    }
+
+    /**
+     * 获取租约趋势（最近7天）
+     * 
+     * @return 趋势数据
+     */
+    @GetMapping("/trends")
+    public Map<String, Object> getContractTrends() {
+        return tenantManagementService.getContractTrends();
     }
 }
