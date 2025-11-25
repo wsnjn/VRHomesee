@@ -14,6 +14,7 @@ E:\wslop\End\Springboot\src\main\java\com\example\homesee\repository\HouseTourRe
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\controller\LandlordHouseController.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\entity\Friendship.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\entity\HouseTour.java
+E:\wslop\End\Springboot\src\main\java\com\example\homesee\dto\FriendDTO.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\service\AppointmentService.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\service\CommunityService.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\HomeseeApplication.java

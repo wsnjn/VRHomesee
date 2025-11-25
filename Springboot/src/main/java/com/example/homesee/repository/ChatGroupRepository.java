@@ -11,4 +11,6 @@ public interface ChatGroupRepository extends JpaRepository<ChatGroup, Long> {
     List<ChatGroup> findByGroupType(Integer groupType);
 
     List<ChatGroup> findByOwnerId(Long ownerId);
+
+    java.util.Optional<ChatGroup> findByGroupName(String groupName);
 }

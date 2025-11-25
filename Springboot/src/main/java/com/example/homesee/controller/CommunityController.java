@@ -39,6 +39,57 @@ public class CommunityController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/groups/private")
+    public ResponseEntity<Map<String, Object>> getPrivateChatGroup(@RequestBody Map<String, Object> request) {
+        Long userId = Long.valueOf(request.get("userId").toString());
+        Long friendId = Long.valueOf(request.get("friendId").toString());
+
+        ChatGroup group = communityService.getPrivateChatGroup(userId, friendId);
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("data", group);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/groups/delete")
+    public ResponseEntity<Map<String, Object>> deleteGroup(@RequestBody Map<String, Object> request) {
+        Long groupId = Long.valueOf(request.get("groupId").toString());
+        Long userId = Long.valueOf(request.get("userId").toString());
+
+        try {
+            communityService.deleteGroup(groupId, userId);
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Group deleted successfully");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    @PostMapping("/groups/invite")
+    public ResponseEntity<Map<String, Object>> inviteToGroup(@RequestBody Map<String, Object> request) {
+        Long groupId = Long.valueOf(request.get("groupId").toString());
+        Long inviterId = Long.valueOf(request.get("inviterId").toString());
+        Long inviteeId = Long.valueOf(request.get("inviteeId").toString());
+
+        try {
+            communityService.inviteToGroup(groupId, inviterId, inviteeId);
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "User invited successfully");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
     // --- Chat Messages ---
     @GetMapping("/messages/group/{groupId}")
     public ResponseEntity<Map<String, Object>> getGroupMessages(@PathVariable Long groupId) {

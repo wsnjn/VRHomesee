@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Optional;
+import java.time.LocalDateTime;
+import com.example.homesee.dto.FriendDTO;
 
 @Service
 public class CommunityService {
@@ -135,8 +138,102 @@ public class CommunityService {
         return null;
     }
 
-    public List<Friendship> getFriends(Long userId) {
-        return friendshipRepository.findAcceptedFriendships(userId);
+    public List<FriendDTO> getFriends(Long userId) {
+        List<Friendship> friendships = friendshipRepository.findAcceptedFriendships(userId);
+        return friendships.stream().map(f -> {
+            FriendDTO dto = new FriendDTO();
+            dto.setId(f.getId());
+            dto.setFriendId(f.getFriendId());
+            dto.setStatus(f.getStatus());
+            dto.setCreatedTime(f.getCreatedTime());
+
+            userRepository.findById(f.getFriendId()).ifPresent(user -> {
+                dto.setUsername(user.getUsername());
+                dto.setAvatar(user.getAvatar());
+                dto.setRealName(user.getRealName());
+            });
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    public ChatGroup getPrivateChatGroup(Long userId, Long friendId) {
+        long minId = Math.min(userId, friendId);
+        long maxId = Math.max(userId, friendId);
+        String uniqueName = "PRIVATE_" + minId + "_" + maxId;
+
+        Optional<ChatGroup> existing = chatGroupRepository.findByGroupName(uniqueName);
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+
+        ChatGroup group = new ChatGroup();
+        group.setGroupName(uniqueName);
+        group.setGroupType(3); // 3 = Private
+        group.setOwnerId(userId);
+        group.setCreatedTime(LocalDateTime.now());
+
+        ChatGroup saved = chatGroupRepository.save(group);
+
+        joinGroup(saved.getId(), userId, 0);
+        joinGroup(saved.getId(), friendId, 0);
+
+        return saved;
+    }
+
+    public void deleteGroup(Long groupId, Long ownerId) {
+        Optional<ChatGroup> groupOpt = chatGroupRepository.findById(groupId);
+        if (groupOpt.isPresent()) {
+            ChatGroup group = groupOpt.get();
+            // Check if user is owner and group is not system group (1 or 2)
+            // Note: Global groups usually have ID 1 or 2, or type 1/2.
+            // The requirement says "except ID 1 and 2".
+            if (group.getId() == 1 || group.getId() == 2) {
+                throw new RuntimeException("Cannot delete system groups");
+            }
+
+            if (!group.getOwnerId().equals(ownerId)) {
+                throw new RuntimeException("Only owner can delete group");
+            }
+
+            // Delete members and messages first?
+            // JPA might handle cascade if configured, but let's be safe or just delete
+            // group.
+            // Assuming cascade or simple delete for now.
+            // Better to delete members and messages.
+            List<GroupMember> members = groupMemberRepository.findByGroupId(groupId);
+            groupMemberRepository.deleteAll(members);
+
+            List<ChatMessage> messages = chatMessageRepository.findByGroupIdOrderByCreatedTimeAsc(groupId);
+            chatMessageRepository.deleteAll(messages);
+
+            chatGroupRepository.delete(group);
+        } else {
+            throw new RuntimeException("Group not found");
+        }
+    }
+
+    public void inviteToGroup(Long groupId, Long inviterId, Long inviteeId) {
+        Optional<ChatGroup> groupOpt = chatGroupRepository.findById(groupId);
+        if (groupOpt.isEmpty()) {
+            throw new RuntimeException("Group not found");
+        }
+
+        ChatGroup group = groupOpt.get();
+        if (group.getId() == 1 || group.getId() == 2) {
+            throw new RuntimeException("Cannot invite to system groups via this method");
+        }
+
+        // Check if inviter is in group
+        if (!groupMemberRepository.existsByGroupIdAndUserId(groupId, inviterId)) {
+            throw new RuntimeException("You are not a member of this group");
+        }
+
+        // Check if invitee is already in group
+        if (groupMemberRepository.existsByGroupIdAndUserId(groupId, inviteeId)) {
+            throw new RuntimeException("User is already in the group");
+        }
+
+        joinGroup(groupId, inviteeId, 0);
     }
 
     public List<Friendship> getPendingRequests(Long userId) {

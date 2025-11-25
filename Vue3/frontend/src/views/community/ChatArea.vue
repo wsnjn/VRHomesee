@@ -77,7 +77,8 @@
 
         <div v-for="friend in friends" :key="friend.id" class="list-item">
           <div class="item-avatar friend-avatar">
-            {{ friend.username?.[0] || 'F' }}
+            <img v-if="friend.avatar" :src="getAvatarSrc(friend.avatar)" style="width:100%;height:100%;border-radius:10px;object-fit:cover;" />
+            <span v-else>{{ friend.username?.[0] || 'F' }}</span>
           </div>
           <div class="item-info">
             <div class="item-name">{{ friend.username }}</div>
@@ -168,6 +169,18 @@
         <div class="modal-actions">
           <button @click="showAddFriendModal = false" class="btn-cancel">取消</button>
           <button @click="sendFriendRequest" class="btn-confirm">发送请求</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Invite Friend Modal -->
+    <div v-if="showInviteModal" class="modal-overlay">
+      <div class="modal-content">
+        <h3>邀请好友入群</h3>
+        <input v-model="inviteFriendId" placeholder="输入好友手机号" class="modal-input" />
+        <div class="modal-actions">
+          <button @click="showInviteModal = false" class="btn-cancel">取消</button>
+          <button @click="inviteFriend" class="btn-confirm">邀请</button>
         </div>
       </div>
     </div>
@@ -369,9 +382,27 @@ const respondToRequest = async (requestId, status) => {
   }
 }
 
-const startPrivateChat = (friend) => {
-  // For now, just alert. In a real app, this would create/find a private chat group or channel.
-  alert(`Start chat with ${friend.username} (Feature coming soon)`)
+const startPrivateChat = async (friend) => {
+  try {
+    const res = await fetch('http://localhost:8080/api/community/groups/private', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: currentUserId, friendId: friend.friendId })
+    })
+    const data = await res.json()
+    if (data.success) {
+      // Add to groups list if not exists
+      const exists = groups.value.find(g => g.id === data.data.id)
+      if (!exists) {
+        groups.value.push(data.data)
+      }
+      // Select it
+      selectGroup(data.data)
+      activeTab.value = 'groups'
+    }
+  } catch (e) {
+    console.error(e)
+  }
 }
 
 const scrollToBottom = () => {
@@ -464,13 +495,22 @@ const inviteFriend = async () => {
   if (!inviteFriendId.value || !activeGroup.value) return
   
   try {
+    // Search by phone first
+    const searchRes = await fetch(`http://localhost:8080/api/user/search/phone?phone=${inviteFriendId.value}`)
+    const searchData = await searchRes.json()
+    
+    if (!searchData.success || !searchData.user) {
+      alert('未找到该用户')
+      return
+    }
+
     const res = await fetch('http://localhost:8080/api/community/groups/invite', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
         groupId: activeGroup.value.id, 
         inviterId: currentUserId,
-        inviteeId: parseInt(inviteFriendId.value)
+        inviteeId: searchData.user.id
       })
     })
     const data = await res.json()
@@ -484,6 +524,11 @@ const inviteFriend = async () => {
   } catch (e) {
     console.error(e)
   }
+}
+
+const getAvatarSrc = (avatarName) => {
+  if (!avatarName) return '/src/assets/image/default-avatar.png'
+  return `/src/assets/image/${avatarName}`
 }
 </script>
 
