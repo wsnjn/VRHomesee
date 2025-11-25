@@ -13,6 +13,8 @@ const router = createRouter({
     { path: '/smart-matching', name: 'smart-matching', component: () => import('../views/tenant/SmartMatching.vue'), meta: { requiresAuth: true, allowedUserTypes: [1, 2, 3] } },
     { path: '/maintenance', name: 'maintenance', component: () => import('../views/tenant/Maintenance.vue'), meta: { requiresAuth: true, allowedUserTypes: [1, 2, 3] } },
     { path: '/community', name: 'community', component: () => import('../views/community/Community.vue'), meta: { requiresAuth: true, allowedUserTypes: [1, 2, 3] } },
+    { path: '/friend-circle', name: 'friend-circle', component: () => import('../views/community/FriendCircle.vue'), meta: { requiresAuth: true, allowedUserTypes: [1, 2, 3] } },
+    { path: '/community-page', name: 'community-page', component: () => import('../views/community/CommunityPage.vue'), meta: { requiresAuth: true, allowedUserTypes: [1, 2, 3] } },
 
     // 登录页面（共享，无需登录）
     { path: '/login', name: 'login', component: () => import('../views/Login.vue'), meta: { requiresAuth: false } },

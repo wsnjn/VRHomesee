@@ -150,7 +150,7 @@ public class CommunityController {
         Map<String, Object> response = new HashMap<>();
         if (file.isEmpty()) {
             response.put("success", false);
-            response.put("message", "File is empty");
+            response.put("message", "文件为空");
             return ResponseEntity.badRequest().body(response);
         }
 
@@ -170,23 +170,43 @@ public class CommunityController {
                 extension = originalFilename.substring(originalFilename.lastIndexOf("."));
             }
 
+            // Determine file type and subdirectory
+            String contentType = file.getContentType();
+            String subDirectory = "images"; // default
+            if (contentType != null) {
+                if (contentType.startsWith("image/")) {
+                    subDirectory = "images";
+                } else if (contentType.startsWith("video/")) {
+                    subDirectory = "videos";
+                } else if (contentType.startsWith("audio/")) {
+                    subDirectory = "musics";
+                }
+            }
+
+            // Create subdirectory if not exists
+            java.nio.file.Path subDirPath = uploadPath.resolve(subDirectory);
+            if (!java.nio.file.Files.exists(subDirPath)) {
+                java.nio.file.Files.createDirectories(subDirPath);
+            }
+
             String newFilename = java.util.UUID.randomUUID().toString() + extension;
-            java.nio.file.Path targetLocation = uploadPath.resolve(newFilename);
+            java.nio.file.Path targetLocation = subDirPath.resolve(newFilename);
 
             java.nio.file.Files.copy(file.getInputStream(), targetLocation,
                     java.nio.file.StandardCopyOption.REPLACE_EXISTING);
 
             // Return URL accessible via Frontend Dev Server
-            String fileUrl = "http://localhost:5173/uploads/" + newFilename;
+            String fileUrl = "http://localhost:5173/uploads/" + subDirectory + "/" + newFilename;
 
             response.put("success", true);
             response.put("url", fileUrl);
-            response.put("message", "File uploaded successfully");
+            response.put("type", subDirectory);
+            response.put("message", "文件上传成功");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             e.printStackTrace();
             response.put("success", false);
-            response.put("message", "Upload failed: " + e.getMessage());
+            response.put("message", "上传失败: " + e.getMessage());
             return ResponseEntity.status(500).body(response);
         }
     }

@@ -1,5 +1,16 @@
 <template>
-  <div class="feed-container">
+  <div class="community-container">
+    <!-- Header -->
+    <div class="community-header">
+      <h1>社区朋友圈</h1>
+      <div class="filter-controls">
+        <select v-model="feedFilter" class="filter-select">
+          <option value="all">全部动态</option>
+          <option value="friends">只看朋友</option>
+        </select>
+      </div>
+    </div>
+
     <!-- Create Post -->
     <div class="create-post-card">
       <div class="input-wrapper">
@@ -42,9 +53,15 @@
             <span>音乐</span>
           </button>
         </div>
-        <button class="submit-btn" @click="submitPost" :disabled="(!newPostContent && !mediaPreview) || !hasActiveLease">
-          发布
-        </button>
+        <div class="post-settings">
+          <select v-model="visibility" class="visibility-select" :disabled="!hasActiveLease">
+            <option value="0">公开</option>
+            <option value="1">仅好友</option>
+          </select>
+          <button class="submit-btn" @click="submitPost" :disabled="(!newPostContent && !mediaPreview) || !hasActiveLease">
+            发布
+          </button>
+        </div>
       </div>
       <div v-if="!hasActiveLease" class="lease-warning">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
@@ -52,43 +69,109 @@
       </div>
     </div>
 
-    <!-- Feed List -->
-    <div class="feed-list">
-      <div v-for="post in posts" :key="post.id" class="post-card">
-        <div class="post-header">
-          <div class="avatar">{{ post.userId ? 'U' : 'A' }}</div>
-          <div class="user-info">
-            <span class="username">用户 {{ post.userId }}</span>
-            <span class="time">{{ formatDate(post.createdTime) }}</span>
+    <!-- Feed Sections -->
+    <div class="feed-sections">
+      <!-- My Posts Section -->
+      <div class="feed-section" v-if="myPosts.length > 0">
+        <h2 class="section-title">我的朋友圈</h2>
+        <div class="feed-list">
+          <div v-for="post in myPosts" :key="post.id" class="post-card">
+            <div class="post-header">
+              <div class="avatar">{{ userState.user?.username?.[0] || 'U' }}</div>
+              <div class="user-info">
+                <span class="username">{{ userState.user?.username || '我' }}</span>
+                <span class="time">{{ formatDate(post.createdTime) }}</span>
+              </div>
+              <div class="visibility-badge" :class="post.visibility === 1 ? 'friends-only' : 'public'">
+                {{ post.visibility === 1 ? '仅好友' : '公开' }}
+              </div>
+            </div>
+            
+            <div class="post-content">
+              <p>{{ post.content }}</p>
+              <div v-if="post.mediaUrls" class="post-media">
+                <template v-if="Array.isArray(getMediaUrls(post.mediaUrls))">
+                  <div v-for="(mediaUrl, index) in getMediaUrls(post.mediaUrls)" :key="index" class="media-item">
+                    <img v-if="isImage(mediaUrl)" :src="mediaUrl" :alt="`Post media ${index + 1}`" />
+                    <video v-else-if="isVideo(mediaUrl)" :src="mediaUrl" controls></video>
+                    <audio v-else-if="isAudio(mediaUrl)" :src="mediaUrl" controls></audio>
+                  </div>
+                </template>
+                <template v-else>
+                  <img v-if="isImage(post.mediaUrls)" :src="post.mediaUrls" alt="Post media" />
+                  <video v-else-if="isVideo(post.mediaUrls)" :src="post.mediaUrls" controls></video>
+                  <audio v-else-if="isAudio(post.mediaUrls)" :src="post.mediaUrls" controls></audio>
+                </template>
+              </div>
+            </div>
+            
+            <div class="post-footer">
+              <button class="footer-btn like-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                <span>赞</span>
+              </button>
+              <button class="footer-btn comment-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                <span>评论</span>
+              </button>
+              <button class="footer-btn share-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                <span>分享</span>
+              </button>
+            </div>
           </div>
-          <button class="more-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
-          </button>
         </div>
-        
-        <div class="post-content">
-          <p>{{ post.content }}</p>
-          <div v-if="post.mediaUrls" class="post-media">
-            <!-- Simple handling for now, assume single URL or comma separated -->
-            <img v-if="isImage(post.mediaUrls)" :src="post.mediaUrls" alt="Post media" />
-            <video v-else-if="isVideo(post.mediaUrls)" :src="post.mediaUrls" controls></video>
-            <audio v-else-if="isAudio(post.mediaUrls)" :src="post.mediaUrls" controls></audio>
+      </div>
+
+      <!-- Community Posts Section -->
+      <div class="feed-section">
+        <h2 class="section-title">社区朋友圈</h2>
+        <div class="feed-list">
+          <div v-for="post in communityPosts" :key="post.id" class="post-card">
+            <div class="post-header">
+              <div class="avatar">{{ post.userId ? 'U' : 'A' }}</div>
+              <div class="user-info">
+                <span class="username">用户 {{ post.userId }}</span>
+                <span class="time">{{ formatDate(post.createdTime) }}</span>
+              </div>
+              <div class="visibility-badge" :class="post.visibility === 1 ? 'friends-only' : 'public'">
+                {{ post.visibility === 1 ? '仅好友' : '公开' }}
+              </div>
+            </div>
+            
+            <div class="post-content">
+              <p>{{ post.content }}</p>
+              <div v-if="post.mediaUrls" class="post-media">
+                <template v-if="Array.isArray(getMediaUrls(post.mediaUrls))">
+                  <div v-for="(mediaUrl, index) in getMediaUrls(post.mediaUrls)" :key="index" class="media-item">
+                    <img v-if="isImage(mediaUrl)" :src="mediaUrl" :alt="`Post media ${index + 1}`" />
+                    <video v-else-if="isVideo(mediaUrl)" :src="mediaUrl" controls></video>
+                    <audio v-else-if="isAudio(mediaUrl)" :src="mediaUrl" controls></audio>
+                  </div>
+                </template>
+                <template v-else>
+                  <img v-if="isImage(post.mediaUrls)" :src="post.mediaUrls" alt="Post media" />
+                  <video v-else-if="isVideo(post.mediaUrls)" :src="post.mediaUrls" controls></video>
+                  <audio v-else-if="isAudio(post.mediaUrls)" :src="post.mediaUrls" controls></audio>
+                </template>
+              </div>
+            </div>
+            
+            <div class="post-footer">
+              <button class="footer-btn like-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                <span>赞</span>
+              </button>
+              <button class="footer-btn comment-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                <span>评论</span>
+              </button>
+              <button class="footer-btn share-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                <span>分享</span>
+              </button>
+            </div>
           </div>
-        </div>
-        
-        <div class="post-footer">
-          <button class="footer-btn like-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-            <span>赞</span>
-          </button>
-          <button class="footer-btn comment-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-            <span>评论</span>
-          </button>
-          <button class="footer-btn share-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-            <span>分享</span>
-          </button>
         </div>
       </div>
     </div>
@@ -104,11 +187,30 @@ const newPostContent = ref('')
 const currentUserId = userState.user ? userState.user.id : 0
 const mediaPreview = ref(null)
 const hasActiveLease = ref(false)
+const visibility = ref('0') // 0-公开, 1-仅好友
+const feedFilter = ref('all') // all, friends
 
 // Refs for file inputs
 const imageInput = ref(null)
 const videoInput = ref(null)
 const audioInput = ref(null)
+
+// Computed properties for filtered posts
+const myPosts = computed(() => {
+  return posts.value.filter(post => post.userId === currentUserId)
+})
+
+const communityPosts = computed(() => {
+  let filtered = posts.value.filter(post => post.userId !== currentUserId)
+  
+  if (feedFilter.value === 'friends') {
+    // TODO: Implement friend filtering logic
+    // For now, show all posts
+    return filtered
+  }
+  
+  return filtered
+})
 
 const checkLease = async () => {
   if (!currentUserId) return
@@ -190,7 +292,7 @@ const submitPost = async () => {
     userId: currentUserId,
     content: newPostContent.value,
     mediaUrls: mediaUrl,
-    visibility: 0
+    visibility: parseInt(visibility.value)
   }
 
   try {
@@ -230,6 +332,21 @@ const isVideo = (url) => {
   return url && url.match(/\.(mp4|webm|ogg|mov)$/i) != null
 }
 
+const getMediaUrls = (mediaUrls) => {
+  if (!mediaUrls) return []
+  try {
+    // Try to parse as JSON array
+    const parsed = JSON.parse(mediaUrls)
+    if (Array.isArray(parsed)) {
+      return parsed
+    }
+  } catch (e) {
+    // If not JSON, treat as single URL
+    return mediaUrls ? [mediaUrls] : []
+  }
+  return []
+}
+
 const isAudio = (url) => {
   return url && url.match(/\.(mp3|wav|aac|flac|m4a)$/i) != null
 }
@@ -241,12 +358,75 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.feed-container {
+.community-container {
   max-width: 680px;
   margin: 0 auto;
   padding: 20px;
   font-family: 'Inter', sans-serif;
   color: #1f2937;
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
+.community-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.community-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.filter-controls {
+  display: flex;
+  gap: 12px;
+}
+
+.filter-select {
+  padding: 8px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: white;
+  color: #374151;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-select:hover {
+  border-color: #6366f1;
+}
+
+.feed-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.feed-section {
+  margin-bottom: 32px;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #6366f1;
+}
+
+.feed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .create-post-card {
@@ -340,6 +520,33 @@ onMounted(() => {
   padding-left: 55px;
 }
 
+.post-settings {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.visibility-select {
+  padding: 6px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: white;
+  color: #374151;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.visibility-select:hover:not(:disabled) {
+  border-color: #6366f1;
+}
+
+.visibility-select:disabled {
+  background: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
 .media-buttons {
   display: flex;
   gap: 8px;
@@ -420,6 +627,26 @@ onMounted(() => {
   margin-right: 12px;
 }
 
+.visibility-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  margin-left: 8px;
+}
+
+.visibility-badge.public {
+  background: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #93c5fd;
+}
+
+.visibility-badge.friends-only {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+}
+
 .user-info {
   flex: 1;
   display: flex;
@@ -465,6 +692,14 @@ onMounted(() => {
   max-width: 100%;
   border-radius: 12px;
   margin-top: 8px;
+}
+
+.media-item {
+  margin-bottom: 8px;
+}
+
+.media-item:last-child {
+  margin-bottom: 0;
 }
 
 .post-footer {
