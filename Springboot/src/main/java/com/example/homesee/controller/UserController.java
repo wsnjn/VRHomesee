@@ -17,6 +17,7 @@ public class UserController {
 
     /**
      * 用户注册接口
+     * 
      * @param request 注册请求参数
      * @return 注册结果
      */
@@ -26,12 +27,13 @@ public class UserController {
         String phone = request.get("phone");
         String password = request.get("password");
         String realName = request.get("realName");
-        
+
         return userService.register(username, phone, password, realName);
     }
 
     /**
      * 用户登录接口
+     * 
      * @param request 登录请求参数
      * @return 登录结果
      */
@@ -39,12 +41,13 @@ public class UserController {
     public Map<String, Object> login(@RequestBody Map<String, String> request) {
         String phone = request.get("phone");
         String password = request.get("password");
-        
+
         return userService.login(phone, password);
     }
 
     /**
      * 检查手机号是否已注册
+     * 
      * @param phone 手机号
      * @return 检查结果
      */
@@ -55,6 +58,7 @@ public class UserController {
 
     /**
      * 检查用户名是否已存在
+     * 
      * @param username 用户名
      * @return 检查结果
      */
@@ -65,6 +69,7 @@ public class UserController {
 
     /**
      * 获取用户详细信息
+     * 
      * @param userId 用户ID
      * @return 用户详细信息
      */
@@ -75,23 +80,37 @@ public class UserController {
 
     /**
      * 上传用户头像
+     * 
      * @param avatar 头像文件
      * @param userId 用户ID
      * @return 上传结果
      */
     @PostMapping("/upload-avatar")
-    public Map<String, Object> uploadAvatar(@RequestParam("avatar") MultipartFile avatar, @RequestParam("userId") Long userId) {
+    public Map<String, Object> uploadAvatar(@RequestParam("avatar") MultipartFile avatar,
+            @RequestParam("userId") Long userId) {
         return userService.uploadAvatar(avatar, userId);
     }
 
     /**
      * 更新用户信息
-     * @param userId 用户ID
+     * 
+     * @param userId     用户ID
      * @param updateData 更新数据
      * @return 更新结果
      */
     @PutMapping("/update/{userId}")
     public Map<String, Object> updateUserInfo(@PathVariable Long userId, @RequestBody Map<String, Object> updateData) {
         return userService.updateUserInfo(userId, updateData);
+    }
+
+    /**
+     * 通过手机号搜索用户
+     * 
+     * @param phone 手机号
+     * @return 用户信息
+     */
+    @GetMapping("/search/phone")
+    public Map<String, Object> searchByPhone(@RequestParam String phone) {
+        return userService.searchByPhone(phone);
     }
 }

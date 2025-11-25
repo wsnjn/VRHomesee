@@ -164,7 +164,7 @@
     <div v-if="showAddFriendModal" class="modal-overlay">
       <div class="modal-content">
         <h3>添加好友</h3>
-        <input v-model="friendIdInput" placeholder="输入用户ID" type="number" class="modal-input" />
+        <input v-model="friendIdInput" placeholder="输入手机号" type="text" class="modal-input" />
         <div class="modal-actions">
           <button @click="showAddFriendModal = false" class="btn-cancel">取消</button>
           <button @click="sendFriendRequest" class="btn-confirm">发送请求</button>
@@ -307,12 +307,27 @@ const createGroup = async () => {
 const sendFriendRequest = async () => {
   if (!friendIdInput.value) return
   
-  const payload = {
-    userId: currentUserId,
-    friendId: parseInt(friendIdInput.value)
-  }
-
   try {
+    // 先通过手机号查找用户
+    const searchRes = await fetch(`http://localhost:8080/api/user/search/phone?phone=${friendIdInput.value}`)
+    const searchData = await searchRes.json()
+    
+    if (!searchData.success || !searchData.user) {
+      alert('未找到该用户')
+      return
+    }
+    
+    if (searchData.user.id === currentUserId) {
+      alert('不能添加自己为好友')
+      return
+    }
+    
+    // 发送好友请求
+    const payload = {
+      userId: currentUserId,
+      friendId: searchData.user.id
+    }
+
     const res = await fetch('http://localhost:8080/api/community/friends/request', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -324,10 +339,11 @@ const sendFriendRequest = async () => {
       showAddFriendModal.value = false
       friendIdInput.value = ''
     } else {
-      alert('发送失败')
+      alert(data.message || '发送失败')
     }
   } catch (e) {
     console.error(e)
+    alert('请求失败，请重试')
   }
 }
 

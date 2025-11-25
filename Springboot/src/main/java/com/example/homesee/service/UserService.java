@@ -470,4 +470,41 @@ public class UserService {
 
         return result;
     }
+
+    /**
+     * 通过手机号搜索用户
+     * 
+     * @param phone 手机号
+     * @return 用户基本信息
+     */
+    public Map<String, Object> searchByPhone(String phone) {
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            Optional<User> userOptional = userRepository.findByPhone(phone);
+            if (userOptional.isEmpty()) {
+                result.put("success", false);
+                result.put("message", "未找到该用户");
+                return result;
+            }
+
+            User user = userOptional.get();
+
+            // 只返回基本信息，不包含敏感信息
+            Map<String, Object> userInfo = new HashMap<>();
+            userInfo.put("id", user.getId());
+            userInfo.put("username", user.getUsername());
+            userInfo.put("avatar", user.getAvatar());
+            userInfo.put("realName", user.getRealName());
+
+            result.put("success", true);
+            result.put("user", userInfo);
+
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", "搜索失败: " + e.getMessage());
+        }
+
+        return result;
+    }
 }
