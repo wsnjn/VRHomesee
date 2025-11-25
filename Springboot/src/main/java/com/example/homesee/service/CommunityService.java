@@ -183,11 +183,15 @@ public class CommunityService {
         return friendships.stream().map(f -> {
             FriendDTO dto = new FriendDTO();
             dto.setId(f.getId());
-            dto.setFriendId(f.getFriendId());
+
+            // Determine who is the friend
+            Long targetId = f.getUserId().equals(userId) ? f.getFriendId() : f.getUserId();
+            dto.setFriendId(targetId);
+
             dto.setStatus(f.getStatus());
             dto.setCreatedTime(f.getCreatedTime());
 
-            userRepository.findById(f.getFriendId()).ifPresent(user -> {
+            userRepository.findById(targetId).ifPresent(user -> {
                 dto.setUsername(user.getUsername());
                 dto.setAvatar(user.getAvatar());
                 dto.setRealName(user.getRealName());

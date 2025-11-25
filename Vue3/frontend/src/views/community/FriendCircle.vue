@@ -143,7 +143,8 @@ const friends = ref([])
 
 // Computed properties for filtered posts (朋友圈只显示自己和朋友的动态)
 const filteredPosts = computed(() => {
-  const friendIds = friends.value.map(f => f.userId === currentUserId ? f.friendId : f.userId)
+  // Now friend.friendId is guaranteed to be the friend's ID
+  const friendIds = friends.value.map(f => f.friendId)
   
   return posts.value.filter(post => {
     const isSelf = post.userId === currentUserId
