@@ -73,9 +73,11 @@
     <div class="feed-list">
       <div v-for="post in filteredPosts" :key="post.id" class="post-card">
         <div class="post-header">
-          <div class="avatar">{{ post.userId ? 'U' : 'A' }}</div>
+          <div class="avatar-container">
+            <img :src="getAvatarUrl(post.avatar)" alt="头像" class="post-avatar" />
+          </div>
           <div class="user-info">
-            <span class="username">{{ post.userId === currentUserId ? (userState.user?.username || '我') : `用户 ${post.userId}` }}</span>
+            <span class="username">{{ post.username || `用户 ${post.userId}` }}</span>
             <span class="time">{{ formatDate(post.createdTime) }}</span>
           </div>
           <div class="visibility-badge" :class="post.visibility === 1 ? 'friends-only' : 'public'">
@@ -137,25 +139,40 @@ const imageInput = ref(null)
 const videoInput = ref(null)
 const audioInput = ref(null)
 
+const friends = ref([])
+
 // Computed properties for filtered posts (朋友圈只显示自己和朋友的动态)
 const filteredPosts = computed(() => {
-  let filtered = posts.value.filter(post => {
-    // 显示自己的所有动态
-    if (post.userId === currentUserId) return true
+  const friendIds = friends.value.map(f => f.userId === currentUserId ? f.friendId : f.userId)
+  
+  return posts.value.filter(post => {
+    const isSelf = post.userId === currentUserId
+    const isFriend = friendIds.includes(post.userId)
     
-    // 显示朋友的动态（公开或仅好友可见）
+    // 核心规则：只显示自己和朋友的动态
+    if (!isSelf && !isFriend) return false
+    
+    // 过滤器逻辑
     if (feedFilter.value === 'friends') {
-      // TODO: 实现好友关系检查
-      // 暂时显示所有公开动态
-      return post.visibility === 0
+      return isFriend
     }
     
-    // 显示所有公开动态
-    return post.visibility === 0
+    return true
   })
-  
-  return filtered
 })
+
+const fetchFriends = async () => {
+  if (!currentUserId) return
+  try {
+    const res = await fetch(`http://localhost:8080/api/community/friends/${currentUserId}`)
+    const data = await res.json()
+    if (data.success) {
+      friends.value = data.data
+    }
+  } catch (e) {
+    console.error(e)
+  }
+}
 
 const checkLease = async () => {
   if (!currentUserId) return
@@ -296,8 +313,16 @@ const isAudio = (url) => {
   return url && url.match(/\.(mp3|wav|aac|flac|m4a)$/i) != null
 }
 
+const getAvatarUrl = (avatarName) => {
+  if (!avatarName) {
+    return '/src/assets/image/default-avatar.png'
+  }
+  return `/src/assets/image/${avatarName}`
+}
+
 onMounted(() => {
   checkLease()
+  fetchFriends()
   fetchPosts()
 })
 </script>
@@ -547,28 +572,36 @@ onMounted(() => {
   margin-bottom: 12px;
 }
 
-.post-header .avatar {
-  margin-right: 10px;
+.avatar-container {
+  margin-right: 12px;
+}
+
+.post-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #e5e7eb;
 }
 
 .visibility-badge {
-  padding: 4px 8px;
-  border-radius: 12px;
   font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-left: auto;
   font-weight: 500;
-  margin-left: 8px;
 }
 
 .visibility-badge.public {
-  background: #dbeafe;
-  color: #1e40af;
-  border: 1px solid #93c5fd;
+  background: #eff6ff;
+  color: #3b82f6;
+  border: 1px solid #bfdbfe;
 }
 
 .visibility-badge.friends-only {
-  background: #fef3c7;
-  color: #92400e;
-  border: 1px solid #fcd34d;
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fde68a;
 }
 
 .user-info {

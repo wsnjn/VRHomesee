@@ -26,6 +26,7 @@ com\example\homesee\entity\Friendship.class
 com\example\homesee\entity\RoomInfo.class
 com\example\homesee\controller\MaintenanceController.class
 com\example\homesee\service\AppointmentService.class
+com\example\homesee\dto\SocialPostDTO.class
 com\example\homesee\service\ViewingAppointmentService.class
 com\example\homesee\controller\LandlordTenantMatchingController.class
 com\example\homesee\entity\TenantManagement.class

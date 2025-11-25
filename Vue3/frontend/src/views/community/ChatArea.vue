@@ -101,21 +101,27 @@
           </span>
         </div>
         <div class="header-actions">
-          <button class="icon-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+          <button class="icon-btn" @click="showInviteModal = true" title="邀请好友">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+          </button>
+          <button class="icon-btn delete-btn" v-if="activeGroup.ownerId === currentUserId" @click="deleteGroup" title="删除群组">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
           </button>
         </div>
       </div>
       
       <div class="messages-container" ref="msgContainer">
         <div v-for="msg in messages" :key="msg.id" class="message-wrapper" :class="{ self: msg.senderId === currentUserId }">
-          <div class="message-avatar" v-if="msg.senderId !== currentUserId">
-            {{ getSenderName(msg.senderId)[0] }}
+          <div class="message-avatar-container" v-if="msg.senderId !== currentUserId">
+            <img :src="getAvatarUrl(msg.senderId)" class="message-avatar-img" />
           </div>
-          <div class="message-bubble">
+          
+          <div class="message-content-wrapper">
             <div class="sender-name" v-if="msg.senderId !== currentUserId">{{ getSenderName(msg.senderId) }}</div>
-            <div class="msg-content">{{ msg.content }}</div>
-            <div class="msg-time">{{ formatTime(msg.createdTime) }}</div>
+            <div class="message-bubble">
+              <div class="msg-content">{{ msg.content }}</div>
+              <div class="msg-time">{{ formatTime(msg.createdTime) }}</div>
+            </div>
           </div>
         </div>
       </div>
@@ -189,8 +195,9 @@ const newGroupAnnouncement = ref('')
 const friendIdInput = ref('')
 
 const fetchGroups = async () => {
+  if (!currentUserId) return
   try {
-    const res = await fetch('http://localhost:8080/api/community/groups')
+    const res = await fetch(`http://localhost:8080/api/community/groups/user/${currentUserId}`)
     const data = await res.json()
     if (data.success) {
       groups.value = data.data
@@ -363,9 +370,43 @@ const getGroupTypeText = (type) => {
   return type === 1 ? '全局群' : (type === 2 ? '租客群' : '普通群')
 }
 
+const userInfoCache = ref({})
+
+const getUserInfo = async (userId) => {
+  if (userInfoCache.value[userId]) return userInfoCache.value[userId]
+  
+  // Placeholder to prevent multiple fetches
+  userInfoCache.value[userId] = { username: `用户 ${userId}`, avatar: '' }
+  
+  try {
+    const res = await fetch(`http://localhost:8080/api/user/${userId}`)
+    const data = await res.json()
+    if (data.success) {
+      userInfoCache.value[userId] = data.user
+    }
+  } catch (e) {
+    console.error(e)
+  }
+  return userInfoCache.value[userId]
+}
+
 const getSenderName = (senderId) => {
-  // In a real app, we would look up user info. For now, just return ID or "Me"
-  return senderId === currentUserId ? '我' : `用户 ${senderId}`
+  if (senderId === currentUserId) return '我'
+  if (!userInfoCache.value[senderId]) {
+    getUserInfo(senderId)
+    return `用户 ${senderId}`
+  }
+  return userInfoCache.value[senderId].username || `用户 ${senderId}`
+}
+
+const getAvatarUrl = (userId) => {
+  if (!userInfoCache.value[userId]) {
+    getUserInfo(userId)
+    return '/src/assets/image/default-avatar.png'
+  }
+  const avatar = userInfoCache.value[userId].avatar
+  if (!avatar) return '/src/assets/image/default-avatar.png'
+  return `/src/assets/image/${avatar}`
 }
 
 const formatTime = (timestamp) => {
@@ -378,6 +419,56 @@ onMounted(() => {
   fetchFriends()
   fetchPendingRequests()
 })
+
+const showInviteModal = ref(false)
+const inviteFriendId = ref('')
+
+const deleteGroup = async () => {
+  if (!activeGroup.value || !confirm('确定要删除该群组吗？')) return
+  
+  try {
+    const res = await fetch('http://localhost:8080/api/community/groups/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ groupId: activeGroup.value.id, userId: currentUserId })
+    })
+    const data = await res.json()
+    if (data.success) {
+      groups.value = groups.value.filter(g => g.id !== activeGroup.value.id)
+      activeGroup.value = null
+    } else {
+      alert(data.message)
+    }
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+const inviteFriend = async () => {
+  if (!inviteFriendId.value || !activeGroup.value) return
+  
+  try {
+    const res = await fetch('http://localhost:8080/api/community/groups/invite', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        groupId: activeGroup.value.id, 
+        inviterId: currentUserId,
+        inviteeId: parseInt(inviteFriendId.value)
+      })
+    })
+    const data = await res.json()
+    if (data.success) {
+      alert('邀请成功')
+      showInviteModal.value = false
+      inviteFriendId.value = ''
+    } else {
+      alert(data.message)
+    }
+  } catch (e) {
+    console.error(e)
+  }
+}
 </script>
 
 <style scoped>
@@ -578,6 +669,7 @@ onMounted(() => {
   display: flex;
   gap: 10px;
   max-width: 70%;
+  align-items: flex-start;
 }
 
 .message-wrapper.self {
@@ -585,26 +677,32 @@ onMounted(() => {
   flex-direction: row-reverse;
 }
 
-.message-avatar {
-  width: 32px;
-  height: 32px;
-  background: #d1d5db;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  color: #4b5563;
+.message-avatar-container {
   flex-shrink: 0;
+}
+
+.message-avatar-img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #e5e7eb;
+}
+
+.message-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
 }
 
 .message-bubble {
   background: white;
-  padding: 12px 16px;
+  padding: 10px 14px;
   border-radius: 12px;
   border-top-left-radius: 2px;
   box-shadow: 0 1px 2px rgba(0,0,0,0.05);
   position: relative;
+  word-wrap: break-word;
 }
 
 .message-wrapper.self .message-bubble {
@@ -612,12 +710,14 @@ onMounted(() => {
   color: white;
   border-radius: 12px;
   border-top-right-radius: 2px;
+  border-top-left-radius: 12px;
 }
 
 .sender-name {
-  font-size: 11px;
-  color: #9ca3af;
+  font-size: 12px;
+  color: #6b7280;
   margin-bottom: 4px;
+  margin-left: 2px;
 }
 
 .msg-content {

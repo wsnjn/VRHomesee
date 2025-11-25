@@ -7,6 +7,7 @@ import com.example.homesee.service.CommunityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +15,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/community")
-@CrossOrigin
 public class CommunityController {
 
     @Autowired
@@ -145,8 +145,7 @@ public class CommunityController {
 
     // --- Media Upload ---
     @PostMapping("/upload")
-    public ResponseEntity<Map<String, Object>> uploadMedia(
-            @RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+    public ResponseEntity<Map<String, Object>> uploadMedia(@RequestParam("file") MultipartFile file) {
         Map<String, Object> response = new HashMap<>();
         if (file.isEmpty()) {
             response.put("success", false);

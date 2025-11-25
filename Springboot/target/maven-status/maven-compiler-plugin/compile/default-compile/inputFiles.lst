@@ -33,6 +33,7 @@ E:\wslop\End\Springboot\src\main\java\com\example\homesee\entity\ChatGroup.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\repository\TenantManagementRepository.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\controller\AppointmentController.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\controller\AdminUserController.java
+E:\wslop\End\Springboot\src\main\java\com\example\homesee\dto\SocialPostDTO.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\service\SmartMatchingService.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\repository\RoomVrSceneRepository.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\controller\TenantMatchingController.java

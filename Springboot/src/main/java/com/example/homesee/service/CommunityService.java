@@ -32,10 +32,28 @@ public class CommunityService {
     }
 
     public List<ChatGroup> getUserGroups(Long userId) {
+        // 获取用户已加入的群组
         List<GroupMember> memberships = groupMemberRepository.findByUserId(userId);
-        return memberships.stream()
+        List<ChatGroup> userGroups = memberships.stream()
                 .map(m -> chatGroupRepository.findById(m.getGroupId()).orElse(null))
                 .filter(g -> g != null)
+                .collect(java.util.stream.Collectors.toList());
+
+        // 获取用户创建的群组（通过 ownerId）
+        List<ChatGroup> ownedGroups = chatGroupRepository.findByOwnerId(userId);
+
+        // 获取所有全局群组（type=1）和租客群组（type=2）
+        List<ChatGroup> globalGroups = chatGroupRepository.findByGroupType(1);
+        List<ChatGroup> tenantGroups = chatGroupRepository.findByGroupType(2);
+
+        // 合并结果，去重
+        userGroups.addAll(ownedGroups);
+        userGroups.addAll(globalGroups);
+        userGroups.addAll(tenantGroups);
+
+        // 去重（基于ID）
+        return userGroups.stream()
+                .distinct()
                 .toList();
     }
 
@@ -45,7 +63,18 @@ public class CommunityService {
 
     @SuppressWarnings("null")
     public ChatGroup createGroup(ChatGroup group) {
-        return chatGroupRepository.save(group);
+        // Save the group first
+        ChatGroup savedGroup = chatGroupRepository.save(group);
+        // If ownerId is provided, automatically add the owner as a member with role 2
+        // (owner)
+        if (savedGroup.getOwnerId() != null) {
+            GroupMember ownerMember = new GroupMember();
+            ownerMember.setGroupId(savedGroup.getId());
+            ownerMember.setUserId(savedGroup.getOwnerId());
+            ownerMember.setRole(2); // Owner role
+            groupMemberRepository.save(ownerMember);
+        }
+        return savedGroup;
     }
 
     // --- Group Membership Logic ---

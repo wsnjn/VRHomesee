@@ -15,9 +15,11 @@
     <div class="feed-list">
       <div v-for="post in filteredPosts" :key="post.id" class="post-card">
         <div class="post-header">
-          <div class="avatar">{{ post.userId ? 'U' : 'A' }}</div>
+          <div class="avatar-container">
+            <img :src="getAvatarUrl(post.avatar)" alt="头像" class="post-avatar" />
+          </div>
           <div class="user-info">
-            <span class="username">用户 {{ post.userId }}</span>
+            <span class="username">{{ post.username || `用户 ${post.userId}` }}</span>
             <span class="time">{{ formatDate(post.createdTime) }}</span>
           </div>
           <div class="visibility-badge" :class="post.visibility === 1 ? 'friends-only' : 'public'">
@@ -134,6 +136,13 @@ const isAudio = (url) => {
   return url && url.match(/\.(mp3|wav|aac|flac|m4a)$/i) != null
 }
 
+const getAvatarUrl = (avatarName) => {
+  if (!avatarName) {
+    return '/src/assets/image/default-avatar.png'
+  }
+  return `/src/assets/image/${avatarName}`
+}
+
 onMounted(() => {
   fetchPosts()
 })
@@ -207,18 +216,17 @@ onMounted(() => {
   margin-bottom: 15px;
 }
 
-.avatar {
+.post-header .avatar-container {
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.post-avatar {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  color: white;
   border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  flex-shrink: 0;
-  margin-right: 12px;
+  object-fit: cover;
+  background: #f3f4f6;
 }
 
 .visibility-badge {

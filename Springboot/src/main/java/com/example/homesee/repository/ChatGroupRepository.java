@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface ChatGroupRepository extends JpaRepository<ChatGroup, Long> {
     List<ChatGroup> findByGroupType(Integer groupType);
+
+    List<ChatGroup> findByOwnerId(Long ownerId);
 }
