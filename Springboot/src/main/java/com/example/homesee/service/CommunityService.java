@@ -267,14 +267,23 @@ public class CommunityService {
             throw new RuntimeException("Cannot invite to system groups via this method");
         }
 
-        // Check if inviter is in group
-        if (!groupMemberRepository.existsByGroupIdAndUserId(groupId, inviterId)) {
-            throw new RuntimeException("You are not a member of this group");
+        // Check if inviter is in group OR is the owner
+        boolean isMember = groupMemberRepository.existsByGroupIdAndUserId(groupId, inviterId);
+        boolean isOwner = group.getOwnerId() != null && group.getOwnerId().equals(inviterId);
+
+        if (!isMember) {
+            if (isOwner) {
+                // Auto-repair: Add owner to group
+                joinGroup(groupId, inviterId, 2); // Role 2 for owner
+            } else {
+                throw new RuntimeException("You are not a member of this group");
+            }
         }
 
         // Check if invitee is already in group
         if (groupMemberRepository.existsByGroupIdAndUserId(groupId, inviteeId)) {
-            throw new RuntimeException("User is already in the group");
+            // Idempotent: just return, consider it a success
+            return;
         }
 
         joinGroup(groupId, inviteeId, 0);

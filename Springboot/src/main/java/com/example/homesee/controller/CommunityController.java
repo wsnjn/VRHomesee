@@ -160,6 +160,15 @@ public class CommunityController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/groups/{groupId}/members")
+    public ResponseEntity<Map<String, Object>> getGroupMembers(@PathVariable Long groupId) {
+        var members = communityService.getGroupMembers(groupId);
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("data", members);
+        return ResponseEntity.ok(response);
+    }
+
     // --- Friendships ---
     @PostMapping("/friends/request")
     public ResponseEntity<Map<String, Object>> sendFriendRequest(@RequestBody Map<String, Object> request) {

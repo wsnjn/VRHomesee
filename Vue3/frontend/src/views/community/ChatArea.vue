@@ -180,13 +180,22 @@
       <div class="modal-content">
         <h3>邀请好友入群</h3>
         <div class="friend-select-list">
-          <div v-for="friend in friends" :key="friend.id" class="friend-select-item" @click="selectFriendToInvite(friend)">
+          <div 
+            v-for="friend in friends" 
+            :key="friend.id" 
+            class="friend-select-item" 
+            :class="{ disabled: groupMembers.some(m => m.userId === friend.friendId) }"
+            @click="selectFriendToInvite(friend)"
+          >
             <div class="item-avatar friend-avatar-small">
               <img v-if="friend.avatar" :src="getAvatarSrc(friend.avatar)" />
               <span v-else>{{ friend.username?.[0] || 'F' }}</span>
             </div>
-            <span class="friend-name">{{ friend.username }}</span>
-            <div class="checkbox" :class="{ checked: selectedInviteFriends.includes(friend.friendId) }"></div>
+            <span class="friend-name">
+              {{ friend.username }}
+              <span v-if="groupMembers.some(m => m.userId === friend.friendId)" class="already-in-badge">(已在群)</span>
+            </span>
+            <div class="checkbox" :class="{ checked: selectedInviteFriends.includes(friend.friendId) }" v-if="!groupMembers.some(m => m.userId === friend.friendId)"></div>
           </div>
         </div>
         <div class="modal-actions">
@@ -207,6 +216,7 @@ const groups = ref([])
 const friends = ref([])
 const pendingRequests = ref([])
 const activeGroup = ref(null)
+const groupMembers = ref([])
 const messages = ref([])
 const newMessage = ref('')
 const msgContainer = ref(null)
@@ -258,6 +268,19 @@ const fetchPendingRequests = async () => {
 const selectGroup = async (group) => {
   activeGroup.value = group
   await fetchMessages(group.id)
+  await fetchGroupMembers(group.id)
+}
+
+const fetchGroupMembers = async (groupId) => {
+  try {
+    const res = await fetch(`http://localhost:8080/api/community/groups/${groupId}/members`)
+    const data = await res.json()
+    if (data.success) {
+      groupMembers.value = data.data
+    }
+  } catch (e) {
+    console.error(e)
+  }
 }
 
 const fetchMessages = async (groupId) => {
@@ -472,10 +495,31 @@ const formatTime = (timestamp) => {
   return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
+import { onUnmounted } from 'vue'
+
+// ... existing refs ...
+
+let pollInterval = null
+
 onMounted(() => {
   fetchGroups()
   fetchFriends()
   fetchPendingRequests()
+  
+  // Poll for updates every 3 seconds
+  pollInterval = setInterval(() => {
+    fetchGroups()
+    fetchFriends()
+    fetchPendingRequests()
+    if (activeGroup.value) {
+      fetchMessages(activeGroup.value.id)
+      fetchGroupMembers(activeGroup.value.id)
+    }
+  }, 3000)
+})
+
+onUnmounted(() => {
+  if (pollInterval) clearInterval(pollInterval)
 })
 
 const showInviteModal = ref(false)
@@ -505,6 +549,9 @@ const deleteGroup = async () => {
 const selectedInviteFriends = ref([])
 
 const selectFriendToInvite = (friend) => {
+  // Check if already member
+  if (groupMembers.value.some(m => m.userId === friend.friendId)) return
+
   const index = selectedInviteFriends.value.indexOf(friend.friendId)
   if (index === -1) {
     selectedInviteFriends.value.push(friend.friendId)
@@ -520,7 +567,7 @@ const inviteSelectedFriends = async () => {
     // Invite one by one for now as backend supports single invite
     // Or update backend to support batch. Let's do loop for simplicity.
     for (const friendId of selectedInviteFriends.value) {
-      await fetch('http://localhost:8080/api/community/groups/invite', {
+      const res = await fetch('http://localhost:8080/api/community/groups/invite', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -529,14 +576,20 @@ const inviteSelectedFriends = async () => {
           inviteeId: friendId
         })
       })
+      const data = await res.json()
+      if (!data.success) {
+        throw new Error(data.message)
+      }
     }
     
     alert('邀请已发送')
     showInviteModal.value = false
     selectedInviteFriends.value = []
+    // Refresh members immediately
+    fetchGroupMembers(activeGroup.value.id)
   } catch (e) {
     console.error(e)
-    alert('邀请部分或全部失败')
+    alert(`邀请失败: ${e.message}`)
   }
 }
 
@@ -1044,5 +1097,17 @@ const getAvatarSrc = (avatarName) => {
   border: solid white;
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
+}
+
+.friend-select-item.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #f3f4f6;
+}
+
+.already-in-badge {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-left: 5px;
 }
 </style>
