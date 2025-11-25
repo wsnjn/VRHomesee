@@ -2,11 +2,13 @@ package com.example.homesee.service;
 
 import com.example.homesee.entity.*;
 import com.example.homesee.repository.*;
+import com.example.homesee.dto.SocialPostDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CommunityService {
@@ -25,6 +27,9 @@ public class CommunityService {
 
     @Autowired
     private FriendshipRepository friendshipRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     // --- Chat Group Logic ---
     public List<ChatGroup> getAllGroups() {
@@ -146,5 +151,26 @@ public class CommunityService {
 
     public List<SocialPost> getAllPosts() {
         return socialPostRepository.findAll(Sort.by(Sort.Direction.DESC, "createdTime"));
+    }
+
+    public List<SocialPostDTO> getAllPostsWithUserInfo() {
+        List<SocialPost> posts = socialPostRepository.findAll(Sort.by(Sort.Direction.DESC, "createdTime"));
+        return posts.stream().map(post -> {
+            SocialPostDTO dto = new SocialPostDTO();
+            dto.setId(post.getId());
+            dto.setUserId(post.getUserId());
+            dto.setContent(post.getContent());
+            dto.setMediaUrls(post.getMediaUrls());
+            dto.setVisibility(post.getVisibility());
+            dto.setCreatedTime(post.getCreatedTime());
+
+            // 获取用户信息
+            userRepository.findById(post.getUserId()).ifPresent(user -> {
+                dto.setUsername(user.getUsername());
+                dto.setAvatar(user.getAvatar());
+            });
+
+            return dto;
+        }).collect(Collectors.toList());
     }
 }

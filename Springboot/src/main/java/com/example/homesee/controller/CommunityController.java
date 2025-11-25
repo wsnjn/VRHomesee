@@ -68,6 +68,15 @@ public class CommunityController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/posts/with-user-info")
+    public ResponseEntity<Map<String, Object>> getAllPostsWithUserInfo() {
+        var list = communityService.getAllPostsWithUserInfo();
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("data", list);
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/posts/create")
     public ResponseEntity<Map<String, Object>> createPost(@RequestBody SocialPost post) {
         SocialPost created = communityService.createPost(post);

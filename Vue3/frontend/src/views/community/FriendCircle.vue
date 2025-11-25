@@ -193,7 +193,7 @@ const checkLease = async () => {
 
 const fetchPosts = async () => {
   try {
-    const res = await fetch('http://localhost:8080/api/community/posts')
+    const res = await fetch('http://localhost:8080/api/community/posts/with-user-info')
     const data = await res.json()
     if (data.success) {
       posts.value = data.data
