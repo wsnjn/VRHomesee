@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Optional;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import com.example.homesee.dto.FriendDTO;
+import com.example.homesee.dto.ChatGroupDTO;
 
 @Service
 public class CommunityService {
@@ -39,13 +41,13 @@ public class CommunityService {
         return chatGroupRepository.findAll();
     }
 
-    public List<ChatGroup> getUserGroups(Long userId) {
+    public List<ChatGroupDTO> getUserGroups(Long userId) {
         // 获取用户已加入的群组
         List<GroupMember> memberships = groupMemberRepository.findByUserId(userId);
         List<ChatGroup> userGroups = memberships.stream()
                 .map(m -> chatGroupRepository.findById(m.getGroupId()).orElse(null))
                 .filter(g -> g != null)
-                .collect(java.util.stream.Collectors.toList());
+                .collect(Collectors.toList());
 
         // 获取用户创建的群组（通过 ownerId）
         List<ChatGroup> ownedGroups = chatGroupRepository.findByOwnerId(userId);
@@ -55,14 +57,52 @@ public class CommunityService {
         List<ChatGroup> tenantGroups = chatGroupRepository.findByGroupType(2);
 
         // 合并结果，去重
-        userGroups.addAll(ownedGroups);
-        userGroups.addAll(globalGroups);
-        userGroups.addAll(tenantGroups);
+        List<ChatGroup> allGroups = new ArrayList<>(userGroups);
+        allGroups.addAll(ownedGroups);
+        allGroups.addAll(globalGroups);
+        allGroups.addAll(tenantGroups);
 
         // 去重（基于ID）
-        return userGroups.stream()
+        List<ChatGroup> distinctGroups = allGroups.stream()
                 .distinct()
-                .toList();
+                .collect(Collectors.toList());
+
+        // Convert to DTO
+        return distinctGroups.stream().map(group -> {
+            ChatGroupDTO dto = new ChatGroupDTO();
+            dto.setId(group.getId());
+            dto.setGroupName(group.getGroupName());
+            dto.setGroupType(group.getGroupType());
+            dto.setOwnerId(group.getOwnerId());
+            dto.setAnnouncement(group.getAnnouncement());
+            dto.setCreatedTime(group.getCreatedTime());
+
+            // Default display info
+            dto.setDisplayName(group.getGroupName());
+            dto.setDisplayAvatar(null); // Default group avatar logic in frontend
+
+            // Handle Private Chat (Type 3)
+            if (group.getGroupType() == 3) {
+                // Find the other member
+                List<GroupMember> members = groupMemberRepository.findByGroupId(group.getId());
+                Optional<GroupMember> otherMember = members.stream()
+                        .filter(m -> !m.getUserId().equals(userId))
+                        .findFirst();
+
+                if (otherMember.isPresent()) {
+                    userRepository.findById(otherMember.get().getUserId()).ifPresent(user -> {
+                        dto.setDisplayName(user.getUsername()); // Or realName
+                        dto.setDisplayAvatar(user.getAvatar());
+                        dto.setTargetUserId(user.getId());
+                    });
+                } else {
+                    // Fallback if other member not found (shouldn't happen in valid private chat)
+                    dto.setDisplayName("Unknown User");
+                }
+            }
+
+            return dto;
+        }).collect(Collectors.toList());
     }
 
     public List<ChatGroup> getGlobalGroups() {

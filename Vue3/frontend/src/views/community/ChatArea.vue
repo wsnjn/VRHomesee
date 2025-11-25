@@ -40,11 +40,13 @@
           :class="{ active: activeGroup && activeGroup.id === group.id }"
           @click="selectGroup(group)"
         >
-          <div class="item-avatar group-avatar">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          <div class="item-avatar group-avatar" :class="{ 'friend-avatar': group.groupType === 3 }">
+            <img v-if="group.displayAvatar" :src="getAvatarSrc(group.displayAvatar)" style="width:100%;height:100%;border-radius:10px;object-fit:cover;" />
+            <span v-else-if="group.groupType === 3">{{ group.displayName?.[0] || 'U' }}</span>
+            <svg v-else xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
           </div>
           <div class="item-info">
-            <div class="item-name">{{ group.groupName }}</div>
+            <div class="item-name">{{ group.displayName || group.groupName }}</div>
             <div class="item-desc">{{ getGroupTypeText(group.groupType) }}</div>
           </div>
         </div>
@@ -95,7 +97,7 @@
     <div class="chat-window" v-if="activeGroup">
       <div class="chat-header">
         <div class="header-info">
-          <h3>{{ activeGroup.groupName }}</h3>
+          <h3>{{ activeGroup.displayName || activeGroup.groupName }}</h3>
           <span class="announcement" v-if="activeGroup.announcement">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8v8"></path><path d="M22 8v8"></path><path d="M2 12h20"></path><path d="M6 4h12"></path><path d="M6 20h12"></path></svg>
             {{ activeGroup.announcement }}
@@ -177,10 +179,19 @@
     <div v-if="showInviteModal" class="modal-overlay">
       <div class="modal-content">
         <h3>邀请好友入群</h3>
-        <input v-model="inviteFriendId" placeholder="输入好友手机号" class="modal-input" />
+        <div class="friend-select-list">
+          <div v-for="friend in friends" :key="friend.id" class="friend-select-item" @click="selectFriendToInvite(friend)">
+            <div class="item-avatar friend-avatar-small">
+              <img v-if="friend.avatar" :src="getAvatarSrc(friend.avatar)" />
+              <span v-else>{{ friend.username?.[0] || 'F' }}</span>
+            </div>
+            <span class="friend-name">{{ friend.username }}</span>
+            <div class="checkbox" :class="{ checked: selectedInviteFriends.includes(friend.friendId) }"></div>
+          </div>
+        </div>
         <div class="modal-actions">
           <button @click="showInviteModal = false" class="btn-cancel">取消</button>
-          <button @click="inviteFriend" class="btn-confirm">邀请</button>
+          <button @click="inviteSelectedFriends" class="btn-confirm">邀请</button>
         </div>
       </div>
     </div>
@@ -414,7 +425,7 @@ const scrollToBottom = () => {
 }
 
 const getGroupTypeText = (type) => {
-  return type === 1 ? '全局群' : (type === 2 ? '租客群' : '普通群')
+  return type === 1 ? '全局群' : (type === 2 ? '租客群' : (type === 3 ? '好友' : '普通群'))
 }
 
 const userInfoCache = ref({})
@@ -491,38 +502,41 @@ const deleteGroup = async () => {
   }
 }
 
-const inviteFriend = async () => {
-  if (!inviteFriendId.value || !activeGroup.value) return
+const selectedInviteFriends = ref([])
+
+const selectFriendToInvite = (friend) => {
+  const index = selectedInviteFriends.value.indexOf(friend.friendId)
+  if (index === -1) {
+    selectedInviteFriends.value.push(friend.friendId)
+  } else {
+    selectedInviteFriends.value.splice(index, 1)
+  }
+}
+
+const inviteSelectedFriends = async () => {
+  if (selectedInviteFriends.value.length === 0 || !activeGroup.value) return
   
   try {
-    // Search by phone first
-    const searchRes = await fetch(`http://localhost:8080/api/user/search/phone?phone=${inviteFriendId.value}`)
-    const searchData = await searchRes.json()
-    
-    if (!searchData.success || !searchData.user) {
-      alert('未找到该用户')
-      return
-    }
-
-    const res = await fetch('http://localhost:8080/api/community/groups/invite', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        groupId: activeGroup.value.id, 
-        inviterId: currentUserId,
-        inviteeId: searchData.user.id
+    // Invite one by one for now as backend supports single invite
+    // Or update backend to support batch. Let's do loop for simplicity.
+    for (const friendId of selectedInviteFriends.value) {
+      await fetch('http://localhost:8080/api/community/groups/invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          groupId: activeGroup.value.id, 
+          inviterId: currentUserId,
+          inviteeId: friendId
+        })
       })
-    })
-    const data = await res.json()
-    if (data.success) {
-      alert('邀请成功')
-      showInviteModal.value = false
-      inviteFriendId.value = ''
-    } else {
-      alert(data.message)
     }
+    
+    alert('邀请已发送')
+    showInviteModal.value = false
+    selectedInviteFriends.value = []
   } catch (e) {
     console.error(e)
+    alert('邀请部分或全部失败')
   }
 }
 
@@ -960,4 +974,75 @@ const getAvatarSrc = (avatarName) => {
 
 .accept-btn { background: #d1fae5; color: #059669; }
 .reject-btn { background: #fee2e2; color: #dc2626; }
+
+.friend-select-list {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.friend-select-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #f3f4f6;
+  gap: 10px;
+}
+
+.friend-select-item:hover {
+  background: #f9fafb;
+}
+
+.friend-avatar-small {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #ec4899;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.friend-avatar-small img {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.friend-name {
+  flex: 1;
+  font-size: 14px;
+  color: #374151;
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #d1d5db;
+  border-radius: 4px;
+  position: relative;
+}
+
+.checkbox.checked {
+  background: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.checkbox.checked::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 4px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
 </style>
