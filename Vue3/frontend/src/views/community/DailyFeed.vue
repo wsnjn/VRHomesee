@@ -72,6 +72,7 @@
             <!-- Simple handling for now, assume single URL or comma separated -->
             <img v-if="isImage(post.mediaUrls)" :src="post.mediaUrls" alt="Post media" />
             <video v-else-if="isVideo(post.mediaUrls)" :src="post.mediaUrls" controls></video>
+            <audio v-else-if="isAudio(post.mediaUrls)" :src="post.mediaUrls" controls></audio>
           </div>
         </div>
         
@@ -222,11 +223,15 @@ const formatDate = (str) => {
 }
 
 const isImage = (url) => {
-  return url && (url.match(/\.(jpeg|jpg|gif|png)$/) != null || url.includes('unsplash'))
+  return url && (url.match(/\.(jpeg|jpg|gif|png)$/i) != null || url.includes('unsplash'))
 }
 
 const isVideo = (url) => {
-  return url && url.match(/\.(mp4|webm|ogg)$/) != null
+  return url && url.match(/\.(mp4|webm|ogg|mov)$/i) != null
+}
+
+const isAudio = (url) => {
+  return url && url.match(/\.(mp3|wav|aac|flac|m4a)$/i) != null
 }
 
 onMounted(() => {

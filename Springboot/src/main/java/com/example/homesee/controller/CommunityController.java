@@ -148,18 +148,43 @@ public class CommunityController {
     public ResponseEntity<Map<String, Object>> uploadMedia(
             @RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
         Map<String, Object> response = new HashMap<>();
+        if (file.isEmpty()) {
+            response.put("success", false);
+            response.put("message", "File is empty");
+            return ResponseEntity.badRequest().body(response);
+        }
+
         try {
-            // In a real app, save the file to storage (S3, local disk, etc.)
-            // For this demo, we'll return a mock URL or the original filename
+            // Define upload directory: ../Vue3/frontend/public/uploads
+            String projectRoot = System.getProperty("user.dir");
+            java.nio.file.Path uploadPath = java.nio.file.Paths.get(projectRoot).getParent()
+                    .resolve("Vue3/frontend/public/uploads");
+
+            if (!java.nio.file.Files.exists(uploadPath)) {
+                java.nio.file.Files.createDirectories(uploadPath);
+            }
+
             String originalFilename = file.getOriginalFilename();
-            // Mock URL - in production this would be the actual URL to access the file
-            String fileUrl = "http://localhost:8080/uploads/" + originalFilename;
+            String extension = "";
+            if (originalFilename != null && originalFilename.contains(".")) {
+                extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            }
+
+            String newFilename = java.util.UUID.randomUUID().toString() + extension;
+            java.nio.file.Path targetLocation = uploadPath.resolve(newFilename);
+
+            java.nio.file.Files.copy(file.getInputStream(), targetLocation,
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+            // Return URL accessible via Frontend Dev Server
+            String fileUrl = "http://localhost:5173/uploads/" + newFilename;
 
             response.put("success", true);
             response.put("url", fileUrl);
-            response.put("message", "File uploaded successfully (Mock)");
+            response.put("message", "File uploaded successfully");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            e.printStackTrace();
             response.put("success", false);
             response.put("message", "Upload failed: " + e.getMessage());
             return ResponseEntity.status(500).body(response);

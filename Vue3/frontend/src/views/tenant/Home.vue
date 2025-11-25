@@ -79,10 +79,10 @@ const navigateToUserProfile = () => {
 
 const logout = () => {
   localStorage.removeItem('user')
+  localStorage.removeItem('token')
   user.value = null
   showUserMenu.value = false
-  // 可以添加重新加载页面或状态更新的逻辑
-  window.location.reload()
+  router.push('/login')
 }
 
 const toggleUserMenu = () => {

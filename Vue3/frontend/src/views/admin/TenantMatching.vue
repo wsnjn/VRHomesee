@@ -1,10 +1,6 @@
 <template>
   <div class="tenant-matching">
-    <div class="page-header">
-      <h2>租客匹配</h2>
-      <p class="page-description">选择房屋和租客，创建租赁合同</p>
-    </div>
-
+  
     <div class="matching-container">
       <!-- 左侧：房屋列表 -->
       <div class="panel house-panel">
@@ -64,7 +60,9 @@
           </div>
           <div v-else class="placeholder">请选择房屋</div>
 
-          <div class="arrow">↓</div>
+          <div class="arrow">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+          </div>
 
           <div v-if="selectedUser" class="selected-item">
             <h4>已选租客</h4>
@@ -459,20 +457,6 @@ onMounted(() => {
 .tenant-matching {
   max-width: 1400px;
   margin: 0 auto;
-}
-
-.page-header {
-  margin-bottom: 2rem;
-}
-
-.page-header h2 {
-  margin: 0;
-  color: #2c3e50;
-}
-
-.page-description {
-  color: #6c757d;
-  margin: 0.5rem 0 0 0;
 }
 
 .matching-container {

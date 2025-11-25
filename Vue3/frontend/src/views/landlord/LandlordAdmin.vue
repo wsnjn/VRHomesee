@@ -540,6 +540,7 @@ const resetNewHouseForm = () => {
 // 退出登录
 const logout = () => {
   localStorage.removeItem('user')
+  localStorage.removeItem('token')
   router.push('/login')
 }
 

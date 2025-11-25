@@ -7,6 +7,8 @@
       </div>
       <div class="nav-links">
         <span class="user-info">管理员: {{ currentUser }}</span>
+        <router-link to="/landlord-admin" class="nav-btn">房东管理端</router-link>
+        <router-link to="/" class="nav-btn">客户端</router-link>
         <button @click="logout" class="logout-btn">退出登录</button>
       </div>
     </nav>
@@ -143,17 +145,23 @@
             <div class="viz-col center-col">
               <div class="kpi-board">
                 <div class="kpi-item">
-                  <div class="kpi-icon">🏠</div>
+                  <div class="kpi-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                  </div>
                   <div class="kpi-value">{{ houseStatistics.total || 0 }}</div>
                   <div class="kpi-label">房源总数</div>
                 </div>
                 <div class="kpi-item">
-                  <div class="kpi-icon">📝</div>
+                  <div class="kpi-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                  </div>
                   <div class="kpi-value">{{ statistics.totalContracts || 0 }}</div>
                   <div class="kpi-label">累计签约</div>
                 </div>
                 <div class="kpi-item">
-                  <div class="kpi-icon">👥</div>
+                  <div class="kpi-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                  </div>
                   <div class="kpi-value">{{ userStatistics.total || 0 }}</div>
                   <div class="kpi-label">用户总数</div>
                 </div>
@@ -721,6 +729,8 @@ const loadData = async () => {
 
 // 退出登录
 const logout = () => {
+  localStorage.removeItem('user')
+  localStorage.removeItem('token')
   router.push('/login')
 }
 
@@ -774,6 +784,26 @@ onUnmounted(() => {
   padding: 0.4rem 0.8rem;
   border-radius: 4px;
   cursor: pointer;
+  transition: all 0.3s;
+}
+
+.logout-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.nav-btn {
+  color: white;
+  text-decoration: none;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  transition: all 0.3s;
+  font-size: 0.9rem;
+}
+
+.nav-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 .admin-container {
