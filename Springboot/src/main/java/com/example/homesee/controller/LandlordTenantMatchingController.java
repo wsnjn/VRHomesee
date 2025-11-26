@@ -15,7 +15,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/landlord/matching")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://39.108.142.250:9999")
 public class LandlordTenantMatchingController {
 
     @Autowired
@@ -29,21 +29,21 @@ public class LandlordTenantMatchingController {
 
     /**
      * 房东创建租约合同
-     * @param request 租约请求数据
+     * 
+     * @param request       租约请求数据
      * @param landlordPhone 房东手机号
      * @return 创建结果
      */
     @PostMapping("/create")
-    public Map<String, Object> createTenantContract(@RequestBody Map<String, Object> request, 
-                                                   @RequestParam String landlordPhone) {
+    public Map<String, Object> createTenantContract(@RequestBody Map<String, Object> request,
+            @RequestParam String landlordPhone) {
         try {
             // 通过房东手机号获取房东用户信息
             Optional<User> landlordOptional = userRepository.findByPhone(landlordPhone);
             if (landlordOptional.isEmpty()) {
                 return Map.of(
-                    "success", false,
-                    "message", "房东用户信息不存在"
-                );
+                        "success", false,
+                        "message", "房东用户信息不存在");
             }
             User landlord = landlordOptional.get();
             Long landlordId = landlord.getId();
@@ -61,17 +61,15 @@ public class LandlordTenantMatchingController {
             Optional<RoomInfo> roomOptional = roomInfoRepository.findById(roomId);
             if (roomOptional.isEmpty()) {
                 return Map.of(
-                    "success", false,
-                    "message", "房屋信息不存在"
-                );
+                        "success", false,
+                        "message", "房屋信息不存在");
             }
-            
+
             RoomInfo room = roomOptional.get();
             if (!landlordPhone.equals(room.getLandlordPhone())) {
                 return Map.of(
-                    "success", false,
-                    "message", "您没有权限管理此房屋"
-                );
+                        "success", false,
+                        "message", "您没有权限管理此房屋");
             }
 
             // 解析日期
@@ -79,19 +77,19 @@ public class LandlordTenantMatchingController {
             LocalDate contractStartDate = LocalDate.parse(contractStartDateStr, formatter);
             LocalDate contractEndDate = LocalDate.parse(contractEndDateStr, formatter);
 
-            return tenantManagementService.createTenantContract(contractNumber, roomId, landlordId, 
-                                                               tenantId, contractStartDate, contractEndDate, 
-                                                               monthlyRent, depositAmount);
+            return tenantManagementService.createTenantContract(contractNumber, roomId, landlordId,
+                    tenantId, contractStartDate, contractEndDate,
+                    monthlyRent, depositAmount);
         } catch (Exception e) {
             return Map.of(
-                "success", false,
-                "message", "请求参数错误: " + e.getMessage()
-            );
+                    "success", false,
+                    "message", "请求参数错误: " + e.getMessage());
         }
     }
 
     /**
      * 根据房东手机号获取租约列表
+     * 
      * @param landlordPhone 房东手机号
      * @return 租约列表
      */
@@ -102,9 +100,8 @@ public class LandlordTenantMatchingController {
             Optional<User> landlordOptional = userRepository.findByPhone(landlordPhone);
             if (landlordOptional.isEmpty()) {
                 return Map.of(
-                    "success", false,
-                    "message", "房东用户信息不存在"
-                );
+                        "success", false,
+                        "message", "房东用户信息不存在");
             }
             User landlord = landlordOptional.get();
             Long landlordId = landlord.getId();
@@ -113,29 +110,28 @@ public class LandlordTenantMatchingController {
             return tenantManagementService.getContractsByLandlordId(landlordId);
         } catch (Exception e) {
             return Map.of(
-                "success", false,
-                "message", "获取租约列表失败: " + e.getMessage()
-            );
+                    "success", false,
+                    "message", "获取租约列表失败: " + e.getMessage());
         }
     }
 
     /**
      * 根据房东手机号和状态获取租约列表
+     * 
      * @param landlordPhone 房东手机号
-     * @param status 状态
+     * @param status        状态
      * @return 租约列表
      */
     @GetMapping("/contracts/status/{status}")
-    public Map<String, Object> getContractsByLandlordAndStatus(@RequestParam String landlordPhone, 
-                                                              @PathVariable Integer status) {
+    public Map<String, Object> getContractsByLandlordAndStatus(@RequestParam String landlordPhone,
+            @PathVariable Integer status) {
         try {
             // 通过房东手机号获取房东用户信息
             Optional<User> landlordOptional = userRepository.findByPhone(landlordPhone);
             if (landlordOptional.isEmpty()) {
                 return Map.of(
-                    "success", false,
-                    "message", "房东用户信息不存在"
-                );
+                        "success", false,
+                        "message", "房东用户信息不存在");
             }
             User landlord = landlordOptional.get();
             Long landlordId = landlord.getId();
@@ -144,9 +140,8 @@ public class LandlordTenantMatchingController {
             return tenantManagementService.getContractsByLandlordIdAndStatus(landlordId, status);
         } catch (Exception e) {
             return Map.of(
-                "success", false,
-                "message", "获取租约列表失败: " + e.getMessage()
-            );
+                    "success", false,
+                    "message", "获取租约列表失败: " + e.getMessage());
         }
     }
 }

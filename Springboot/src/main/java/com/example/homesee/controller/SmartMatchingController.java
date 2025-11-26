@@ -12,7 +12,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/smart-matching")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+@CrossOrigin(origins = "http://39.108.142.250:9999", allowCredentials = "true")
 public class SmartMatchingController {
 
     @Autowired

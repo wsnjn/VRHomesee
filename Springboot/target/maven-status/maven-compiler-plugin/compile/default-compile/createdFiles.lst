@@ -7,6 +7,7 @@ com\example\homesee\controller\RoomInfoFilterController.class
 com\example\homesee\entity\Appointment.class
 com\example\homesee\repository\ChatHistoryRepository.class
 com\example\homesee\controller\UserController.class
+com\example\homesee\dto\ChatGroupDTO.class
 com\example\homesee\entity\GroupMember.class
 com\example\homesee\repository\TenantManagementRepository.class
 com\example\homesee\entity\ChatGroup.class
@@ -15,6 +16,7 @@ com\example\homesee\controller\LandlordHouseController.class
 com\example\homesee\entity\RentPayment.class
 com\example\homesee\entity\ChatMessage.class
 com\example\homesee\repository\MaintenanceRepository.class
+com\example\homesee\dto\FriendDTO.class
 com\example\homesee\repository\RoomInfoRepository.class
 com\example\homesee\entity\MaintenanceRequest.class
 com\example\homesee\entity\User.class

@@ -223,54 +223,69 @@ public class CommunityController {
         }
 
         try {
-            // Define upload directory: ../Vue3/frontend/public/uploads
-            String projectRoot = System.getProperty("user.dir");
-            java.nio.file.Path uploadPath = java.nio.file.Paths.get(projectRoot).getParent()
-                    .resolve("Vue3/frontend/public/uploads");
-
-            if (!java.nio.file.Files.exists(uploadPath)) {
-                java.nio.file.Files.createDirectories(uploadPath);
-            }
-
             String originalFilename = file.getOriginalFilename();
             String extension = "";
             if (originalFilename != null && originalFilename.contains(".")) {
                 extension = originalFilename.substring(originalFilename.lastIndexOf("."));
             }
 
-            // Determine file type and subdirectory
-            String contentType = file.getContentType();
-            String subDirectory = "images"; // default
-            if (contentType != null) {
-                if (contentType.startsWith("image/")) {
-                    subDirectory = "images";
-                } else if (contentType.startsWith("video/")) {
-                    subDirectory = "videos";
-                } else if (contentType.startsWith("audio/")) {
-                    subDirectory = "musics";
-                }
-            }
-
-            // Create subdirectory if not exists
-            java.nio.file.Path subDirPath = uploadPath.resolve(subDirectory);
-            if (!java.nio.file.Files.exists(subDirPath)) {
-                java.nio.file.Files.createDirectories(subDirPath);
-            }
-
+            // Generate unique filename with original extension
             String newFilename = java.util.UUID.randomUUID().toString() + extension;
-            java.nio.file.Path targetLocation = subDirPath.resolve(newFilename);
 
-            java.nio.file.Files.copy(file.getInputStream(), targetLocation,
-                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-
-            // Return URL accessible via Frontend Dev Server
-            String fileUrl = "http://localhost:5173/uploads/" + subDirectory + "/" + newFilename;
-
-            response.put("success", true);
-            response.put("url", fileUrl);
-            response.put("type", subDirectory);
-            response.put("message", "文件上传成功");
-            return ResponseEntity.ok(response);
+            // Upload to file server
+            String fileServerUrl = "http://39.108.142.250:8088/api/files/upload";
+            
+            // Create multipart request
+            org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+            headers.setContentType(org.springframework.http.MediaType.MULTIPART_FORM_DATA);
+            
+            org.springframework.util.LinkedMultiValueMap<String, Object> body = new org.springframework.util.LinkedMultiValueMap<>();
+            body.add("file", file.getResource());
+            
+            org.springframework.http.HttpEntity<org.springframework.util.LinkedMultiValueMap<String, Object>> requestEntity = 
+                new org.springframework.http.HttpEntity<>(body, headers);
+            
+            org.springframework.web.client.RestTemplate restTemplate = new org.springframework.web.client.RestTemplate();
+            ResponseEntity<Map> fileServerResponse = restTemplate.postForEntity(fileServerUrl, requestEntity, Map.class);
+            
+            if (fileServerResponse.getStatusCode().is2xxSuccessful() && fileServerResponse.getBody() != null) {
+                Map<String, Object> fileServerBody = fileServerResponse.getBody();
+                System.out.println("文件服务器响应: " + fileServerBody);
+                
+                if (Boolean.TRUE.equals(fileServerBody.get("success"))) {
+                    String fileUrl = (String) fileServerBody.get("fileUrl");
+                    
+                    // 检查fileUrl是否为null
+                    if (fileUrl == null) {
+                        response.put("success", false);
+                        response.put("message", "文件服务器返回的fileUrl为空");
+                        return ResponseEntity.status(500).body(response);
+                    }
+                    
+                    // Extract filename from URL (last part after last slash)
+                    String fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+                    
+                    // 输出日志信息
+                    System.out.println("=== 文件上传日志 ===");
+                    System.out.println("用户上传的文件名称: " + originalFilename);
+                    System.out.println("数据库存储的文件名称: " + fileName);
+                    System.out.println("从服务器获取的完整路径: " + fileUrl);
+                    System.out.println("=== 日志结束 ===");
+                    
+                    response.put("success", true);
+                    response.put("filename", fileName);  // 只返回文件名
+                    response.put("message", "文件上传成功");
+                    return ResponseEntity.ok(response);
+                } else {
+                    response.put("success", false);
+                    response.put("message", "文件服务器上传失败: " + fileServerBody.get("message"));
+                    return ResponseEntity.status(500).body(response);
+                }
+            } else {
+                response.put("success", false);
+                response.put("message", "文件服务器响应异常");
+                return ResponseEntity.status(500).body(response);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             response.put("success", false);

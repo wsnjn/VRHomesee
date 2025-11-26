@@ -316,6 +316,9 @@ public class UserService {
             if (updateData.containsKey("houseRequirements")) {
                 user.setHouseRequirements(getStringValue(updateData.get("houseRequirements")));
             }
+            if (updateData.containsKey("avatar")) {
+                user.setAvatar(getStringValue(updateData.get("avatar")));
+            }
 
             // 更新最后修改时间
             user.setUpdatedTime(LocalDateTime.now());
@@ -433,25 +436,19 @@ public class UserService {
                 return result;
             }
 
-            // 生成文件名 - 使用用户ID作为文件名
-            String originalFilename = avatar.getOriginalFilename();
-            String fileExtension = "";
-            if (originalFilename != null && originalFilename.contains(".")) {
-                fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
-            }
-            String fileName = userId.toString() + fileExtension;
-
-            // 创建保存目录 - 保存到前端项目的assets/image目录
-            Path uploadPath = Paths.get("../Vue3/frontend/src/assets/image");
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
+            // 生成文件名 - 使用原始文件名
+            String fileName = avatar.getOriginalFilename();
+            if (fileName == null || fileName.isEmpty()) {
+                // 如果原始文件名为空，降级使用用户ID
+                String fileExtension = "";
+                String originalFilename = avatar.getOriginalFilename();
+                if (originalFilename != null && originalFilename.contains(".")) {
+                    fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+                }
+                fileName = userId.toString() + fileExtension;
             }
 
-            // 保存文件
-            Path filePath = uploadPath.resolve(fileName);
-            Files.copy(avatar.getInputStream(), filePath);
-
-            // 更新用户头像信息
+            // 更新用户头像信息 - 只保存文件名，文件实际存储在文件服务器
             user.setAvatar(fileName);
             user.setUpdatedTime(LocalDateTime.now());
             userRepository.save(user);
@@ -460,9 +457,6 @@ public class UserService {
             result.put("message", "头像上传成功");
             result.put("avatar", fileName);
 
-        } catch (IOException e) {
-            result.put("success", false);
-            result.put("message", "文件保存失败: " + e.getMessage());
         } catch (Exception e) {
             result.put("success", false);
             result.put("message", "上传失败: " + e.getMessage());

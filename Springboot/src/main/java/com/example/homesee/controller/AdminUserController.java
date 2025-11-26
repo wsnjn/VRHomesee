@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/admin/user")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://39.108.142.250:9999")
 public class AdminUserController {
 
     @Autowired
@@ -22,12 +22,13 @@ public class AdminUserController {
 
     /**
      * 获取所有用户列表
+     * 
      * @return 用户列表
      */
     @GetMapping("/all")
     public Map<String, Object> getAllUsers() {
         Map<String, Object> result = new HashMap<>();
-        
+
         try {
             List<User> users = userRepository.findAll();
             result.put("success", true);
@@ -36,19 +37,20 @@ public class AdminUserController {
             result.put("success", false);
             result.put("message", "获取用户列表失败: " + e.getMessage());
         }
-        
+
         return result;
     }
 
     /**
      * 获取用户详情
+     * 
      * @param userId 用户ID
      * @return 用户详情
      */
     @GetMapping("/{userId}")
     public Map<String, Object> getUserDetail(@PathVariable Long userId) {
         Map<String, Object> result = new HashMap<>();
-        
+
         try {
             Optional<User> userOptional = userRepository.findById(userId);
             if (userOptional.isPresent()) {
@@ -65,25 +67,26 @@ public class AdminUserController {
             result.put("success", false);
             result.put("message", "获取用户详情失败: " + e.getMessage());
         }
-        
+
         return result;
     }
 
     /**
      * 更新用户信息 - 支持所有字段更新
-     * @param userId 用户ID
+     * 
+     * @param userId  用户ID
      * @param request 更新数据
      * @return 更新结果
      */
     @PutMapping("/{userId}")
     public Map<String, Object> updateUser(@PathVariable Long userId, @RequestBody Map<String, Object> request) {
         Map<String, Object> result = new HashMap<>();
-        
+
         try {
             Optional<User> userOptional = userRepository.findById(userId);
             if (userOptional.isPresent()) {
                 User user = userOptional.get();
-                
+
                 // 更新所有字段 - 安全处理null值
                 if (request.containsKey("username")) {
                     Object usernameObj = request.get("username");
@@ -213,10 +216,10 @@ public class AdminUserController {
                         user.setCertificationTime(null);
                     }
                 }
-                
+
                 user.setUpdatedTime(LocalDateTime.now());
                 userRepository.save(user);
-                
+
                 result.put("success", true);
                 result.put("message", "用户信息更新成功");
             } else {
@@ -227,24 +230,25 @@ public class AdminUserController {
             result.put("success", false);
             result.put("message", "更新用户信息失败: " + e.getMessage());
         }
-        
+
         return result;
     }
 
     /**
      * 获取用户统计信息
+     * 
      * @return 统计信息
      */
     @GetMapping("/statistics")
     public Map<String, Object> getUserStatistics() {
         Map<String, Object> result = new HashMap<>();
-        
+
         try {
             long totalUsers = userRepository.count();
             long landlordCount = userRepository.countByUserType(1); // 房东
-            long tenantCount = userRepository.countByUserType(2);   // 租客
-            long activeUsers = userRepository.countByStatus(1);     // 活跃用户
-            
+            long tenantCount = userRepository.countByUserType(2); // 租客
+            long activeUsers = userRepository.countByStatus(1); // 活跃用户
+
             result.put("success", true);
             result.put("totalUsers", totalUsers);
             result.put("landlordCount", landlordCount);
@@ -254,19 +258,20 @@ public class AdminUserController {
             result.put("success", false);
             result.put("message", "获取用户统计失败: " + e.getMessage());
         }
-        
+
         return result;
     }
 
     /**
      * 根据用户类型获取用户列表
+     * 
      * @param userType 用户类型
      * @return 用户列表
      */
     @GetMapping("/type/{userType}")
     public Map<String, Object> getUsersByType(@PathVariable Integer userType) {
         Map<String, Object> result = new HashMap<>();
-        
+
         try {
             List<User> users = userRepository.findByUserType(userType);
             // 隐藏密码信息
@@ -277,19 +282,20 @@ public class AdminUserController {
             result.put("success", false);
             result.put("message", "获取用户列表失败: " + e.getMessage());
         }
-        
+
         return result;
     }
 
     /**
      * 根据状态获取用户列表
+     * 
      * @param status 状态
      * @return 用户列表
      */
     @GetMapping("/status/{status}")
     public Map<String, Object> getUsersByStatus(@PathVariable Integer status) {
         Map<String, Object> result = new HashMap<>();
-        
+
         try {
             List<User> users = userRepository.findByStatus(status);
             // 隐藏密码信息
@@ -300,20 +306,21 @@ public class AdminUserController {
             result.put("success", false);
             result.put("message", "获取用户列表失败: " + e.getMessage());
         }
-        
+
         return result;
     }
 
     /**
      * 更新用户状态
-     * @param userId 用户ID
+     * 
+     * @param userId  用户ID
      * @param request 状态更新请求
      * @return 更新结果
      */
     @PutMapping("/{userId}/status")
     public Map<String, Object> updateUserStatus(@PathVariable Long userId, @RequestBody Map<String, Object> request) {
         Map<String, Object> result = new HashMap<>();
-        
+
         try {
             Integer status = Integer.valueOf(request.get("status").toString());
             Optional<User> userOptional = userRepository.findById(userId);
@@ -321,9 +328,9 @@ public class AdminUserController {
                 User user = userOptional.get();
                 user.setStatus(status);
                 user.setUpdatedTime(LocalDateTime.now());
-                
+
                 userRepository.save(user);
-                
+
                 result.put("success", true);
                 result.put("message", "用户状态更新成功");
             } else {
@@ -334,22 +341,24 @@ public class AdminUserController {
             result.put("success", false);
             result.put("message", "更新用户状态失败: " + e.getMessage());
         }
-        
+
         return result;
     }
 
     /**
      * 搜索用户
+     * 
      * @param keyword 关键词
      * @return 用户列表
      */
     @GetMapping("/search")
     public Map<String, Object> searchUsers(@RequestParam String keyword) {
         Map<String, Object> result = new HashMap<>();
-        
+
         try {
-            List<User> users = userRepository.findByUsernameContainingOrRealNameContainingOrPhoneContainingOrEmailContaining(
-                keyword, keyword, keyword, keyword);
+            List<User> users = userRepository
+                    .findByUsernameContainingOrRealNameContainingOrPhoneContainingOrEmailContaining(
+                            keyword, keyword, keyword, keyword);
             // 隐藏密码信息
             users.forEach(user -> user.setPassword(null));
             result.put("success", true);
@@ -358,19 +367,20 @@ public class AdminUserController {
             result.put("success", false);
             result.put("message", "搜索用户失败: " + e.getMessage());
         }
-        
+
         return result;
     }
 
     /**
      * 创建用户（管理员创建）
+     * 
      * @param request 用户数据
      * @return 创建结果
      */
     @PostMapping("/create")
     public Map<String, Object> createUser(@RequestBody Map<String, Object> request) {
         Map<String, Object> result = new HashMap<>();
-        
+
         try {
             // 检查用户名是否已存在
             String username = (String) request.get("username");
@@ -391,30 +401,31 @@ public class AdminUserController {
             user.setIdCard((String) request.get("idCard"));
             user.setUserType(Integer.valueOf(request.get("userType").toString()));
             user.setStatus(1); // 默认激活状态
-            
+
             User savedUser = userRepository.save(user);
-            
+
             result.put("success", true);
             result.put("message", "用户创建成功");
             result.put("userId", savedUser.getId());
-            
+
         } catch (Exception e) {
             result.put("success", false);
             result.put("message", "创建用户失败: " + e.getMessage());
         }
-        
+
         return result;
     }
 
     /**
      * 重置用户密码为默认密码 "123456"
+     * 
      * @param userId 用户ID
      * @return 重置结果
      */
     @PutMapping("/{userId}/reset-password")
     public Map<String, Object> resetPassword(@PathVariable Long userId) {
         Map<String, Object> result = new HashMap<>();
-        
+
         try {
             Optional<User> userOptional = userRepository.findById(userId);
             if (userOptional.isPresent()) {
@@ -422,9 +433,9 @@ public class AdminUserController {
                 // 重置密码为 "123456"
                 user.setPassword("e10adc3949ba59abbe56e057f20f883e");
                 user.setUpdatedTime(LocalDateTime.now());
-                
+
                 userRepository.save(user);
-                
+
                 result.put("success", true);
                 result.put("message", "用户密码已重置为 123456");
             } else {
@@ -435,25 +446,26 @@ public class AdminUserController {
             result.put("success", false);
             result.put("message", "重置密码失败: " + e.getMessage());
         }
-        
+
         return result;
     }
 
     /**
      * 删除用户
+     * 
      * @param userId 用户ID
      * @return 删除结果
      */
     @DeleteMapping("/{userId}")
     public Map<String, Object> deleteUser(@PathVariable Long userId) {
         Map<String, Object> result = new HashMap<>();
-        
+
         try {
             Optional<User> userOptional = userRepository.findById(userId);
             if (userOptional.isPresent()) {
                 User user = userOptional.get();
                 userRepository.delete(user);
-                
+
                 result.put("success", true);
                 result.put("message", "用户删除成功");
             } else {
@@ -464,7 +476,7 @@ public class AdminUserController {
             result.put("success", false);
             result.put("message", "删除用户失败: " + e.getMessage());
         }
-        
+
         return result;
     }
 }

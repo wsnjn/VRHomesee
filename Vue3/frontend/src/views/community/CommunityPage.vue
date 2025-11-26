@@ -32,15 +32,15 @@
           <div v-if="post.mediaUrls" class="post-media">
             <template v-if="Array.isArray(getMediaUrls(post.mediaUrls))">
               <div v-for="(mediaUrl, index) in getMediaUrls(post.mediaUrls)" :key="index" class="media-item">
-                <img v-if="isImage(mediaUrl)" :src="mediaUrl" :alt="`Post media ${index + 1}`" />
-                <video v-else-if="isVideo(mediaUrl)" :src="mediaUrl" controls></video>
-                <audio v-else-if="isAudio(mediaUrl)" :src="mediaUrl" controls></audio>
+                <img v-if="isImage(mediaUrl)" :src="buildFileUrl(mediaUrl)" :alt="`Post media ${index + 1}`" />
+                <video v-else-if="isVideo(mediaUrl)" :src="buildFileUrl(mediaUrl)" controls></video>
+                <audio v-else-if="isAudio(mediaUrl)" :src="buildFileUrl(mediaUrl)" controls></audio>
               </div>
             </template>
             <template v-else>
-              <img v-if="isImage(post.mediaUrls)" :src="post.mediaUrls" alt="Post media" />
-              <video v-else-if="isVideo(post.mediaUrls)" :src="post.mediaUrls" controls></video>
-              <audio v-else-if="isAudio(post.mediaUrls)" :src="post.mediaUrls" controls></audio>
+              <img v-if="isImage(post.mediaUrls)" :src="buildFileUrl(post.mediaUrls)" alt="Post media" />
+              <video v-else-if="isVideo(post.mediaUrls)" :src="buildFileUrl(post.mediaUrls)" controls></video>
+              <audio v-else-if="isAudio(post.mediaUrls)" :src="buildFileUrl(post.mediaUrls)" controls></audio>
             </template>
           </div>
         </div>
@@ -87,7 +87,7 @@ const filteredPosts = computed(() => {
 
 const fetchPosts = async () => {
   try {
-    const res = await fetch('http://localhost:8080/api/community/posts/with-user-info')
+    const res = await fetch('http://39.108.142.250:8080/api/community/posts/with-user-info')
     const data = await res.json()
     if (data.success) {
       posts.value = data.data
@@ -140,7 +140,29 @@ const getAvatarUrl = (avatarName) => {
   if (!avatarName) {
     return '/src/assets/image/default-avatar.png'
   }
-  return `/src/assets/image/${avatarName}`
+  
+  // 如果是完整的HTTP URL，直接使用
+  if (avatarName.startsWith('http')) {
+    return avatarName
+  }
+  
+  // 使用文件服务器获取头像
+  const FILE_SERVER_HOST = 'http://39.108.142.250:8088'
+  return `${FILE_SERVER_HOST}/api/files/download/${avatarName}`
+}
+
+// 构建完整的文件URL
+const buildFileUrl = (filename) => {
+  if (!filename) return ''
+  
+  // 如果是完整的HTTP URL，直接使用
+  if (filename.startsWith('http')) {
+    return filename
+  }
+  
+  // 使用文件服务器获取文件
+  const FILE_SERVER_HOST = 'http://39.108.142.250:8088'
+  return `${FILE_SERVER_HOST}/api/files/download/${filename}`
 }
 
 onMounted(() => {

@@ -3,8 +3,11 @@ package com.example.homesee.controller;
 import com.example.homesee.entity.RoomVrScene;
 import com.example.homesee.service.RoomVrSceneService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
@@ -13,11 +16,14 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/vr-scenes")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+@CrossOrigin(origins = "http://39.108.142.250:9999", allowCredentials = "true")
 public class RoomVrSceneController {
 
     @Autowired
     private RoomVrSceneService roomVrSceneService;
+
+    // 文件服务器地址
+    private final String FILE_SERVER_URL = "http://39.108.142.250:8088/api/files/upload";
 
     @GetMapping("/{roomId}")
     public ResponseEntity<Map<String, Object>> getScenes(@PathVariable Long roomId) {
@@ -41,10 +47,36 @@ public class RoomVrSceneController {
             @RequestParam("file") MultipartFile file) {
         Map<String, Object> response = new HashMap<>();
         try {
-            RoomVrScene scene = roomVrSceneService.addScene(roomId, sceneName, file);
-            response.put("success", true);
-            response.put("data", scene);
-            return ResponseEntity.ok(response);
+            // 1. 先上传文件到文件服务器
+            RestTemplate restTemplate = new RestTemplate();
+
+            // 准备文件上传请求
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("file", file.getResource());
+
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+            // 发送文件到文件服务器
+            ResponseEntity<String> fileServerResponse = restTemplate.exchange(
+                    FILE_SERVER_URL,
+                    HttpMethod.POST,
+                    requestEntity,
+                    String.class);
+
+            // 2. 如果文件上传成功，保存场景信息到数据库
+            if (fileServerResponse.getStatusCode().is2xxSuccessful()) {
+                RoomVrScene scene = roomVrSceneService.addScene(roomId, sceneName, file);
+                response.put("success", true);
+                response.put("data", scene);
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("success", false);
+                response.put("message", "文件服务器上传失败");
+                return ResponseEntity.badRequest().body(response);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             response.put("success", false);

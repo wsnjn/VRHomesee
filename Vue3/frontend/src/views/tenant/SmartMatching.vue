@@ -57,10 +57,25 @@ const textarea = ref(null)
 const currentUser = ref(null)
 
 // API Configuration
-const BACKEND_URL = 'http://localhost:8080/api/smart-matching'
+const BACKEND_URL = 'http://39.108.142.250:8080/api/smart-matching'
 
 // User Avatar
 const userAvatar = ref('/src/assets/image/default-avatar.png')
+
+const getAvatarUrl = (avatarName) => {
+  if (!avatarName) {
+    return '/src/assets/image/default-avatar.png'
+  }
+  
+  // 如果是完整的HTTP URL，直接使用
+  if (avatarName.startsWith('http')) {
+    return avatarName
+  }
+  
+  // 使用文件服务器获取头像
+  const FILE_SERVER_HOST = 'http://39.108.142.250:8088'
+  return `${FILE_SERVER_HOST}/api/files/download/${avatarName}`
+}
 
 onMounted(async () => {
   // Load user info
@@ -68,7 +83,7 @@ onMounted(async () => {
   if (userData) {
     currentUser.value = JSON.parse(userData)
     if (currentUser.value.avatar) {
-      userAvatar.value = `/src/assets/image/${currentUser.value.avatar}`
+      userAvatar.value = getAvatarUrl(currentUser.value.avatar)
     }
     
     // Fetch history

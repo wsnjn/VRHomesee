@@ -10,7 +10,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin/tenant")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://39.108.142.250:9999")
 public class TenantManagementController {
 
     @Autowired

@@ -14,7 +14,7 @@ const avatarUploading = ref(false)
 const avatarFile = ref(null)
 
 // API基础URL
-const API_BASE_URL = 'http://localhost:8080/api'
+const API_BASE_URL = 'http://39.108.142.250:8080/api'
 
 // 用户类型映射
 const userTypeMap = {
@@ -225,16 +225,29 @@ const getFieldLabel = (fieldName) => {
 
 // 获取头像URL
 const getAvatarUrl = () => {
-  
   if (!user.value || !user.value.avatar) {
-    console.log('使用默认头像')
     return '/src/assets/image/default-avatar.png'
   }
   
-  const avatarUrl = `/src/assets/image/${user.value.avatar}?t=${new Date().getTime()}`
-
-  return avatarUrl
+  // 如果是完整的HTTP URL，直接使用
+  if (user.value.avatar.startsWith('http')) {
+    return user.value.avatar
+  }
+  
+  // 放弃本地路径，全部走文件服务器
+  const FILE_SERVER_HOST = 'http://39.108.142.250:8088'
+  return `${FILE_SERVER_HOST}/api/files/download/${user.value.avatar}`
 }
+
+// 监听用户头像变化，输出调试信息
+import { watch } from 'vue'
+watch(() => user.value?.avatar, (newVal) => {
+  console.log('=== 头像调试信息 ===')
+  console.log('当前用户:', user.value?.username)
+  console.log('数据库存储文件名:', newVal || '无')
+  console.log('最终加载URL:', getAvatarUrl())
+  console.log('==================')
+}, { immediate: true })
 
 // 处理头像文件选择
 const handleAvatarSelect = (event) => {
@@ -247,9 +260,9 @@ const handleAvatarSelect = (event) => {
     return
   }
   
-  // 检查文件大小（限制为2MB）
-  if (file.size > 2 * 1024 * 1024) {
-    message.value = '图片大小不能超过2MB'
+  // 检查文件大小（限制为10MB）
+  if (file.size > 10 * 1024 * 1024) {
+    message.value = '图片大小不能超过10MB'
     return
   }
   
@@ -272,28 +285,45 @@ const uploadAvatar = async () => {
     message.value = '请先选择头像图片'
     return
   }
-  
+
   avatarUploading.value = true
   message.value = ''
-  
+
   try {
+    // 1. 上传到文件服务器
     const formData = new FormData()
-    formData.append('avatar', avatarFile.value)
-    formData.append('userId', user.value.id)
+    formData.append('file', avatarFile.value)
     
-    const response = await axios.post(`${API_BASE_URL}/user/upload-avatar`, formData, {
+    // 使用确定的文件服务器地址
+    const FILE_SERVER_HOST = 'http://39.108.142.250:8088'
+    
+    const uploadResponse = await axios.post(`${FILE_SERVER_HOST}/api/files/upload`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
     })
     
-    if (response.data.success) {
+    if (!uploadResponse.data.success) {
+      message.value = '文件上传失败: ' + (uploadResponse.data.error || '未知错误')
+      return
+    }
+    
+    // 获取上传后的文件名 - 使用服务器返回的文件名（已经是原始文件名）
+    const fileName = uploadResponse.data.fileName
+    
+    console.log('服务器返回文件名:', fileName)
+    
+    // 2. 更新后端用户信息 - 只保存文件名
+    const updatePayload = { avatar: fileName }
+    
+    const updateResponse = await axios.put(`${API_BASE_URL}/user/update/${user.value.id}`, updatePayload)
+    
+    if (updateResponse.data.success) {
       message.value = '头像上传成功'
       // 更新用户信息
-      user.value.avatar = response.data.avatar
+      user.value.avatar = fileName
       localStorage.setItem('user', JSON.stringify(user.value))
-      // 重新获取最新用户信息
-      await fetchUserInfo(user.value.id)
+      
       // 重置文件输入
       avatarFile.value = null
       const fileInput = document.getElementById('avatar-input')
@@ -301,11 +331,11 @@ const uploadAvatar = async () => {
         fileInput.value = ''
       }
     } else {
-      message.value = response.data.message
+      message.value = updateResponse.data.message
     }
   } catch (error) {
     console.error('上传头像失败:', error)
-    message.value = '上传失败，请稍后重试'
+    message.value = '上传失败: ' + (error.response?.data?.message || error.message)
   } finally {
     avatarUploading.value = false
   }

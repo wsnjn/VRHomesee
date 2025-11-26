@@ -90,15 +90,15 @@
           <div v-if="post.mediaUrls" class="post-media">
             <template v-if="Array.isArray(getMediaUrls(post.mediaUrls))">
               <div v-for="(mediaUrl, index) in getMediaUrls(post.mediaUrls)" :key="index" class="media-item">
-                <img v-if="isImage(mediaUrl)" :src="mediaUrl" :alt="`Post media ${index + 1}`" />
-                <video v-else-if="isVideo(mediaUrl)" :src="mediaUrl" controls></video>
-                <audio v-else-if="isAudio(mediaUrl)" :src="mediaUrl" controls></audio>
+                <img v-if="isImage(mediaUrl)" :src="buildFileUrl(mediaUrl)" :alt="`Post media ${index + 1}`" />
+                <video v-else-if="isVideo(mediaUrl)" :src="buildFileUrl(mediaUrl)" controls></video>
+                <audio v-else-if="isAudio(mediaUrl)" :src="buildFileUrl(mediaUrl)" controls></audio>
               </div>
             </template>
             <template v-else>
-              <img v-if="isImage(post.mediaUrls)" :src="post.mediaUrls" alt="Post media" />
-              <video v-else-if="isVideo(post.mediaUrls)" :src="post.mediaUrls" controls></video>
-              <audio v-else-if="isAudio(post.mediaUrls)" :src="post.mediaUrls" controls></audio>
+              <img v-if="isImage(post.mediaUrls)" :src="buildFileUrl(post.mediaUrls)" alt="Post media" />
+              <video v-else-if="isVideo(post.mediaUrls)" :src="buildFileUrl(post.mediaUrls)" controls></video>
+              <audio v-else-if="isAudio(post.mediaUrls)" :src="buildFileUrl(post.mediaUrls)" controls></audio>
             </template>
           </div>
         </div>
@@ -165,7 +165,7 @@ const filteredPosts = computed(() => {
 const fetchFriends = async () => {
   if (!currentUserId) return
   try {
-    const res = await fetch(`http://localhost:8080/api/community/friends/${currentUserId}`)
+    const res = await fetch(`http://39.108.142.250:8080/api/community/friends/${currentUserId}`)
     const data = await res.json()
     if (data.success) {
       friends.value = data.data
@@ -178,7 +178,7 @@ const fetchFriends = async () => {
 const checkLease = async () => {
   if (!currentUserId) return
   try {
-    const res = await fetch(`http://localhost:8080/api/admin/tenant/tenant/${currentUserId}`)
+    const res = await fetch(`http://39.108.142.250:8080/api/admin/tenant/tenant/${currentUserId}`)
     const data = await res.json()
     if (data.success && data.contracts && data.contracts.length > 0) {
       const active = data.contracts.find(c => c.contractStatus === 1)
@@ -194,7 +194,7 @@ const checkLease = async () => {
 
 const fetchPosts = async () => {
   try {
-    const res = await fetch('http://localhost:8080/api/community/posts/with-user-info')
+    const res = await fetch('http://39.108.142.250:8080/api/community/posts/with-user-info')
     const data = await res.json()
     if (data.success) {
       posts.value = data.data
@@ -228,17 +228,25 @@ const uploadMediaFile = async (file) => {
   formData.append('file', file)
 
   try {
-    const res = await fetch('http://localhost:8080/api/community/upload', {
+    // 直接上传到文件服务器
+    const FILE_SERVER_HOST = 'http://39.108.142.250:8088'
+    const res = await fetch(`${FILE_SERVER_HOST}/api/files/upload`, {
       method: 'POST',
       body: formData
     })
     const data = await res.json()
+    
     if (data.success) {
-      return data.url
+      // 优先使用服务器返回的文件名
+      // 如果服务器返回了 fileName (UUID)，就用它
+      // 如果没返回，降级使用原始文件名 (file.name)
+      // 根据之前的经验，服务器返回 { success: true, fileName: "UUID..." }
+      return data.fileName || file.name
     }
-    throw new Error(data.message)
+    throw new Error(data.message || '上传失败')
   } catch (e) {
     console.error('Upload failed', e)
+    alert('上传失败: ' + e.message)
     return null
   }
 }
@@ -259,7 +267,7 @@ const submitPost = async () => {
   }
 
   try {
-    const res = await fetch('http://localhost:8080/api/community/posts/create', {
+    const res = await fetch('http://39.108.142.250:8080/api/community/posts/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -314,11 +322,33 @@ const isAudio = (url) => {
   return url && url.match(/\.(mp3|wav|aac|flac|m4a)$/i) != null
 }
 
+// 构建完整的文件URL
+const buildFileUrl = (filename) => {
+  if (!filename) return ''
+  
+  // 如果是完整的HTTP URL，直接使用
+  if (filename.startsWith('http')) {
+    return filename
+  }
+  
+  // 使用文件服务器获取文件
+  const FILE_SERVER_HOST = 'http://39.108.142.250:8088'
+  return `${FILE_SERVER_HOST}/api/files/download/${filename}`
+}
+
 const getAvatarUrl = (avatarName) => {
   if (!avatarName) {
     return '/src/assets/image/default-avatar.png'
   }
-  return `/src/assets/image/${avatarName}`
+  
+  // 如果是完整的HTTP URL，直接使用
+  if (avatarName.startsWith('http')) {
+    return avatarName
+  }
+  
+  // 使用文件服务器获取头像
+  const FILE_SERVER_HOST = 'http://39.108.142.250:8088'
+  return `${FILE_SERVER_HOST}/api/files/download/${avatarName}`
 }
 
 onMounted(() => {

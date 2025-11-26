@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin/matching")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+@CrossOrigin(origins = "http://39.108.142.250:9999", allowCredentials = "true")
 public class TenantMatchingController {
 
     @Autowired
@@ -39,13 +39,15 @@ public class TenantMatchingController {
         Map<String, Object> response = new HashMap<>();
         try {
             List<RoomInfo> rooms = roomInfoRepository.findAll();
-            
+
             // 转换为前端需要的格式
             List<Map<String, Object>> houseList = rooms.stream().map(room -> {
                 Map<String, Object> houseMap = new HashMap<>();
                 houseMap.put("id", room.getId());
-                houseMap.put("roomName", room.getCommunityName() + " " + room.getDoorNumber() + (room.getRoomNumber() != null ? "-" + room.getRoomNumber() : ""));
-                houseMap.put("address", room.getProvince() + room.getCity() + room.getDistrict() + room.getStreet() + room.getCommunityName());
+                houseMap.put("roomName", room.getCommunityName() + " " + room.getDoorNumber()
+                        + (room.getRoomNumber() != null ? "-" + room.getRoomNumber() : ""));
+                houseMap.put("address", room.getProvince() + room.getCity() + room.getDistrict() + room.getStreet()
+                        + room.getCommunityName());
                 houseMap.put("area", room.getRoomArea());
                 houseMap.put("monthlyRent", room.getRentPrice());
                 houseMap.put("landlordId", getUserIdByPhone(room.getLandlordPhone()));
@@ -61,7 +63,7 @@ public class TenantMatchingController {
                 houseMap.put("landlordPhone", room.getLandlordPhone());
                 return houseMap;
             }).collect(Collectors.toList());
-            
+
             response.put("success", true);
             response.put("houses", houseList);
             return ResponseEntity.ok(response);
@@ -89,20 +91,21 @@ public class TenantMatchingController {
                 System.out.println(entry.getKey() + ": " + entry.getValue());
             }
             System.out.println("=====================");
-            
+
             // 简化验证：只验证最核心的字段
-            if (!request.containsKey("contractNumber") || request.get("contractNumber") == null || request.get("contractNumber").toString().isEmpty()) {
+            if (!request.containsKey("contractNumber") || request.get("contractNumber") == null
+                    || request.get("contractNumber").toString().isEmpty()) {
                 response.put("success", false);
                 response.put("message", "合同编号不能为空");
                 return ResponseEntity.badRequest().body(response);
             }
-            
+
             if (!request.containsKey("roomId") || request.get("roomId") == null) {
                 response.put("success", false);
                 response.put("message", "房屋ID不能为空");
                 return ResponseEntity.badRequest().body(response);
             }
-            
+
             if (!request.containsKey("tenantId") || request.get("tenantId") == null) {
                 response.put("success", false);
                 response.put("message", "租客ID不能为空");
@@ -147,7 +150,7 @@ public class TenantMatchingController {
             TenantManagement tenantManagement = new TenantManagement();
             tenantManagement.setContractNumber(contractNumber);
             tenantManagement.setRoomId(roomId);
-            
+
             // 自动获取房东ID（从房屋信息中）
             Long landlordId = getUserIdByPhone(room.getLandlordPhone());
             if (landlordId == null) {
@@ -156,53 +159,56 @@ public class TenantMatchingController {
                 return ResponseEntity.badRequest().body(response);
             }
             tenantManagement.setLandlordId(landlordId);
-            
+
             // 打印选择的房东信息
             System.out.println("=== 选择的房东信息 ===");
             System.out.println("房东ID: " + landlordId);
             System.out.println("房东手机: " + room.getLandlordPhone());
             System.out.println("=====================");
-            
+
             tenantManagement.setTenantId(Long.valueOf(request.get("tenantId").toString()));
-            
+
             // 设置日期（使用默认值或提供的值）
-            if (request.containsKey("contractStartDate") && request.get("contractStartDate") != null && !request.get("contractStartDate").toString().isEmpty()) {
+            if (request.containsKey("contractStartDate") && request.get("contractStartDate") != null
+                    && !request.get("contractStartDate").toString().isEmpty()) {
                 tenantManagement.setContractStartDate(LocalDate.parse(request.get("contractStartDate").toString()));
             } else {
                 tenantManagement.setContractStartDate(LocalDate.now());
             }
-            
-            if (request.containsKey("contractEndDate") && request.get("contractEndDate") != null && !request.get("contractEndDate").toString().isEmpty()) {
+
+            if (request.containsKey("contractEndDate") && request.get("contractEndDate") != null
+                    && !request.get("contractEndDate").toString().isEmpty()) {
                 tenantManagement.setContractEndDate(LocalDate.parse(request.get("contractEndDate").toString()));
             } else {
                 tenantManagement.setContractEndDate(LocalDate.now().plusYears(1));
             }
-            
+
             // 设置金额（使用默认值或提供的值）
             if (request.containsKey("monthlyRent") && request.get("monthlyRent") != null) {
                 tenantManagement.setMonthlyRent(new BigDecimal(request.get("monthlyRent").toString()));
             } else {
                 tenantManagement.setMonthlyRent(new BigDecimal("0"));
             }
-            
+
             if (request.containsKey("depositAmount") && request.get("depositAmount") != null) {
                 tenantManagement.setDepositAmount(new BigDecimal(request.get("depositAmount").toString()));
             } else {
                 tenantManagement.setDepositAmount(new BigDecimal("0"));
             }
-            
+
             // 设置付款周期（使用默认值或提供的值）
-            if (request.containsKey("paymentCycle") && request.get("paymentCycle") != null && !request.get("paymentCycle").toString().isEmpty()) {
+            if (request.containsKey("paymentCycle") && request.get("paymentCycle") != null
+                    && !request.get("paymentCycle").toString().isEmpty()) {
                 tenantManagement.setPaymentCycle(Integer.valueOf(request.get("paymentCycle").toString()));
             } else {
                 tenantManagement.setPaymentCycle(1); // 默认月付
             }
-            
+
             // 设置默认状态
             tenantManagement.setContractStatus(0); // 待签约
-            tenantManagement.setRentStatus(0);     // 未付款
-            tenantManagement.setDepositStatus(0);  // 未付
-            
+            tenantManagement.setRentStatus(0); // 未付款
+            tenantManagement.setDepositStatus(0); // 未付
+
             // 设置时间戳
             tenantManagement.setCreatedTime(LocalDateTime.now());
             tenantManagement.setUpdatedTime(LocalDateTime.now());

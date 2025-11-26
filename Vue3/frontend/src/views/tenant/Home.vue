@@ -45,7 +45,15 @@ const avatarUrl = computed(() => {
   if (!user.value || !user.value.avatar) {
     return '/src/assets/image/default-avatar.png'
   }
-  return `/src/assets/image/${user.value.avatar}?t=${new Date().getTime()}`
+  
+  // 如果是完整的HTTP URL，直接使用
+  if (user.value.avatar.startsWith('http')) {
+    return user.value.avatar
+  }
+  
+  // 使用文件服务器获取头像
+  const FILE_SERVER_HOST = 'http://39.108.142.250:8088'
+  return `${FILE_SERVER_HOST}/api/files/download/${user.value.avatar}`
 })
 
 const navigateToLogin = () => {
@@ -113,7 +121,7 @@ const fetchUserAppointments = async () => {
   
   loadingAppointments.value = true
   try {
-    const response = await fetch(`http://localhost:8080/api/viewing-appointment/user/${user.value.id}`)
+    const response = await fetch(`http://39.108.142.250:8080/api/viewing-appointment/user/${user.value.id}`)
     if (response.ok) {
       appointments.value = await response.json()
     } else {

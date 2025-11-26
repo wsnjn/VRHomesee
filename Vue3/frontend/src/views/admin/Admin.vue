@@ -32,34 +32,25 @@
         </div>
 
         <div class="menu-section">
-          <h3>租约管理</h3>
+          <h3>社区管理</h3>
           <ul class="menu-list">
             <li 
-              :class="{ active: activeTab === 'tenant-management' }"
-              @click="switchTab('tenant-management')"
+              :class="{ active: activeTab === 'resource-management' }"
+              @click="switchTab('resource-management')"
             >
               <span class="menu-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
               </span>
-              租约列表
+              资源管理
             </li>
             <li 
-              :class="{ active: activeTab === 'rent-payment' }"
-              @click="switchTab('rent-payment')"
+              :class="{ active: activeTab === 'channel-management' }"
+              @click="switchTab('channel-management')"
             >
               <span class="menu-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
               </span>
-              租金管理
-            </li>
-            <li 
-              :class="{ active: activeTab === 'maintenance' }"
-              @click="switchTab('maintenance')"
-            >
-              <span class="menu-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
-              </span>
-              维修报修
+              频道管理
             </li>
           </ul>
         </div>
@@ -217,8 +208,18 @@
           <user-management />
         </div>
 
+        <!-- 资源管理 -->
+        <div v-if="activeTab === 'resource-management'">
+          <resource-management />
+        </div>
+
+        <!-- 频道管理 -->
+        <div v-if="activeTab === 'channel-management'">
+          <channel-management />
+        </div>
+
         <!-- 其他页面占位 -->
-        <div v-else-if="activeTab !== 'dashboard' && activeTab !== 'tenant-management' && activeTab !== 'tenant-matching' && activeTab !== 'house-management' && activeTab !== 'user-management'" class="page-placeholder">
+        <div v-else-if="activeTab !== 'dashboard' && activeTab !== 'resource-management' && activeTab !== 'channel-management' && activeTab !== 'house-management' && activeTab !== 'user-management' && activeTab !== 'tenant-matching'" class="page-placeholder">
           <h2>{{ getTabTitle(activeTab) }}</h2>
           <p>功能开发中...</p>
         </div>
@@ -236,11 +237,13 @@ import TenantManagement from './TenantManagement.vue'
 import TenantMatching from './TenantMatching.vue'
 import HouseManagement from './HouseManagement.vue'
 import UserManagement from './UserManagement.vue'
+import ResourceManagement from './community/ResourceManagement.vue'
+import ChannelManagement from './community/ChannelManagement.vue'
 
 const router = useRouter()
 
 // API基础URL
-const API_BASE_URL = 'http://localhost:8080/api'
+const API_BASE_URL = 'http://39.108.142.250:8080/api'
 
 // 响应式数据
 const activeTab = ref('dashboard')
@@ -328,9 +331,8 @@ const switchTab = (tab) => {
 const getTabTitle = (tab) => {
   const titles = {
     'dashboard': '数据概览',
-    'tenant-management': '租约管理',
-    'rent-payment': '租金管理',
-    'maintenance': '维修报修',
+    'resource-management': '资源管理',
+    'channel-management': '频道管理',
     'house-management': '房屋管理',
     'house-status': '房屋状态',
     'user-management': '用户管理',

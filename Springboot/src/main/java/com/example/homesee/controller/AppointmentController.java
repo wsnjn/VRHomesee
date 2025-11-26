@@ -10,7 +10,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/appointment")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://39.108.142.250:9999")
 public class AppointmentController {
 
     @Autowired
@@ -18,6 +18,7 @@ public class AppointmentController {
 
     /**
      * 创建预约
+     * 
      * @param request 预约请求数据
      * @return 创建结果
      */
@@ -36,18 +37,18 @@ public class AppointmentController {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             LocalDateTime appointmentDateTime = LocalDateTime.parse(appointmentDateTimeStr, formatter);
 
-            return appointmentService.createAppointment(houseId, userId, contactName, contactPhone, 
-                                                       appointmentDateTime, appointmentType, remarks);
+            return appointmentService.createAppointment(houseId, userId, contactName, contactPhone,
+                    appointmentDateTime, appointmentType, remarks);
         } catch (Exception e) {
             return Map.of(
-                "success", false,
-                "message", "请求参数错误: " + e.getMessage()
-            );
+                    "success", false,
+                    "message", "请求参数错误: " + e.getMessage());
         }
     }
 
     /**
      * 获取预约详情
+     * 
      * @param appointmentId 预约ID
      * @return 预约详情
      */
@@ -58,6 +59,7 @@ public class AppointmentController {
 
     /**
      * 根据用户ID获取预约列表
+     * 
      * @param userId 用户ID
      * @return 预约列表
      */
@@ -68,26 +70,27 @@ public class AppointmentController {
 
     /**
      * 更新预约状态
+     * 
      * @param appointmentId 预约ID
-     * @param request 状态更新请求
+     * @param request       状态更新请求
      * @return 更新结果
      */
     @PutMapping("/{appointmentId}/status")
-    public Map<String, Object> updateAppointmentStatus(@PathVariable Long appointmentId, 
-                                                      @RequestBody Map<String, Object> request) {
+    public Map<String, Object> updateAppointmentStatus(@PathVariable Long appointmentId,
+            @RequestBody Map<String, Object> request) {
         try {
             Integer status = Integer.valueOf(request.get("status").toString());
             return appointmentService.updateAppointmentStatus(appointmentId, status);
         } catch (Exception e) {
             return Map.of(
-                "success", false,
-                "message", "请求参数错误: " + e.getMessage()
-            );
+                    "success", false,
+                    "message", "请求参数错误: " + e.getMessage());
         }
     }
 
     /**
      * 取消预约
+     * 
      * @param appointmentId 预约ID
      * @return 取消结果
      */
@@ -98,6 +101,7 @@ public class AppointmentController {
 
     /**
      * 确认预约
+     * 
      * @param appointmentId 预约ID
      * @return 确认结果
      */

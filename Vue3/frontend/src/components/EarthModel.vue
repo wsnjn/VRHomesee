@@ -55,7 +55,7 @@ export default {
       
       // 加载地球模型
       loader.load(
-        '/src/assets/module/earth 2.glb',
+        '/models/earth 2.glb',
         (gltf) => {
           earthModel = gltf.scene;
           

@@ -1,7 +1,7 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHashHistory(),
   routes: [
     // 用户端路由（租客可访问）
     { path: '/', name: 'home', component: () => import('../views/tenant/Home.vue'), meta: { requiresAuth: true, allowedUserTypes: [1, 2, 3] } },

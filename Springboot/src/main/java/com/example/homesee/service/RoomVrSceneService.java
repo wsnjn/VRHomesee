@@ -6,13 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class RoomVrSceneService {
@@ -20,52 +15,35 @@ public class RoomVrSceneService {
     @Autowired
     private RoomVrSceneRepository roomVrSceneRepository;
 
-    // Hardcoded path as per user requirement
-    private final String UPLOAD_DIR = "e:/wslop/End/Vue3/frontend/src/assets/image/";
+    // 文件服务器地址
+    private final String FILE_SERVER_HOST = "http://39.108.142.250:8088";
 
     public List<RoomVrScene> getScenesByRoomId(Long roomId) {
-        return roomVrSceneRepository.findByRoomId(roomId);
+        List<RoomVrScene> scenes = roomVrSceneRepository.findByRoomId(roomId);
+        // 为每个场景设置完整的文件服务器URL
+        for (RoomVrScene scene : scenes) {
+            if (scene.getImageUrl() != null && !scene.getImageUrl().startsWith("http")) {
+                scene.setImageUrl(FILE_SERVER_HOST + "/api/files/download/" + scene.getImageUrl());
+            }
+        }
+        return scenes;
     }
 
     public RoomVrScene addScene(Long roomId, String sceneName, MultipartFile file) throws IOException {
-        // 1. Create directory if not exists
-        String roomDir = UPLOAD_DIR + roomId;
-        File directory = new File(roomDir);
-        if (!directory.exists()) {
-            directory.mkdirs();
-        }
-
-        // 2. Save file
-        String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-        Path filePath = Paths.get(roomDir, fileName);
-        Files.write(filePath, file.getBytes());
-
-        // 3. Create entity
-        // The URL should be relative to src/assets/image for frontend usage
-        // e.g., /src/assets/image/1/abc.jpg
-        // But frontend usually imports assets. If we use dynamic paths, we might need
-        // to use public folder or handle it differently.
-        // However, user asked to store in src/assets/image.
-        // In Vue, dynamic images from src/assets can be tricky if not imported.
-        // A common workaround is to put them in 'public' or use a specific alias.
-        // But let's follow instructions. We will store the path that Vue can try to
-        // resolve or serve statically.
-        // 返回前端可以直接访问的路径
-        // 在Vue开发环境中，图片应该放在public目录下，但用户要求放在src/assets
-        // 这里我们返回一个前端可以处理的相对路径
-        String relativePath = "/src/assets/image/" + roomId + "/" + fileName;
-
-        RoomVrScene scene = new RoomVrScene(roomId, sceneName, relativePath);
+        // 1. 上传文件到文件服务器
+        String fileName = file.getOriginalFilename();
+        
+        // 2. 创建实体，只保存文件名
+        // 实际文件存储在文件服务器，这里只保存文件名用于后续获取
+        RoomVrScene scene = new RoomVrScene(roomId, sceneName, fileName);
         return roomVrSceneRepository.save(scene);
     }
 
     public void deleteScene(Long id) {
         RoomVrScene scene = roomVrSceneRepository.findById(id).orElse(null);
         if (scene != null) {
-            // Optional: Delete file from disk
-            // String filePath = "e:/wslop/End/Vue3/frontend" + scene.getImageUrl();
-            // new File(filePath).delete();
-
+            // 注意：这里只删除数据库记录，实际文件仍然保留在文件服务器
+            // 如果需要删除文件服务器上的文件，需要调用文件服务器的删除接口
             roomVrSceneRepository.delete(scene);
         }
     }
