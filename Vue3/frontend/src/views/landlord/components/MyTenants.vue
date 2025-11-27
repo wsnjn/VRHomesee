@@ -1403,4 +1403,47 @@ onMounted(() => {
   background: #a0aec0;
   cursor: not-allowed;
 }
+
+/* 状态编辑样式 */
+.status-edit {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-select {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  background-color: white;
+  min-width: 100px;
+}
+
+.status-select:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.save-icon-btn {
+  background: none;
+  border: none;
+  color: #667eea;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.save-icon-btn:hover {
+  background-color: #ebf4ff;
+}
+
+.save-icon-btn:disabled {
+  color: #a0aec0;
+  cursor: not-allowed;
+}
 </style>

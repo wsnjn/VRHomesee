@@ -11,125 +11,155 @@
       </button>
     </div>
 
-    <!-- Active Leases -->
-    <div class="section-title">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-      <h3>当前房屋信息</h3>
-    </div>
-    
-    <div class="lease-card" v-if="activeLease">
-      <div class="lease-header">
-        <h4 class="lease-title">当前租约信息</h4>
-        <span class="lease-status" :class="getLeaseStatusClass(activeLease.contractStatus)">{{ getLeaseStatusText(activeLease.contractStatus) }}</span>
-      </div>
-      
-      <div class="lease-info-grid">
-        <div class="info-item">
-          <span class="label">合同编号</span>
-          <span class="value">{{ activeLease.contractNumber }}</span>
+    <div class="content-grid">
+      <!-- Left Column: House Info -->
+      <div class="left-column">
+        <div class="section-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          <h3>当前房屋信息</h3>
         </div>
-        <div class="info-item">
-          <span class="label">房间信息</span>
-          <span class="value">{{ activeLease.roomInfo || '未获取到房间信息' }}</span>
-        </div>
-        <div class="info-item">
-          <span class="label">租期</span>
-          <span class="value">{{ formatDate(activeLease.contractStartDate) }} 至 {{ formatDate(activeLease.contractEndDate) }}</span>
-        </div>
-        <div class="info-item">
-          <span class="label">月租金</span>
-          <span class="value">¥{{ activeLease.monthlyRent }}</span>
-        </div>
-        <div class="info-item">
-          <span class="label">押金</span>
-          <span class="value">¥{{ activeLease.deposit || '未设置' }}</span>
-        </div>
-        <div class="info-item">
-          <span class="label">付款方式</span>
-          <span class="value">{{ getPaymentMethodText(activeLease.paymentMethod) }}</span>
-        </div>
-        <div class="info-item">
-          <span class="label">合同状态</span>
-          <span class="value">{{ getLeaseStatusText(activeLease.contractStatus) }}</span>
-        </div>
-        <div class="info-item">
-          <span class="label">签约日期</span>
-          <span class="value">{{ formatDate(activeLease.contractSignDate) }}</span>
-        </div>
-        <div class="info-item">
-          <span class="label">合同备注</span>
-          <span class="value">{{ activeLease.contractNotes || '无备注' }}</span>
-        </div>
-      </div>
-      
-      <!-- 房屋详细信息 -->
-      <div class="house-details-section" v-if="houseDetails">
-        <h5 class="section-subtitle">房屋详细信息</h5>
-        <div class="house-details-grid">
-          <div class="detail-item">
-            <span class="label">小区名称</span>
-            <span class="value">{{ houseDetails.communityName || '未知' }}</span>
+        
+        <div class="lease-card" v-if="activeLease">
+          <div class="lease-header">
+            <h4 class="lease-title">当前租约信息</h4>
+            <span class="lease-status" :class="getLeaseStatusClass(activeLease.contractStatus)">{{ getLeaseStatusText(activeLease.contractStatus) }}</span>
           </div>
-          <div class="detail-item">
-            <span class="label">详细地址</span>
-            <span class="value">{{ getFullAddress(houseDetails) }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="label">房屋面积</span>
-            <span class="value">{{ houseDetails.roomArea || '未知' }}㎡</span>
-          </div>
-          <div class="detail-item">
-            <span class="label">楼层信息</span>
-            <span class="value">{{ houseDetails.floorInfo || '未知' }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="label">装修程度</span>
-            <span class="value">{{ getDecorationText(houseDetails.decoration) }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="label">朝向</span>
-            <span class="value">{{ getOrientationText(houseDetails.orientation) }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="label">租赁类型</span>
-            <span class="value">{{ getRentalTypeText(houseDetails.rentalType) }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="label">房东电话</span>
-            <span class="value">{{ houseDetails.landlordPhone ? formatPhoneNumber(houseDetails.landlordPhone) : '未提供' }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div v-else class="no-data-card">
-      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="15"></line><line x1="15" y1="9" x2="9" y2="15"></line></svg>
-      <p>暂无有效租约</p>
-    </div>
+          
+          <div class="lease-info-grid">
+            <div class="info-item">
+              <span class="label">合同编号</span>
+              <span class="value">{{ activeLease.contractNumber }}</span>
+            </div>
 
-    <!-- Request List -->
-    <div class="section-title">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-      <h3>维修记录</h3>
-    </div>
-
-    <div v-if="requests.length === 0" class="no-data-card">
-      <p>暂无维修记录</p>
-    </div>
-    <div v-else class="request-list">
-      <div class="request-card" v-for="req in requests" :key="req.id">
-        <div class="req-header">
-          <span class="req-title">{{ req.requestTitle }}</span>
-          <span class="req-status" :class="getStatusClass(req.requestStatus)">{{ getStatusText(req.requestStatus) }}</span>
-        </div>
-        <p class="req-desc">{{ req.requestDescription }}</p>
-        <div class="req-meta">
-          <div class="meta-item">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-            <span>申请: {{ formatDate(req.requestDate) }}</span>
+            <div class="info-item">
+              <span class="label">租期</span>
+              <span class="value">{{ formatDate(activeLease.contractStartDate) }} 至 {{ formatDate(activeLease.contractEndDate) }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">月租金</span>
+              <span class="value">¥{{ activeLease.monthlyRent }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">押金</span>
+              <span class="value">¥{{ activeLease.depositAmount ?? 0 }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">付款方式</span>
+              <span class="value">{{ getPaymentMethodText(activeLease.paymentCycle) }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">押金状态</span>
+              <span class="value">{{ getDepositStatusText(activeLease.depositStatus) }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">合同状态</span>
+              <span class="value">{{ getLeaseStatusText(activeLease.contractStatus) }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">签约日期</span>
+              <span class="value">{{ formatDate(activeLease.contractSignedTime) }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">合同备注</span>
+              <span class="value">{{ activeLease.contractNotes || '无备注' }}</span>
+            </div>
           </div>
-          <div class="meta-item" v-if="req.expectedFixDate">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-            <span>期望: {{ formatDate(req.expectedFixDate) }}</span>
+          
+          <!-- 水电费用信息 -->
+          <div class="house-details-section">
+            <h5 class="section-subtitle">水电费用信息</h5>
+            <div class="house-details-grid">
+              <div class="detail-item">
+                <span class="label">水费单价</span>
+                <span class="value">{{ houseDetails?.waterPrice ? '¥' + houseDetails.waterPrice + '/吨' : '未设置' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">电费单价</span>
+                <span class="value">{{ houseDetails?.electricPrice ? '¥' + houseDetails.electricPrice + '/度' : '未设置' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">上期水表读数</span>
+                <span class="value">{{ activeLease.lastWaterReading ?? 0 }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">上期电表读数</span>
+                <span class="value">{{ activeLease.lastElectricReading ?? 0 }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 房屋详细信息 -->
+          <div class="house-details-section" v-if="houseDetails">
+            <h5 class="section-subtitle">房屋详细信息</h5>
+            <div class="house-details-grid">
+              <div class="detail-item">
+                <span class="label">小区名称</span>
+                <span class="value">{{ houseDetails.communityName || '未知' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">详细地址</span>
+                <span class="value">{{ getFullAddress(houseDetails) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">房屋面积</span>
+                <span class="value">{{ houseDetails.roomArea || '未知' }}㎡</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">楼层信息</span>
+                <span class="value">{{ houseDetails.floorInfo || '未知' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">装修程度</span>
+                <span class="value">{{ getDecorationText(houseDetails.decoration) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">朝向</span>
+                <span class="value">{{ getOrientationText(houseDetails.orientation) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">租赁类型</span>
+                <span class="value">{{ getRentalTypeText(houseDetails.rentalType) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">房东电话</span>
+                <span class="value">{{ houseDetails.landlordPhone ? formatPhoneNumber(houseDetails.landlordPhone) : '未提供' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-else class="no-data-card">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="15"></line><line x1="15" y1="9" x2="9" y2="15"></line></svg>
+          <p>暂无有效租约</p>
+        </div>
+      </div>
+
+      <!-- Right Column: Maintenance Requests -->
+      <div class="right-column">
+        <div class="section-title" style="margin-top: 0;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          <h3>维修记录</h3>
+        </div>
+
+        <div v-if="requests.length === 0" class="no-data-card">
+          <p>暂无维修记录</p>
+        </div>
+        <div v-else class="request-list">
+          <div class="request-card" v-for="req in requests" :key="req.id">
+            <div class="req-header">
+              <span class="req-title">{{ req.requestTitle }}</span>
+              <span class="req-status" :class="getStatusClass(req.requestStatus)">{{ getStatusText(req.requestStatus) }}</span>
+            </div>
+            <p class="req-desc">{{ req.requestDescription }}</p>
+            <div class="req-meta">
+              <div class="meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <span>申请: {{ formatDate(req.requestDate) }}</span>
+              </div>
+              <div class="meta-item" v-if="req.expectedFixDate">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                <span>期望: {{ formatDate(req.expectedFixDate) }}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -190,8 +220,8 @@ const fetchActiveLease = async () => {
     const res = await fetch(`http://localhost:8080/api/admin/tenant/tenant/${currentUserId}`)
     const data = await res.json()
     if (data.success && data.contracts && data.contracts.length > 0) {
-      // Find the active contract (status === 1)
-      const active = data.contracts.find(c => c.contractStatus === 1)
+      // Find the active contract (status 1=Signed or 2=In Progress)
+      const active = data.contracts.find(c => c.contractStatus === 1 || c.contractStatus === 2)
       if (active) {
         activeLease.value = active
         // Fetch house details if roomId is available
@@ -289,13 +319,20 @@ const formatPhoneNumber = (phone) => {
 
 // 获取合同状态文字
 const getLeaseStatusText = (status) => {
-  const map = { 0: '待生效', 1: '生效中', 2: '已到期', 3: '已终止' }
+  const map = { 0: '待签约', 1: '已签约', 2: '履行中', 3: '已到期', 4: '提前解约', 5: '已退租' }
   return map[status] || '未知状态'
 }
 
 // 获取合同状态样式类
 const getLeaseStatusClass = (status) => {
-  const map = { 0: 'status-pending', 1: 'status-active', 2: 'status-expired', 3: 'status-terminated' }
+  const map = { 
+    0: 'status-pending', 
+    1: 'status-active', 
+    2: 'status-active', 
+    3: 'status-expired', 
+    4: 'status-terminated',
+    5: 'status-terminated'
+  }
   return map[status] || ''
 }
 
@@ -303,6 +340,12 @@ const getLeaseStatusClass = (status) => {
 const getPaymentMethodText = (method) => {
   const map = { 0: '月付', 1: '季付', 2: '半年付', 3: '年付' }
   return map[method] || '未知'
+}
+
+// 获取押金状态文字
+const getDepositStatusText = (status) => {
+  const map = { 0: '未付', 1: '已付', 2: '已退', 3: '抵扣中' }
+  return map[status] || '未知'
 }
 
 // 获取装修程度文字
@@ -338,10 +381,23 @@ onMounted(() => {
 <style scoped>
 .maintenance-container {
   padding: 30px;
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
   font-family: 'Inter', sans-serif;
   color: #333;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .header {
@@ -428,34 +484,34 @@ onMounted(() => {
 
 .lease-info-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  margin-bottom: 25px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
 }
 
 .house-details-section {
-  margin-top: 25px;
-  padding-top: 20px;
+  margin-top: 20px;
+  padding-top: 15px;
   border-top: 1px solid #f1f3f5;
 }
 
 .section-subtitle {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   color: #374151;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
 }
 
 .house-details-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 15px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
 }
 
 .detail-item {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .detail-item .label {
@@ -467,7 +523,7 @@ onMounted(() => {
 }
 
 .detail-item .value {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: #1f2937;
 }
@@ -475,19 +531,19 @@ onMounted(() => {
 .info-item {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 2px;
 }
 
 .info-item .label {
-  font-size: 12px;
+  font-size: 11px;
   color: #9ca3af;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .info-item .value {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 500;
   color: #1f2937;
 }
 
