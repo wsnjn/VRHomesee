@@ -21,6 +21,12 @@ public class MaintenanceService {
     @Autowired
     private TenantManagementRepository tenantManagementRepository;
 
+    @Autowired
+    private com.example.homesee.repository.UserRepository userRepository;
+
+    @Autowired
+    private com.example.homesee.repository.RoomInfoRepository roomInfoRepository;
+
     public MaintenanceRequest createRequest(MaintenanceRequest request) {
         return maintenanceRepository.save(request);
     }
@@ -39,30 +45,31 @@ public class MaintenanceService {
 
     /**
      * 获取用户的活跃租约
+     * 
      * @param userId 用户ID
      * @return 活跃租约信息
      */
     public Map<String, Object> getActiveLeaseByUserId(Long userId) {
         Map<String, Object> result = new HashMap<>();
-        
+
         try {
             // 获取用户的所有租约
             List<TenantManagement> userLeases = tenantManagementRepository.findByTenantId(userId);
-            
+
             // 查找当前有效的租约（状态为已签约或履行中，且租期未结束）
             TenantManagement activeLease = userLeases.stream()
-                .filter(lease -> {
-                    Integer status = lease.getContractStatus();
-                    LocalDate endDate = lease.getContractEndDate();
-                    LocalDate today = LocalDate.now();
-                    
-                    // 状态为已签约(1)或履行中(2)，且租期未结束
-                    return (status == 1 || status == 2) && 
-                           (endDate == null || endDate.isAfter(today) || endDate.isEqual(today));
-                })
-                .findFirst()
-                .orElse(null);
-            
+                    .filter(lease -> {
+                        Integer status = lease.getContractStatus();
+                        LocalDate endDate = lease.getContractEndDate();
+                        LocalDate today = LocalDate.now();
+
+                        // 状态为已签约(1)或履行中(2)，且租期未结束
+                        return (status == 1 || status == 2) &&
+                                (endDate == null || endDate.isAfter(today) || endDate.isEqual(today));
+                    })
+                    .findFirst()
+                    .orElse(null);
+
             if (activeLease != null) {
                 Map<String, Object> leaseInfo = new HashMap<>();
                 leaseInfo.put("id", activeLease.getId());
@@ -72,22 +79,101 @@ public class MaintenanceService {
                 leaseInfo.put("contractEndDate", activeLease.getContractEndDate());
                 leaseInfo.put("contractStatus", activeLease.getContractStatus());
                 leaseInfo.put("monthlyRent", activeLease.getMonthlyRent());
-                
+
                 // 这里可以添加获取房间详细信息的逻辑
                 leaseInfo.put("roomName", "房间 " + activeLease.getRoomId()); // 临时占位
-                
+
                 result.put("success", true);
                 result.put("data", leaseInfo);
             } else {
                 result.put("success", true);
                 result.put("data", null);
             }
-            
+
         } catch (Exception e) {
             result.put("success", false);
             result.put("message", "获取租约信息失败: " + e.getMessage());
         }
-        
+
+        return result;
+    }
+
+    /**
+     * 获取房东的所有维修工单
+     * 
+     * @param landlordId 房东ID
+     * @return 维修工单列表（包含租户和房屋信息）
+     */
+    public List<Map<String, Object>> getRequestsByLandlordId(Long landlordId) {
+        List<Map<String, Object>> result = new java.util.ArrayList<>();
+
+        // 1. 获取房东的所有租约
+        List<TenantManagement> contracts = tenantManagementRepository.findByLandlordId(landlordId);
+        if (contracts.isEmpty()) {
+            return result;
+        }
+
+        List<Long> contractIds = contracts.stream()
+                .map(TenantManagement::getId)
+                .collect(java.util.stream.Collectors.toList());
+
+        // 2. 获取这些租约的所有维修工单
+        List<MaintenanceRequest> requests = maintenanceRepository.findByTenantManagementIdIn(contractIds);
+
+        // 3. 组装数据，补充租户和房屋信息
+        for (MaintenanceRequest req : requests) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", req.getId());
+            map.put("tenantManagementId", req.getTenantManagementId());
+            map.put("requestTitle", req.getRequestTitle());
+            map.put("requestDescription", req.getRequestDescription());
+            map.put("requestStatus", req.getRequestStatus());
+            map.put("requestDate", req.getRequestDate());
+            map.put("expectedFixDate", req.getExpectedFixDate());
+            map.put("actualFixDate", req.getActualFixDate());
+            map.put("repairCost", req.getRepairCost());
+            map.put("costBearer", req.getCostBearer());
+            map.put("fixNotes", req.getFixNotes());
+            map.put("createdTime", req.getCreatedTime());
+            map.put("updatedTime", req.getUpdatedTime());
+
+            // 查找对应的租约
+            TenantManagement contract = contracts.stream()
+                    .filter(c -> c.getId().equals(req.getTenantManagementId()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (contract != null) {
+                // 补充租户信息
+                map.put("tenantId", contract.getTenantId());
+                userRepository.findById(contract.getTenantId()).ifPresent(user -> {
+                    map.put("tenantName", user.getRealName() != null ? user.getRealName() : user.getUsername());
+                    map.put("tenantPhone", user.getPhone());
+                });
+
+                // 补充房屋信息
+                map.put("roomId", contract.getRoomId());
+                map.put("contractNumber", contract.getContractNumber());
+                roomInfoRepository.findById(contract.getRoomId()).ifPresent(room -> {
+                    String address = String.format("%s%s%s%s %s %s-%s-%s",
+                            room.getProvince(), room.getCity(), room.getDistrict(), room.getStreet(),
+                            room.getCommunityName(), room.getBuildingUnit(), room.getDoorNumber(),
+                            room.getRoomNumber());
+                    map.put("roomAddress", address);
+                    map.put("communityName", room.getCommunityName());
+                });
+            }
+
+            result.add(map);
+        }
+
+        // 按申请时间倒序排序
+        result.sort((a, b) -> {
+            java.time.LocalDateTime t1 = (java.time.LocalDateTime) a.get("createdTime");
+            java.time.LocalDateTime t2 = (java.time.LocalDateTime) b.get("createdTime");
+            return t2.compareTo(t1);
+        });
+
         return result;
     }
 }

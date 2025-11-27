@@ -163,10 +163,7 @@
 
         <!-- 维修报修 -->
         <div v-if="activeTab === 'maintenance'">
-          <placeholder-page 
-            title="维修报修"
-            message="维修工单管理功能开发中..."
-          />
+          <landlord-maintenance :userId="userId" />
         </div>
       </div>
     </div>
@@ -185,6 +182,8 @@ import AddHouse from './components/AddHouse.vue'
 import TenantManagement from './components/TenantManagement.vue'
 import LandlordTenantMatching from './components/LandlordTenantMatching.vue'
 import MyTenants from './components/MyTenants.vue'
+
+import LandlordMaintenance from './components/LandlordMaintenance.vue'
 
 // 占位页面组件
 const PlaceholderPage = {

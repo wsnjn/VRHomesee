@@ -50,4 +50,13 @@ public class MaintenanceController {
         Map<String, Object> result = maintenanceService.getActiveLeaseByUserId(userId);
         return ResponseEntity.ok(result);
     }
+
+    @GetMapping("/landlord/{landlordId}")
+    public ResponseEntity<Map<String, Object>> getRequestsByLandlordId(@PathVariable Long landlordId) {
+        List<Map<String, Object>> list = maintenanceService.getRequestsByLandlordId(landlordId);
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("data", list);
+        return ResponseEntity.ok(response);
+    }
 }

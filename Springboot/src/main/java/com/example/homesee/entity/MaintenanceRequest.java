@@ -39,6 +39,9 @@ public class MaintenanceRequest {
     @Column(name = "cost_bearer")
     private Integer costBearer; // 1-Landlord, 2-Tenant, 3-Shared
 
+    @Column(name = "fix_notes", columnDefinition = "TEXT")
+    private String fixNotes;
+
     @Column(name = "created_time", updatable = false)
     private LocalDateTime createdTime;
 
@@ -138,6 +141,14 @@ public class MaintenanceRequest {
 
     public void setCostBearer(Integer costBearer) {
         this.costBearer = costBearer;
+    }
+
+    public String getFixNotes() {
+        return fixNotes;
+    }
+
+    public void setFixNotes(String fixNotes) {
+        this.fixNotes = fixNotes;
     }
 
     public LocalDateTime getCreatedTime() {
