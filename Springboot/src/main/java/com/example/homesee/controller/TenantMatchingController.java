@@ -217,6 +217,7 @@ public class TenantMatchingController {
             TenantManagement savedContract = tenantManagementRepository.save(tenantManagement);
 
             // 更新房屋状态为已出租
+            
             room.setStatus(1); // 已出租
             roomInfoRepository.save(room);
 
