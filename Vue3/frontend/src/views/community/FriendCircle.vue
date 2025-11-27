@@ -58,8 +58,8 @@
             <option value="0">公开</option>
             <option value="1">仅好友</option>
           </select>
-          <button class="submit-btn" @click="submitPost" :disabled="(!newPostContent && !mediaPreview) || !hasActiveLease">
-            发布
+          <button class="submit-btn" @click="submitPost" :disabled="(!newPostContent && !mediaPreview) || !hasActiveLease || isSubmitting">
+            {{ isSubmitting ? '发布中...' : '发布' }}
           </button>
         </div>
       </div>
@@ -139,6 +139,9 @@ const imageInput = ref(null)
 const videoInput = ref(null)
 const audioInput = ref(null)
 
+const isSubmitting = ref(false)
+const MAX_FILE_SIZE = 100 * 1024 * 1024 // 100MB
+
 const friends = ref([])
 
 // Computed properties for filtered posts (朋友圈只显示自己和朋友的动态)
@@ -181,7 +184,7 @@ const checkLease = async () => {
     const res = await fetch(`http://localhost:8080/api/admin/tenant/tenant/${currentUserId}`)
     const data = await res.json()
     if (data.success && data.contracts && data.contracts.length > 0) {
-      const active = data.contracts.find(c => c.contractStatus === 1)
+      const active = data.contracts.find(c => c.contractStatus === 1 || c.contractStatus === 2)
       hasActiveLease.value = !!active
     } else {
       hasActiveLease.value = false
@@ -214,6 +217,11 @@ const handleFileUpload = async (event, type) => {
   const file = event.target.files[0]
   if (!file) return
 
+  if (file.size > MAX_FILE_SIZE) {
+    alert(`文件大小不能超过 ${MAX_FILE_SIZE / 1024 / 1024}MB`)
+    return
+  }
+
   // Create preview
   const url = URL.createObjectURL(file)
   mediaPreview.value = { type, url, file }
@@ -234,52 +242,70 @@ const uploadMediaFile = async (file) => {
       method: 'POST',
       body: formData
     })
+
+    if (!res.ok) {
+      if (res.status === 413) {
+        throw new Error('文件过大，服务器拒绝接收')
+      }
+      throw new Error(`上传失败 (${res.status})`)
+    }
+
     const data = await res.json()
     
     if (data.success) {
-      // 优先使用服务器返回的文件名
-      // 如果服务器返回了 fileName (UUID)，就用它
-      // 如果没返回，降级使用原始文件名 (file.name)
-      // 根据之前的经验，服务器返回 { success: true, fileName: "UUID..." }
+      // 文件服务器返回的是 fileName (驼峰)
       return data.fileName || file.name
     }
     throw new Error(data.message || '上传失败')
   } catch (e) {
     console.error('Upload failed', e)
     alert('上传失败: ' + e.message)
-    return null
+    throw e // Re-throw to stop submission
   }
 }
 
 const submitPost = async () => {
   if ((!newPostContent.value.trim() && !mediaPreview.value) || !hasActiveLease.value) return
+  if (isSubmitting.value) return
 
-  let mediaUrl = ''
-  if (mediaPreview.value) {
-    mediaUrl = await uploadMediaFile(mediaPreview.value.file)
-  }
-
-  const payload = {
-    userId: currentUserId,
-    content: newPostContent.value,
-    mediaUrls: mediaUrl,
-    visibility: parseInt(visibility.value)
-  }
-
+  isSubmitting.value = true
   try {
+    let mediaUrl = ''
+    if (mediaPreview.value) {
+      mediaUrl = await uploadMediaFile(mediaPreview.value.file)
+    }
+
+    const payload = {
+      userId: currentUserId,
+      content: newPostContent.value,
+      mediaUrls: mediaUrl,
+      visibility: parseInt(visibility.value)
+    }
+
     const res = await fetch('http://localhost:8080/api/community/posts/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     })
+    
+    if (!res.ok) {
+      throw new Error(`发布失败 (${res.status})`)
+    }
+
     const data = await res.json()
     if (data.success) {
       posts.value.unshift(data.data)
       newPostContent.value = ''
       mediaPreview.value = null
+      alert('发布成功')
+    } else {
+      throw new Error(data.message || '发布失败')
     }
   } catch (e) {
     console.error(e)
+    alert('发布失败: ' + e.message)
+  } finally {
+    isSubmitting.value = false
   }
 }
 

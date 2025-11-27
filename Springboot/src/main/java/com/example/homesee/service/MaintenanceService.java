@@ -40,6 +40,9 @@ public class MaintenanceService {
     }
 
     public MaintenanceRequest getRequestById(Long id) {
+        if (id == null) {
+            return null;
+        }
         return maintenanceRepository.findById(id).orElse(null);
     }
 
@@ -145,11 +148,14 @@ public class MaintenanceService {
 
             if (contract != null) {
                 // 补充租户信息
-                map.put("tenantId", contract.getTenantId());
-                userRepository.findById(contract.getTenantId()).ifPresent(user -> {
-                    map.put("tenantName", user.getRealName() != null ? user.getRealName() : user.getUsername());
-                    map.put("tenantPhone", user.getPhone());
-                });
+                Long tenantId = contract.getTenantId();
+                map.put("tenantId", tenantId);
+                if (tenantId != null) {
+                    userRepository.findById(tenantId).ifPresent(user -> {
+                        map.put("tenantName", user.getRealName() != null ? user.getRealName() : user.getUsername());
+                        map.put("tenantPhone", user.getPhone());
+                    });
+                }
 
                 // 补充房屋信息
                 map.put("roomId", contract.getRoomId());
