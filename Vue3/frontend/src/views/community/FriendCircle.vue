@@ -83,6 +83,25 @@
           <div class="visibility-badge" :class="post.visibility === 1 ? 'friends-only' : 'public'">
             {{ post.visibility === 1 ? '仅好友' : '公开' }}
           </div>
+          
+          <!-- More Menu for Own Posts -->
+          <div class="more-menu-container" v-if="post.userId === currentUserId">
+            <button class="more-btn" @click.stop="toggleMenu(post.id)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+            </button>
+            
+            <div class="dropdown-menu" v-if="activeMenuId === post.id">
+              <button @click="changeVisibility(post)">
+                <svg v-if="post.visibility === 1" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                设为{{ post.visibility === 1 ? '公开' : '仅好友' }}
+              </button>
+              <button class="delete-btn" @click="deletePost(post.id)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                删除
+              </button>
+            </div>
+          </div>
         </div>
         
         <div class="post-content">
@@ -308,6 +327,75 @@ const submitPost = async () => {
     isSubmitting.value = false
   }
 }
+
+const activeMenuId = ref(null)
+
+const toggleMenu = (postId) => {
+  activeMenuId.value = activeMenuId.value === postId ? null : postId
+}
+
+// Close menu when clicking outside
+const closeMenu = () => {
+  activeMenuId.value = null
+}
+
+const deletePost = async (postId) => {
+  if (!confirm('确定要删除这条动态吗？')) return
+  
+  try {
+    const res = await fetch(`http://localhost:8080/api/community/posts/${postId}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: currentUserId })
+    })
+    
+    const data = await res.json()
+    if (data.success) {
+      posts.value = posts.value.filter(p => p.id !== postId)
+      activeMenuId.value = null
+    } else {
+      alert(data.message || '删除失败')
+    }
+  } catch (e) {
+    console.error(e)
+    alert('删除失败')
+  }
+}
+
+const changeVisibility = async (post) => {
+  const newVisibility = post.visibility === 1 ? 0 : 1
+  try {
+    const res = await fetch(`http://localhost:8080/api/community/posts/${post.id}/visibility`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        userId: currentUserId,
+        visibility: newVisibility 
+      })
+    })
+    
+    const data = await res.json()
+    if (data.success) {
+      post.visibility = newVisibility
+      activeMenuId.value = null
+    } else {
+      alert(data.message || '修改失败')
+    }
+  } catch (e) {
+    console.error(e)
+    alert('修改失败')
+  }
+}
+
+// Add click outside listener
+onMounted(() => {
+  document.addEventListener('click', closeMenu)
+})
+
+import { onUnmounted } from 'vue'
+onUnmounted(() => {
+  document.removeEventListener('click', closeMenu)
+})
 
 const formatDate = (str) => {
   if (!str) return ''
@@ -757,4 +845,61 @@ onMounted(() => {
 .like-btn:hover { color: #ef4444; background: #fef2f2; }
 .comment-btn:hover { color: #3b82f6; background: #eff6ff; }
 .share-btn:hover { color: #10b981; background: #ecfdf5; }
+.share-btn:hover { color: #10b981; background: #ecfdf5; }
+
+.more-menu-container {
+  position: relative;
+  margin-left: 8px;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  padding: 6px;
+  min-width: 140px;
+  z-index: 20;
+  border: 1px solid #f3f4f6;
+  transform-origin: top right;
+  animation: scaleIn 0.1s ease-out;
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.dropdown-menu button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  color: #4b5563;
+  border-radius: 8px;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.dropdown-menu button:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.dropdown-menu .delete-btn {
+  color: #ef4444;
+}
+
+.dropdown-menu .delete-btn:hover {
+  background: #fef2f2;
+  color: #dc2626;
+}
 </style>

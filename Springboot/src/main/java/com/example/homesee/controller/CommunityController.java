@@ -234,46 +234,47 @@ public class CommunityController {
 
             // Upload to file server
             String fileServerUrl = "http://39.108.142.250:8088/api/files/upload";
-            
+
             // Create multipart request
             org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
             headers.setContentType(org.springframework.http.MediaType.MULTIPART_FORM_DATA);
-            
+
             org.springframework.util.LinkedMultiValueMap<String, Object> body = new org.springframework.util.LinkedMultiValueMap<>();
             body.add("file", file.getResource());
-            
-            org.springframework.http.HttpEntity<org.springframework.util.LinkedMultiValueMap<String, Object>> requestEntity = 
-                new org.springframework.http.HttpEntity<>(body, headers);
-            
+
+            org.springframework.http.HttpEntity<org.springframework.util.LinkedMultiValueMap<String, Object>> requestEntity = new org.springframework.http.HttpEntity<>(
+                    body, headers);
+
             org.springframework.web.client.RestTemplate restTemplate = new org.springframework.web.client.RestTemplate();
-            ResponseEntity<Map> fileServerResponse = restTemplate.postForEntity(fileServerUrl, requestEntity, Map.class);
-            
+            ResponseEntity<Map> fileServerResponse = restTemplate.postForEntity(fileServerUrl, requestEntity,
+                    Map.class);
+
             if (fileServerResponse.getStatusCode().is2xxSuccessful() && fileServerResponse.getBody() != null) {
                 Map<String, Object> fileServerBody = fileServerResponse.getBody();
                 System.out.println("文件服务器响应: " + fileServerBody);
-                
+
                 if (Boolean.TRUE.equals(fileServerBody.get("success"))) {
                     String fileUrl = (String) fileServerBody.get("fileUrl");
-                    
+
                     // 检查fileUrl是否为null
                     if (fileUrl == null) {
                         response.put("success", false);
                         response.put("message", "文件服务器返回的fileUrl为空");
                         return ResponseEntity.status(500).body(response);
                     }
-                    
+
                     // Extract filename from URL (last part after last slash)
                     String fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
-                    
+
                     // 输出日志信息
                     System.out.println("=== 文件上传日志 ===");
                     System.out.println("用户上传的文件名称: " + originalFilename);
                     System.out.println("数据库存储的文件名称: " + fileName);
                     System.out.println("从服务器获取的完整路径: " + fileUrl);
                     System.out.println("=== 日志结束 ===");
-                    
+
                     response.put("success", true);
-                    response.put("filename", fileName);  // 只返回文件名
+                    response.put("filename", fileName); // 只返回文件名
                     response.put("message", "文件上传成功");
                     return ResponseEntity.ok(response);
                 } else {

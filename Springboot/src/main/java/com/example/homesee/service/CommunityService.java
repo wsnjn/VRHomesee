@@ -323,4 +323,37 @@ public class CommunityService {
             return dto;
         }).collect(Collectors.toList());
     }
+
+    // --- Missing methods for CommunityController ---
+    
+    @SuppressWarnings("null")
+    public void deletePost(Long postId, Long userId) {
+        Optional<SocialPost> postOpt = socialPostRepository.findById(postId);
+        if (postOpt.isPresent()) {
+            SocialPost post = postOpt.get();
+            // Check if user is the owner of the post
+            if (!post.getUserId().equals(userId)) {
+                throw new RuntimeException("Only post owner can delete the post");
+            }
+            socialPostRepository.delete(post);
+        } else {
+            throw new RuntimeException("Post not found");
+        }
+    }
+
+    @SuppressWarnings("null")
+    public SocialPost updatePostVisibility(Long postId, Integer visibility, Long userId) {
+        Optional<SocialPost> postOpt = socialPostRepository.findById(postId);
+        if (postOpt.isPresent()) {
+            SocialPost post = postOpt.get();
+            // Check if user is the owner of the post
+            if (!post.getUserId().equals(userId)) {
+                throw new RuntimeException("Only post owner can update visibility");
+            }
+            post.setVisibility(visibility);
+            return socialPostRepository.save(post);
+        } else {
+            throw new RuntimeException("Post not found");
+        }
+    }
 }
