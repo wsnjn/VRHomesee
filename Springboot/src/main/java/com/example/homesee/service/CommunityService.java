@@ -36,6 +36,12 @@ public class CommunityService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private SocialLikeRepository socialLikeRepository;
+
+    @Autowired
+    private SocialCommentRepository socialCommentRepository;
+
     // --- Chat Group Logic ---
     public List<ChatGroup> getAllGroups() {
         return chatGroupRepository.findAll();
@@ -303,7 +309,7 @@ public class CommunityService {
         return socialPostRepository.findAll(Sort.by(Sort.Direction.DESC, "createdTime"));
     }
 
-    public List<SocialPostDTO> getAllPostsWithUserInfo() {
+    public List<SocialPostDTO> getAllPostsWithUserInfo(Long currentUserId) {
         List<SocialPost> posts = socialPostRepository.findAll(Sort.by(Sort.Direction.DESC, "createdTime"));
         return posts.stream().map(post -> {
             SocialPostDTO dto = new SocialPostDTO();
@@ -320,12 +326,50 @@ public class CommunityService {
                 dto.setAvatar(user.getAvatar());
             });
 
+            // 获取互动数据
+            dto.setLikeCount(socialLikeRepository.countByPostId(post.getId()));
+            dto.setCommentCount(socialCommentRepository.countByPostId(post.getId()));
+
+            if (currentUserId != null) {
+                dto.setLiked(socialLikeRepository.existsByPostIdAndUserId(post.getId(), currentUserId));
+            } else {
+                dto.setLiked(false);
+            }
+
             return dto;
         }).collect(Collectors.toList());
     }
 
+    // --- Like Logic ---
+    public boolean toggleLike(Long postId, Long userId) {
+        Optional<SocialLike> existingLike = socialLikeRepository.findByPostIdAndUserId(postId, userId);
+        if (existingLike.isPresent()) {
+            socialLikeRepository.delete(existingLike.get());
+            return false; // Unliked
+        } else {
+            SocialLike like = new SocialLike();
+            like.setPostId(postId);
+            like.setUserId(userId);
+            socialLikeRepository.save(like);
+            return true; // Liked
+        }
+    }
+
+    // --- Comment Logic ---
+    public SocialComment addComment(Long postId, Long userId, String content) {
+        SocialComment comment = new SocialComment();
+        comment.setPostId(postId);
+        comment.setUserId(userId);
+        comment.setContent(content);
+        return socialCommentRepository.save(comment);
+    }
+
+    public List<SocialComment> getComments(Long postId) {
+        return socialCommentRepository.findByPostIdOrderByCreatedTimeAsc(postId);
+    }
+
     // --- Missing methods for CommunityController ---
-    
+
     @SuppressWarnings("null")
     public void deletePost(Long postId, Long userId) {
         Optional<SocialPost> postOpt = socialPostRepository.findById(postId);

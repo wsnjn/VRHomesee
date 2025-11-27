@@ -24,10 +24,12 @@ E:\wslop\End\Springboot\src\main\java\com\example\homesee\service\MaintenanceSer
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\entity\ContractChange.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\entity\RoomInfo.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\controller\MaintenanceController.java
+E:\wslop\End\Springboot\src\main\java\com\example\homesee\entity\SocialLike.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\repository\ChatHistoryRepository.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\config\CorsConfig.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\entity\RoomVrScene.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\repository\AppointmentRepository.java
+E:\wslop\End\Springboot\src\main\java\com\example\homesee\repository\SocialCommentRepository.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\controller\TenantManagementController.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\controller\ViewingAppointmentController.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\controller\RoomVrSceneController.java
@@ -37,6 +39,7 @@ E:\wslop\End\Springboot\src\main\java\com\example\homesee\controller\Appointment
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\controller\AdminUserController.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\dto\SocialPostDTO.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\service\SmartMatchingService.java
+E:\wslop\End\Springboot\src\main\java\com\example\homesee\repository\SocialLikeRepository.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\repository\RoomVrSceneRepository.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\controller\TenantMatchingController.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\controller\LandlordTenantMatchingController.java
@@ -52,6 +55,7 @@ E:\wslop\End\Springboot\src\main\java\com\example\homesee\repository\GroupMember
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\service\RoomVrSceneService.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\controller\SmartMatchingController.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\entity\RentPayment.java
+E:\wslop\End\Springboot\src\main\java\com\example\homesee\entity\SocialComment.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\service\TenantManagementService.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\entity\SocialPost.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\controller\CommunityController.java

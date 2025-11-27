@@ -14,6 +14,11 @@ public class SocialPostDTO {
     private String username;
     private String avatar;
 
+    // Interaction stats
+    private long likeCount;
+    private long commentCount;
+    private boolean isLiked;
+
     public Long getId() {
         return id;
     }
@@ -76,5 +81,29 @@ public class SocialPostDTO {
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public long getLikeCount() {
+        return likeCount;
+    }
+
+    public void setLikeCount(long likeCount) {
+        this.likeCount = likeCount;
+    }
+
+    public long getCommentCount() {
+        return commentCount;
+    }
+
+    public void setCommentCount(long commentCount) {
+        this.commentCount = commentCount;
+    }
+
+    public boolean isLiked() {
+        return isLiked;
+    }
+
+    public void setLiked(boolean liked) {
+        isLiked = liked;
     }
 }

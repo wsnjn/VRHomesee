@@ -3,6 +3,7 @@ package com.example.homesee.controller;
 import com.example.homesee.entity.ChatGroup;
 import com.example.homesee.entity.ChatMessage;
 import com.example.homesee.entity.SocialPost;
+import com.example.homesee.entity.SocialComment;
 import com.example.homesee.service.CommunityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -120,11 +121,47 @@ public class CommunityController {
     }
 
     @GetMapping("/posts/with-user-info")
-    public ResponseEntity<Map<String, Object>> getAllPostsWithUserInfo() {
-        var list = communityService.getAllPostsWithUserInfo();
+    public ResponseEntity<Map<String, Object>> getAllPostsWithUserInfo(@RequestParam(required = false) Long userId) {
+        var list = communityService.getAllPostsWithUserInfo(userId);
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
         response.put("data", list);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/posts/{postId}/like")
+    public ResponseEntity<Map<String, Object>> toggleLike(@PathVariable Long postId,
+            @RequestBody Map<String, Object> request) {
+        Long userId = Long.valueOf(request.get("userId").toString());
+        boolean isLiked = communityService.toggleLike(postId, userId);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("isLiked", isLiked);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/posts/{postId}/comment")
+    public ResponseEntity<Map<String, Object>> addComment(@PathVariable Long postId,
+            @RequestBody Map<String, Object> request) {
+        Long userId = Long.valueOf(request.get("userId").toString());
+        String content = (String) request.get("content");
+
+        SocialComment comment = communityService.addComment(postId, userId, content);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("data", comment);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/posts/{postId}/comments")
+    public ResponseEntity<Map<String, Object>> getComments(@PathVariable Long postId) {
+        List<SocialComment> comments = communityService.getComments(postId);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("data", comments);
         return ResponseEntity.ok(response);
     }
 
