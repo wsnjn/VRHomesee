@@ -233,6 +233,18 @@ public class UserService {
             User user = userOptional.get();
 
             // 更新允许修改的字段
+            if (updateData.containsKey("username")) {
+                String newUsername = getStringValue(updateData.get("username"));
+                if (newUsername != null && !newUsername.isEmpty() && !newUsername.equals(user.getUsername())) {
+                    // Check if username already exists
+                    if (userRepository.existsByUsername(newUsername)) {
+                        result.put("success", false);
+                        result.put("message", "用户名已存在");
+                        return result;
+                    }
+                    user.setUsername(newUsername);
+                }
+            }
             if (updateData.containsKey("realName")) {
                 user.setRealName(getStringValue(updateData.get("realName")));
             }

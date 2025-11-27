@@ -186,7 +186,7 @@ const formatDate = (dateString) => {
         <div class="nav-links-container">
           <!-- 用户信息区域 -->
           <div class="user-info-container" v-if="isLoggedIn">
-            <button class="button-message" @click.stop="toggleUserMenu">
+            <button id="btn-message" class="button-message" @click.stop="toggleUserMenu">
               <div class="content-avatar">
                 <div class="status-user"></div>
                 <div class="avatar">
@@ -195,7 +195,8 @@ const formatDate = (dateString) => {
               </div>
               <div class="notice-content">
                 <div class="username">{{ displayName }}</div>
-                <div class="lable-message">{{ user.username }}</div>
+                <div class="lable-message">{{ user.phone }}</div>
+                <div class="user-id">@{{ user.username }}</div>
               </div>
             </button>
             
@@ -726,27 +727,56 @@ const formatDate = (dateString) => {
   position: relative;
 }
 
+#btn-message {
+  --text-color: #000000;
+  --bg-color-sup: #e0e0e0;
+  --bg-color: #ffffff;
+  --bg-hover-color: #f5f5f5;
+  --online-status: #00da00;
+  --font-size: 16px;
+  --btn-transition: all 0.2s ease-out;
+}
+
 .button-message {
   display: flex;
+  justify-content: center;
   align-items: center;
-  background: white;
-  border: 1px solid rgba(0,0,0,0.1);
-  border-radius: 50px;
-  padding: 4px;
+  font: 400 var(--font-size) Helvetica Neue, sans-serif;
+  box-shadow: 0 0 2.17382px rgba(0,0,0,.049),0 1.75px 6.01034px rgba(0,0,0,.07),0 3.63px 14.4706px rgba(0,0,0,.091),0 22px 48px rgba(0,0,0,.14);
+  background-color: var(--bg-color);
+  border-radius: 68px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  height: 48px;
+  padding: 6px 10px 6px 6px;
+  width: fit-content;
+  height: 40px;
+  border: 0;
+  overflow: hidden;
+  position: relative;
+  transition: var(--btn-transition);
 }
 
 .button-message:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  transform: translateY(-1px);
+  height: 56px;
+  padding: 8px 20px 8px 8px;
+  background-color: var(--bg-hover-color);
+  transition: var(--btn-transition);
+}
+
+.button-message:active {
+  transform: scale(0.99);
 }
 
 .content-avatar {
+  width: 30px;
+  height: 30px;
+  margin: 0;
+  transition: var(--btn-transition);
+  position: relative;
+}
+
+.button-message:hover .content-avatar {
   width: 40px;
   height: 40px;
-  position: relative;
 }
 
 .avatar {
@@ -754,6 +784,7 @@ const formatDate = (dateString) => {
   height: 100%;
   border-radius: 50%;
   overflow: hidden;
+  background-color: var(--bg-color-sup);
 }
 
 .user-img {
@@ -764,30 +795,119 @@ const formatDate = (dateString) => {
 
 .status-user {
   position: absolute;
-  bottom: 0;
-  right: 0;
+  width: 6px;
+  height: 6px;
+  right: 1px;
+  bottom: 1px;
+  border-radius: 50%;
+  outline: solid 2px var(--bg-color);
+  background-color: var(--online-status);
+  transition: var(--btn-transition);
+  animation: active-status 2s ease-in-out infinite;
+}
+
+.button-message:hover .status-user {
   width: 10px;
   height: 10px;
-  background: #2ecc71;
-  border: 2px solid white;
-  border-radius: 50%;
+  right: 1px;
+  bottom: 1px;
+  outline: solid 3px var(--bg-hover-color);
 }
 
 .notice-content {
-  margin-left: 10px;
-  margin-right: 15px;
-  text-align: left;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding-left: 8px;
+  text-align: initial;
+  color: var(--text-color);
 }
 
 .username {
+  letter-spacing: -6px;
+  height: 0;
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: var(--btn-transition);
   font-weight: 600;
   font-size: 0.9rem;
-  color: #2c3e50;
+  color: var(--text-color);
+}
+
+.user-id {
+  font-size: 12px;
+  letter-spacing: -6px;
+  height: 0;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: var(--btn-transition);
+  color: var(--text-color);
 }
 
 .lable-message {
-  font-size: 0.75rem;
-  color: #999;
+  display: flex;
+  align-items: center;
+  opacity: 1;
+  transform: scaleY(1);
+  transition: var(--btn-transition);
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-color);
+}
+
+.button-message:hover .username {
+  height: auto;
+  letter-spacing: normal;
+  opacity: 1;
+  transform: translateY(0);
+  transition: var(--btn-transition);
+}
+
+.button-message:hover .user-id {
+  height: auto;
+  letter-spacing: normal;
+  opacity: 1;
+  transform: translateY(0);
+  transition: var(--btn-transition);
+}
+
+.button-message:hover .lable-message {
+  height: 0;
+  transform: scaleY(0);
+  transition: var(--btn-transition);
+}
+
+.number-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  margin-left: 8px;
+  font-size: 12px;
+  width: 16px;
+  height: 16px;
+  background-color: var(--bg-color-sup);
+  border-radius: 20px;
+}
+
+/*==============================================*/
+@keyframes active-status {
+  0% {
+    background-color: var(--online-status);
+  }
+
+  33.33% {
+    background-color: #93e200;
+  }
+
+  66.33% {
+    background-color: #93e200;
+  }
+
+  100% {
+    background-color: var(--online-status);
+  }
 }
 
 .user-menu {

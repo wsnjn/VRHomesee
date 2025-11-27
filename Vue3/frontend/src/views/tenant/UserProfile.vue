@@ -32,6 +32,7 @@ const genderMap = {
 
 // 编辑表单数据
 const editForm = reactive({
+  username: '',
   realName: '',
   gender: 0,
   birthday: '',
@@ -90,6 +91,9 @@ const fetchUserInfo = async (userId) => {
 const initEditForm = () => {
   if (!user.value) return
   
+  if (!user.value) return
+  
+  editForm.username = user.value.username || ''
   editForm.realName = user.value.realName || ''
   editForm.gender = user.value.gender || 0
   editForm.birthday = user.value.birthday ? formatDateForInput(user.value.birthday) : ''
@@ -490,7 +494,12 @@ const uploadAvatar = async () => {
           <div class="info-grid">
             <div class="info-item">
               <label>用户名：</label>
-              <span>{{ user.username }}</span>
+              <div v-if="!isEditing || editingField !== 'username'" 
+                   class="editable-field" 
+                   @click="startEditField('username')">
+                {{ user.username }}
+              </div>
+              <input v-else v-model="editForm.username" class="edit-input" type="text" placeholder="请输入用户名">
             </div>
             <div class="info-item">
               <label>真实姓名：</label>
