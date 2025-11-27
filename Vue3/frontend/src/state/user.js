@@ -27,8 +27,8 @@ export const userState = reactive({
 
     get avatarUrl() {
         if (!this.user || !this.user.avatar) {
-            return '/src/assets/image/default-avatar.png'
+            return '/models/default-avatar.png'
         }
-        return `/src/assets/image/${this.user.avatar}`
+        return `/models/${this.user.avatar}`
     }
 })

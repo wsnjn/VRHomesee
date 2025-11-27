@@ -486,10 +486,10 @@ const getSenderName = (senderId) => {
 const getAvatarUrl = (userId) => {
   if (!userInfoCache.value[userId]) {
     getUserInfo(userId)
-    return '/src/assets/image/default-avatar.png'
+    return '/models/image/default-avatar.png'
   }
   const avatar = userInfoCache.value[userId].avatar
-  if (!avatar) return '/src/assets/image/default-avatar.png'
+  if (!avatar) return '/models/image/default-avatar.png'
   
   // 如果是完整的HTTP URL，直接使用
   if (avatar.startsWith('http')) {
@@ -605,7 +605,7 @@ const inviteSelectedFriends = async () => {
 }
 
 const getAvatarSrc = (avatarName) => {
-  if (!avatarName) return '/src/assets/image/default-avatar.png'
+  if (!avatarName) return '/models/image/default-avatar.png'
   
   // 如果是完整的HTTP URL，直接使用
   if (avatarName.startsWith('http')) {

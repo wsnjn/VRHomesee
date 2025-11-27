@@ -475,7 +475,7 @@ const getDecorationText = (decoration) => {
 // 获取房屋图片
 const getHouseImage = (house) => {
   // 这里可以使用真实的图片URL，暂时使用占位图
-  return '/src/assets/客厅.jpg'
+  return '/models/客厅.jpg'
 }
 
 // 获取状态文字

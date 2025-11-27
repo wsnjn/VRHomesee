@@ -7,11 +7,11 @@ export const houseTourData = [
       rotation: [180, 0, 0],
       title: "客厅",
       sphereSource: {
-        thumb: "/src/assets/客厅.jpg",
+        thumb: "/models/客厅.jpg",
         slices: []
       },
       cubeSource: {
-        thumb: "/src/assets/客厅.jpg",
+        thumb: "/models/客厅.jpg",
         slices: []
       },
       is_main: 1
@@ -38,11 +38,11 @@ export const houseTourData = [
       rotation: [180, 0, 0],
       title: "卧室",
       sphereSource: {
-        thumb: "/src/assets/卧室.jpg",
+        thumb: "/models/卧室.jpg",
         slices: []
       },
       cubeSource: {
-        thumb: "/src/assets/卧室.jpg",
+        thumb: "/models/卧室.jpg",
         slices: []
       },
       is_main: 0
@@ -63,11 +63,11 @@ export const houseTourData = [
       rotation: [180, 0, 0],
       title: "厨房",
       sphereSource: {
-        thumb: "/src/assets/厨房.jpg",
+        thumb: "/models/厨房.jpg",
         slices: []
       },
       cubeSource: {
-        thumb: "/src/assets/厨房.jpg",
+        thumb: "/models/厨房.jpg",
         slices: []
       },
       is_main: 0
@@ -92,11 +92,11 @@ export const simpleHouseTourData = [
       rotation: [180, 0, 0],
       title: "客厅",
       sphereSource: {
-        thumb: "/src/assets/客厅.jpg",
+        thumb: "/models/客厅.jpg",
         slices: []
       },
       cubeSource: {
-        thumb: "/src/assets/客厅.jpg",
+        thumb: "/models/客厅.jpg",
         slices: []
       },
       is_main: 1
@@ -117,11 +117,11 @@ export const simpleHouseTourData = [
       rotation: [180, 0, 0],
       title: "卧室",
       sphereSource: {
-        thumb: "/src/assets/卧室.jpg",
+        thumb: "/models/卧室.jpg",
         slices: []
       },
       cubeSource: {
-        thumb: "/src/assets/卧室.jpg",
+        thumb: "/models/卧室.jpg",
         slices: []
       },
       is_main: 0

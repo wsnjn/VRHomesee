@@ -60,11 +60,11 @@ const currentUser = ref(null)
 const BACKEND_URL = 'http://39.108.142.250:8080/api/smart-matching'
 
 // User Avatar
-const userAvatar = ref('/src/assets/image/default-avatar.png')
+const userAvatar = ref('/models/image/default-avatar.png')
 
 const getAvatarUrl = (avatarName) => {
   if (!avatarName) {
-    return '/src/assets/image/default-avatar.png'
+    return '/models/image/default-avatar.png'
   }
   
   // 如果是完整的HTTP URL，直接使用

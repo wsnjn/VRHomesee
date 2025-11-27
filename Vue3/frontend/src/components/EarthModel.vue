@@ -87,7 +87,7 @@ export default {
       
       // 创建地球纹理材质
       const textureLoader = new THREE.TextureLoader();
-      const earthTexture = textureLoader.load('/src/assets/image/1.png'); // 使用现有图片作为备用纹理
+      const earthTexture = textureLoader.load('/models/image/1.png'); // 使用现有图片作为备用纹理
       
       const material = new THREE.MeshPhongMaterial({
         map: earthTexture,

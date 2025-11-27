@@ -559,7 +559,7 @@ const initCharts = async () => {
   
   try {
     // 加载中国地图GeoJSON
-    const chinaJson = await axios.get('https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json')
+   const chinaJson = await axios.get('/geojson/china.json')
     echarts.registerMap('china', chinaJson.data)
     
     // 准备地图数据

@@ -338,7 +338,7 @@ const buildFileUrl = (filename) => {
 
 const getAvatarUrl = (avatarName) => {
   if (!avatarName) {
-    return '/src/assets/image/default-avatar.png'
+    return '/models/image/default-avatar.png'
   }
   
   // 如果是完整的HTTP URL，直接使用

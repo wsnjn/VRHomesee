@@ -112,7 +112,7 @@ const goBack = () => {
     <!-- 顶部导航栏 -->
     <nav class="navbar">
       <div class="logo-container">
-        <img src="@/assets/logo/logo (1).png" alt="HOMSEE Logo" class="nav-logo">
+        <img src="/models/logo (1).png" alt="HOMSEE Logo" class="nav-logo">
       </div>
       <div class="nav-content">
         <button @click="goBack" class="back-btn">返回首页</button>

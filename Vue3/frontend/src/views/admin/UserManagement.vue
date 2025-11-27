@@ -117,7 +117,7 @@
               <td>
                 <div class="user-info">
                   <div class="user-avatar">
-                    <img :src="user.avatar || '/src/assets/default-avatar.png'" :alt="user.username" />
+                    <img :src="user.avatar || '/models/default-avatar.png'" :alt="user.username" />
                   </div>
                   <div class="user-details">
                     <strong>{{ user.username }}</strong>

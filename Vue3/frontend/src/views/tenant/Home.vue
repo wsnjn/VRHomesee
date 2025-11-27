@@ -43,7 +43,7 @@ const displayName = computed(() => {
 // 计算属性：获取头像URL
 const avatarUrl = computed(() => {
   if (!user.value || !user.value.avatar) {
-    return '/src/assets/image/default-avatar.png'
+    return '/models/image/default-avatar.png'
   }
   
   // 如果是完整的HTTP URL，直接使用
@@ -179,7 +179,7 @@ const formatDate = (dateString) => {
     <nav class="navbar" :class="{ 'scrolled': isScrolled }">
       <div class="nav-content">
         <div class="logo-container">
-          <img src="/src/assets/logo/logo (1).png" alt="HOMESEE Logo" class="nav-logo-canvas">
+          <img src="/models/logo (1).png" alt="HOMESEE Logo" class="nav-logo-canvas">
           <span class="logo-text">HOMESEE</span>
         </div>
         
