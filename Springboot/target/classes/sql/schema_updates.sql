@@ -90,6 +90,62 @@ CREATE TABLE IF NOT EXISTS social_like (
     UNIQUE INDEX idx_post_user (post_id, user_id)
 ) COMMENT='动态点赞表';
 
+-- Viewing Appointment Table
+CREATE TABLE IF NOT EXISTS viewing_appointment (
+    -- 基础信息
+    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '预约ID，主键',
+    appointment_number VARCHAR(50) NOT NULL UNIQUE COMMENT '预约编号（唯一）',
+    room_id BIGINT NOT NULL COMMENT '房间ID，外键关联room_info',
+    user_id BIGINT NOT NULL COMMENT '用户ID，外键关联user',
+
+    -- 预约信息
+    preferred_date DATE NOT NULL COMMENT '期望看房日期',
+    preferred_time_slot VARCHAR(20) NOT NULL COMMENT '期望时间段（如：09:00-10:00）',
+    actual_date DATE COMMENT '实际看房日期',
+    actual_time_slot VARCHAR(20) COMMENT '实际看房时间段',
+    appointment_type TINYINT(1) NOT NULL DEFAULT 1 COMMENT '预约类型：1-现场看房，2-视频看房',
+
+    -- 用户信息
+    contact_name VARCHAR(50) NOT NULL COMMENT '联系人姓名',
+    contact_phone VARCHAR(20) NOT NULL COMMENT '联系电话',
+    wechat_id VARCHAR(50) COMMENT '微信号（可选）',
+    tenant_count TINYINT COMMENT '租客人数',
+    expected_move_in_date DATE COMMENT '期望入住日期',
+    rental_intention TEXT COMMENT '租赁意向描述',
+
+    -- 预约状态
+    status TINYINT(1) NOT NULL DEFAULT 0 COMMENT '预约状态：0-待确认，1-已确认，2-已完成，3-已取消，4-已过期，5-用户爽约',
+    cancellation_reason VARCHAR(200) COMMENT '取消原因',
+
+    -- 管理信息
+    assigned_agent_id BIGINT COMMENT '分配的业务员ID',
+    agent_notes TEXT COMMENT '业务员备注',
+    admin_notes TEXT COMMENT '管理员备注',
+    follow_up_required TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否需要跟进：0-否，1-是',
+    follow_up_date DATE COMMENT '下次跟进日期',
+
+    -- 时间戳
+    appointment_created_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '预约创建时间',
+    confirmed_time DATETIME COMMENT '确认时间',
+    completed_time DATETIME COMMENT '完成时间',
+    cancelled_time DATETIME COMMENT '取消时间',
+    updated_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+
+    -- 外键约束
+    FOREIGN KEY (room_id) REFERENCES room_info(id),
+    FOREIGN KEY (user_id) REFERENCES user(id),
+    FOREIGN KEY (assigned_agent_id) REFERENCES user(id),
+
+    -- 索引优化
+    INDEX idx_appointment_number (appointment_number),
+    INDEX idx_room_id (room_id),
+    INDEX idx_user_id (user_id),
+    INDEX idx_status (status),
+    INDEX idx_preferred_date (preferred_date),
+    INDEX idx_assigned_agent_id (assigned_agent_id),
+    INDEX idx_appointment_created_time (appointment_created_time)
+) COMMENT='预约看房表，记录用户预约看房信息';
+
 -- Initialize Default Groups
 INSERT INTO chat_group (group_name, group_type, announcement) 
 SELECT '幸福家园大家庭', 1, '欢迎来到幸福家园！' 

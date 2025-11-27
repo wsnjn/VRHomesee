@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin/matching")
-@CrossOrigin(origins = "http://39.108.142.250:9999", allowCredentials = "true")
+@CrossOrigin(origins = "http://39.108.142.250:9999,http://localhost:5173", allowCredentials = "true")
 public class TenantMatchingController {
 
     @Autowired

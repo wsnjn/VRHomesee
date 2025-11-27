@@ -165,7 +165,7 @@ const filteredPosts = computed(() => {
 const fetchFriends = async () => {
   if (!currentUserId) return
   try {
-    const res = await fetch(`http://39.108.142.250:8080/api/community/friends/${currentUserId}`)
+    const res = await fetch(`http://localhost:8080/api/community/friends/${currentUserId}`)
     const data = await res.json()
     if (data.success) {
       friends.value = data.data
@@ -178,7 +178,7 @@ const fetchFriends = async () => {
 const checkLease = async () => {
   if (!currentUserId) return
   try {
-    const res = await fetch(`http://39.108.142.250:8080/api/admin/tenant/tenant/${currentUserId}`)
+    const res = await fetch(`http://localhost:8080/api/admin/tenant/tenant/${currentUserId}`)
     const data = await res.json()
     if (data.success && data.contracts && data.contracts.length > 0) {
       const active = data.contracts.find(c => c.contractStatus === 1)
@@ -194,7 +194,7 @@ const checkLease = async () => {
 
 const fetchPosts = async () => {
   try {
-    const res = await fetch('http://39.108.142.250:8080/api/community/posts/with-user-info')
+    const res = await fetch('http://localhost:8080/api/community/posts/with-user-info')
     const data = await res.json()
     if (data.success) {
       posts.value = data.data
@@ -267,7 +267,7 @@ const submitPost = async () => {
   }
 
   try {
-    const res = await fetch('http://39.108.142.250:8080/api/community/posts/create', {
+    const res = await fetch('http://localhost:8080/api/community/posts/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)

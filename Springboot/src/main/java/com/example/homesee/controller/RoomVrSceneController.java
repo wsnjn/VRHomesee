@@ -16,7 +16,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/vr-scenes")
-@CrossOrigin(origins = "http://39.108.142.250:9999", allowCredentials = "true")
+@CrossOrigin(origins = "http://39.108.142.250:9999,http://localhost:5173", allowCredentials = "true")
 public class RoomVrSceneController {
 
     @Autowired

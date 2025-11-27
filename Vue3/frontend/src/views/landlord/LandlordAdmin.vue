@@ -69,6 +69,20 @@
               租约列表
             </li>
             <li 
+              :class="{ active: activeTab === 'my-tenants' }"
+              @click="switchTab('my-tenants')"
+            >
+              <span class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+              </span>
+              我的租户
+            </li>
+            <li 
               :class="{ active: activeTab === 'tenant-matching' }"
               @click="switchTab('tenant-matching')"
             >
@@ -142,6 +156,11 @@
           <landlord-tenant-matching :userPhone="userPhone" />
         </div>
 
+        <!-- 我的租户 -->
+        <div v-if="activeTab === 'my-tenants'">
+          <my-tenants :userPhone="userPhone" />
+        </div>
+
         <!-- 维修报修 -->
         <div v-if="activeTab === 'maintenance'">
           <placeholder-page 
@@ -165,6 +184,7 @@ import HouseStatus from './components/HouseStatus.vue'
 import AddHouse from './components/AddHouse.vue'
 import TenantManagement from './components/TenantManagement.vue'
 import LandlordTenantMatching from './components/LandlordTenantMatching.vue'
+import MyTenants from './components/MyTenants.vue'
 
 // 占位页面组件
 const PlaceholderPage = {
@@ -180,7 +200,7 @@ const PlaceholderPage = {
 const router = useRouter()
 
 // API基础URL
-const API_BASE_URL = 'http://39.108.142.250:8080/api'
+const API_BASE_URL = 'http://localhost:8080/api'
 
 // 响应式数据
 const activeTab = ref('my-houses')

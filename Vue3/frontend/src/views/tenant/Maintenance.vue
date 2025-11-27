@@ -18,14 +18,19 @@
     </div>
     
     <div class="lease-card" v-if="activeLease">
+      <div class="lease-header">
+        <h4 class="lease-title">当前租约信息</h4>
+        <span class="lease-status" :class="getLeaseStatusClass(activeLease.contractStatus)">{{ getLeaseStatusText(activeLease.contractStatus) }}</span>
+      </div>
+      
       <div class="lease-info-grid">
         <div class="info-item">
           <span class="label">合同编号</span>
           <span class="value">{{ activeLease.contractNumber }}</span>
         </div>
         <div class="info-item">
-          <span class="label">房间ID</span>
-          <span class="value">{{ activeLease.roomId }}</span>
+          <span class="label">房间信息</span>
+          <span class="value">{{ activeLease.roomInfo || '未获取到房间信息' }}</span>
         </div>
         <div class="info-item">
           <span class="label">租期</span>
@@ -34,6 +39,65 @@
         <div class="info-item">
           <span class="label">月租金</span>
           <span class="value">¥{{ activeLease.monthlyRent }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">押金</span>
+          <span class="value">¥{{ activeLease.deposit || '未设置' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">付款方式</span>
+          <span class="value">{{ getPaymentMethodText(activeLease.paymentMethod) }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">合同状态</span>
+          <span class="value">{{ getLeaseStatusText(activeLease.contractStatus) }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">签约日期</span>
+          <span class="value">{{ formatDate(activeLease.contractSignDate) }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">合同备注</span>
+          <span class="value">{{ activeLease.contractNotes || '无备注' }}</span>
+        </div>
+      </div>
+      
+      <!-- 房屋详细信息 -->
+      <div class="house-details-section" v-if="houseDetails">
+        <h5 class="section-subtitle">房屋详细信息</h5>
+        <div class="house-details-grid">
+          <div class="detail-item">
+            <span class="label">小区名称</span>
+            <span class="value">{{ houseDetails.communityName || '未知' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">详细地址</span>
+            <span class="value">{{ getFullAddress(houseDetails) }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">房屋面积</span>
+            <span class="value">{{ houseDetails.roomArea || '未知' }}㎡</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">楼层信息</span>
+            <span class="value">{{ houseDetails.floorInfo || '未知' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">装修程度</span>
+            <span class="value">{{ getDecorationText(houseDetails.decoration) }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">朝向</span>
+            <span class="value">{{ getOrientationText(houseDetails.orientation) }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">租赁类型</span>
+            <span class="value">{{ getRentalTypeText(houseDetails.rentalType) }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">房东电话</span>
+            <span class="value">{{ houseDetails.landlordPhone ? formatPhoneNumber(houseDetails.landlordPhone) : '未提供' }}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -110,6 +174,7 @@ import { userState } from '../../state/user'
 const requests = ref([])
 const showCreateModal = ref(false)
 const activeLease = ref(null)
+const houseDetails = ref(null)
 const currentUserId = userState.user ? userState.user.id : 0
 
 const newRequest = ref({
@@ -122,13 +187,17 @@ const fetchActiveLease = async () => {
   if (!currentUserId) return
   try {
     // Use the new endpoint to get all contracts for the tenant
-    const res = await fetch(`http://39.108.142.250:8080/api/admin/tenant/tenant/${currentUserId}`)
+    const res = await fetch(`http://localhost:8080/api/admin/tenant/tenant/${currentUserId}`)
     const data = await res.json()
     if (data.success && data.contracts && data.contracts.length > 0) {
       // Find the active contract (status === 1)
       const active = data.contracts.find(c => c.contractStatus === 1)
       if (active) {
         activeLease.value = active
+        // Fetch house details if roomId is available
+        if (active.roomId) {
+          await fetchHouseDetails(active.roomId)
+        }
         await fetchRequests()
       }
     }
@@ -137,11 +206,23 @@ const fetchActiveLease = async () => {
   }
 }
 
+const fetchHouseDetails = async (roomId) => {
+  try {
+    const res = await fetch(`http://localhost:8080/api/room-info/${roomId}`)
+    const data = await res.json()
+    if (data.success && data.room) {
+      houseDetails.value = data.room
+    }
+  } catch (e) {
+    console.error('获取房屋详情失败:', e)
+  }
+}
+
 const fetchRequests = async () => {
   if (!activeLease.value) return
   
   try {
-      const res = await fetch(`http://39.108.142.250:8080/api/maintenance/list/${activeLease.value.id}`)
+      const res = await fetch(`http://localhost:8080/api/maintenance/list/${activeLease.value.id}`)
       const data = await res.json()
       if (data.success) {
           requests.value = data.data
@@ -161,7 +242,7 @@ const submitRequest = async () => {
   }
 
   try {
-    const res = await fetch('http://39.108.142.250:8080/api/maintenance/create', {
+    const res = await fetch('http://localhost:8080/api/maintenance/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -194,6 +275,59 @@ const getStatusClass = (status) => {
 const formatDate = (str) => {
   if (!str) return ''
   return new Date(str).toLocaleDateString()
+}
+
+// 格式化电话号码
+const formatPhoneNumber = (phone) => {
+  if (!phone) return ''
+  const cleaned = phone.replace(/\D/g, '')
+  if (cleaned.length === 11) {
+    return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 7)}-${cleaned.slice(7)}`
+  }
+  return phone
+}
+
+// 获取合同状态文字
+const getLeaseStatusText = (status) => {
+  const map = { 0: '待生效', 1: '生效中', 2: '已到期', 3: '已终止' }
+  return map[status] || '未知状态'
+}
+
+// 获取合同状态样式类
+const getLeaseStatusClass = (status) => {
+  const map = { 0: 'status-pending', 1: 'status-active', 2: 'status-expired', 3: 'status-terminated' }
+  return map[status] || ''
+}
+
+// 获取付款方式文字
+const getPaymentMethodText = (method) => {
+  const map = { 0: '月付', 1: '季付', 2: '半年付', 3: '年付' }
+  return map[method] || '未知'
+}
+
+// 获取装修程度文字
+const getDecorationText = (decoration) => {
+  const types = { 1: '毛坯', 2: '简装', 3: '精装', 4: '豪装' }
+  return types[decoration] || '未知'
+}
+
+// 获取朝向文字
+const getOrientationText = (orientation) => {
+  const map = { 1: '东', 2: '南', 3: '西', 4: '北', 5: '东南', 6: '西南', 7: '东北', 8: '西北' }
+  return map[orientation] || '未知'
+}
+
+// 获取租赁类型文字
+const getRentalTypeText = (type) => {
+  const types = { 0: '整租', 1: '合租', 2: '单间' }
+  return types[type] || '未知'
+}
+
+// 获取完整地址
+const getFullAddress = (house) => {
+  if (!house) return ''
+  const parts = [house.province, house.city, house.district, house.street, house.communityName]
+  return parts.filter(part => part).join('')
 }
 
 onMounted(() => {
@@ -264,10 +398,78 @@ onMounted(() => {
   transform: translateY(-2px);
 }
 
+.lease-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #f1f3f5;
+}
+
+.lease-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.lease-status {
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+.status-active { background: #f0fdf4; color: #15803d; }
+.status-pending { background: #fff7ed; color: #c2410c; }
+.status-expired { background: #f3f4f6; color: #6b7280; }
+.status-terminated { background: #fef2f2; color: #dc2626; }
+
 .lease-info-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
+  margin-bottom: 25px;
+}
+
+.house-details-section {
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid #f1f3f5;
+}
+
+.section-subtitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 15px;
+}
+
+.house-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detail-item .label {
+  font-size: 11px;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+.detail-item .value {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1f2937;
 }
 
 .info-item {

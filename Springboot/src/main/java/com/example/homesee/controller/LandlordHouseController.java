@@ -15,7 +15,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/landlord")
-@CrossOrigin(origins = "http://39.108.142.250:9999")
+@CrossOrigin(origins = "http://39.108.142.250:9999,http://localhost:5173")
 public class LandlordHouseController {
 
     @Autowired

@@ -202,12 +202,13 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import axios from 'axios'
+import { userState } from '../../state/user.js'
 
 const router = useRouter()
 const route = useRoute()
 
 // API基础URL
-const API_BASE_URL = 'http://39.108.142.250:8080/api'
+const API_BASE_URL = 'http://localhost:8080/api'
 
 // 响应式数据
 const loading = ref(false)
@@ -334,11 +335,28 @@ const validateForm = () => {
   return true
 }
 
-// 获取当前用户ID（需要根据实际登录系统实现）
+// 获取当前用户ID
 const getCurrentUserId = () => {
-  // 这里需要根据实际的用户登录状态获取用户ID
-  // 暂时返回一个默认值，实际项目中应该从登录状态中获取
-  return 1 // 假设当前用户ID为1
+  // 从用户状态管理中获取当前登录用户的ID
+  if (userState.user && userState.user.id) {
+    return userState.user.id
+  }
+  
+  // 如果用户状态中没有用户信息，尝试从localStorage获取
+  const storedUser = localStorage.getItem('user')
+  if (storedUser) {
+    try {
+      const userData = JSON.parse(storedUser)
+      return userData.id
+    } catch (e) {
+      console.error('解析用户数据失败:', e)
+    }
+  }
+  
+  // 如果无法获取用户ID，提示用户登录
+  alert('请先登录后再进行预约')
+  router.push('/')
+  throw new Error('用户未登录')
 }
 
 // 获取状态文字
@@ -382,10 +400,8 @@ const goToHouseSelection = () => {
 
 // 查看我的预约
 const viewMyAppointments = () => {
-  // 这里可以跳转到用户预约列表页面
-  alert('查看我的预约功能待实现')
   showSuccessModal.value = false
-  goToHouseSelection()
+  router.push('/my-appointments')
 }
 
 // 页面加载时初始化数据
