@@ -158,7 +158,7 @@
 
         <!-- 我的租户 -->
         <div v-if="activeTab === 'my-tenants'">
-          <my-tenants :userPhone="userPhone" />
+          <my-tenants :userPhone="userPhone" :userId="userId" />
         </div>
 
         <!-- 维修报修 -->
@@ -206,6 +206,7 @@ const API_BASE_URL = 'http://localhost:8080/api'
 const activeTab = ref('my-houses')
 const currentUser = ref('')
 const userPhone = ref('')
+const userId = ref(null)
 const statistics = ref({})
 const expiringContracts = ref([])
 
@@ -328,6 +329,7 @@ const setCurrentUser = () => {
   const user = JSON.parse(localStorage.getItem('user') || '{}')
   currentUser.value = user.realName || '房东用户'
   userPhone.value = user.phone || ''
+  userId.value = user.id || null
 }
 
 // 加载我的房屋列表

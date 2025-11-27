@@ -174,6 +174,33 @@ public class TenantManagementController {
     }
 
     /**
+     * 根据房东ID获取租约列表
+     * 
+     * @param landlordId 房东ID
+     * @return 租约列表
+     */
+    @GetMapping("/landlord/{landlordId}")
+    public Map<String, Object> getContractsByLandlordId(@PathVariable Long landlordId) {
+        return tenantManagementService.getContractsByLandlordId(landlordId);
+    }
+
+    /**
+     * 更新水电读数
+     */
+    @PostMapping("/meter-readings")
+    public Map<String, Object> updateMeterReadings(@RequestBody Map<String, Object> request) {
+        Long contractId = Long.valueOf(request.get("contractId").toString());
+        Double waterReading = request.get("waterReading") != null
+                ? Double.valueOf(request.get("waterReading").toString())
+                : null;
+        Double electricReading = request.get("electricReading") != null
+                ? Double.valueOf(request.get("electricReading").toString())
+                : null;
+
+        return tenantManagementService.updateMeterReadings(contractId, waterReading, electricReading);
+    }
+
+    /**
      * 获取租约趋势（最近7天）
      * 
      * @return 趋势数据

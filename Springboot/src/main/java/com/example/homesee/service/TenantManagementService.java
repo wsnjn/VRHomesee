@@ -21,6 +21,12 @@ public class TenantManagementService {
     @Autowired
     private CommunityService communityService;
 
+    @Autowired
+    private com.example.homesee.repository.UserRepository userRepository;
+
+    @Autowired
+    private com.example.homesee.repository.RoomInfoRepository roomInfoRepository;
+
     /**
      * 创建租约
      * 
@@ -399,6 +405,47 @@ public class TenantManagementService {
     }
 
     /**
+     * 更新水电读数
+     * 
+     * @param contractId      租约ID
+     * @param waterReading    水表读数
+     * @param electricReading 电表读数
+     * @return 更新结果
+     */
+    public Map<String, Object> updateMeterReadings(Long contractId, Double waterReading, Double electricReading) {
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            Optional<TenantManagement> contractOptional = tenantManagementRepository.findById(contractId);
+            if (contractOptional.isPresent()) {
+                TenantManagement contract = contractOptional.get();
+
+                if (waterReading != null) {
+                    contract.setLastWaterReading(java.math.BigDecimal.valueOf(waterReading));
+                }
+
+                if (electricReading != null) {
+                    contract.setLastElectricReading(java.math.BigDecimal.valueOf(electricReading));
+                }
+
+                contract.setUpdatedTime(LocalDateTime.now());
+                tenantManagementRepository.save(contract);
+
+                result.put("success", true);
+                result.put("message", "水电读数更新成功");
+            } else {
+                result.put("success", false);
+                result.put("message", "租约不存在");
+            }
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", "更新水电读数失败: " + e.getMessage());
+        }
+
+        return result;
+    }
+
+    /**
      * 将租约实体转换为Map
      */
     private Map<String, Object> convertToMap(TenantManagement contract) {
@@ -427,6 +474,40 @@ public class TenantManagementService {
         contractMap.put("contractSignedTime", contract.getContractSignedTime());
         contractMap.put("createdTime", contract.getCreatedTime());
         contractMap.put("updatedTime", contract.getUpdatedTime());
+
+        // Enrich with tenant info
+        try {
+            userRepository.findById(contract.getTenantId()).ifPresent(user -> {
+                contractMap.put("tenantName", user.getRealName() != null ? user.getRealName() : user.getUsername());
+                contractMap.put("tenantPhone", user.getPhone());
+            });
+        } catch (Exception e) {
+            // Ignore if user not found or error
+        }
+
+        // Enrich with room info
+        try {
+            roomInfoRepository.findById(contract.getRoomId()).ifPresent(room -> {
+                contractMap.put("province", room.getProvince());
+                contractMap.put("city", room.getCity());
+                contractMap.put("district", room.getDistrict());
+                contractMap.put("street", room.getStreet());
+                contractMap.put("communityName", room.getCommunityName());
+                contractMap.put("buildingUnit", room.getBuildingUnit());
+                contractMap.put("doorNumber", room.getDoorNumber());
+                contractMap.put("roomNumber", room.getRoomNumber());
+                contractMap.put("roomArea", room.getRoomArea());
+                contractMap.put("orientation", room.getOrientation());
+                contractMap.put("decoration", room.getDecoration());
+                contractMap.put("floorInfo", room.getFloorInfo());
+                contractMap.put("hasElevator", room.getHasElevator());
+                contractMap.put("rentalType", room.getRentalType());
+                contractMap.put("waterPrice", room.getWaterPrice());
+                contractMap.put("electricPrice", room.getElectricPrice());
+            });
+        } catch (Exception e) {
+            // Ignore if room not found or error
+        }
 
         return contractMap;
     }

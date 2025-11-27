@@ -205,6 +205,242 @@
         </div>
       </div>
     </div>
+    <!-- 合同详情弹窗 -->
+    <div v-if="showContractModal" class="modal-overlay" @click.self="closeContractModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>合同详情</h3>
+          <button class="close-btn" @click="closeContractModal">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        
+        <div class="modal-body" v-if="selectedContract">
+          <!-- 基本信息 -->
+          <div class="detail-section">
+            <h4 class="section-title">基本信息</h4>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <span class="label">合同编号</span>
+                <span class="value">{{ selectedContract.contractNumber }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">合同状态</span>
+                <div class="status-edit">
+                  <select v-model="editingStatuses.contractStatus" class="status-select">
+                    <option :value="0">待签约</option>
+                    <option :value="1">已签约</option>
+                    <option :value="2">履行中</option>
+                    <option :value="3">已到期</option>
+                    <option :value="4">提前解约</option>
+                    <option :value="5">已退租</option>
+                  </select>
+                  <button class="save-icon-btn" @click="saveStatusChange('contract')" title="保存状态" :disabled="savingStatus">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="detail-item">
+                <span class="label">签约时间</span>
+                <span class="value">{{ formatDate(selectedContract.contractSignedTime) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 房屋信息 -->
+          <div class="detail-section">
+            <h4 class="section-title">房屋信息</h4>
+            <div class="detail-grid">
+              <div class="detail-item full-width">
+                <span class="label">房屋地址</span>
+                <span class="value">{{ getHouseAddress(selectedContract) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">租赁类型</span>
+                <span class="value">{{ getRentalTypeText(selectedContract.rentalType) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">装修程度</span>
+                <span class="value">{{ getDecorationText(selectedContract.decoration) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">房屋面积</span>
+                <span class="value">{{ selectedContract.roomArea }}㎡</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">楼层信息</span>
+                <span class="value">{{ selectedContract.floorInfo || '-' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">电梯</span>
+                <span class="value">{{ selectedContract.hasElevator === 1 ? '有' : '无' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">朝向</span>
+                <span class="value">{{ selectedContract.orientation || '-' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 租客信息 -->
+          <div class="detail-section">
+            <h4 class="section-title">租客信息</h4>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <span class="label">租客姓名</span>
+                <span class="value">{{ selectedContract.tenantName || '未知' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">联系电话</span>
+                <span class="value">{{ formatPhoneNumber(selectedContract.tenantPhone) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">紧急联系人</span>
+                <span class="value">{{ selectedContract.emergencyContact || '-' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">紧急电话</span>
+                <span class="value">{{ formatPhoneNumber(selectedContract.emergencyPhone) || '-' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 租期信息 -->
+          <div class="detail-section">
+            <h4 class="section-title">租期信息</h4>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <span class="label">起止日期</span>
+                <span class="value">{{ formatDate(selectedContract.contractStartDate) }} 至 {{ formatDate(selectedContract.contractEndDate) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">实际入住</span>
+                <span class="value">{{ formatDate(selectedContract.actualMoveInDate) || '-' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">实际搬离</span>
+                <span class="value">{{ formatDate(selectedContract.actualMoveOutDate) || '-' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">剩余天数</span>
+                <span class="value" :class="getDaysLeftClass(selectedContract.contractEndDate)">
+                  {{ calculateDaysLeft(selectedContract.contractEndDate) }}天
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 财务信息 -->
+          <div class="detail-section">
+            <h4 class="section-title">财务信息</h4>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <span class="label">月租金</span>
+                <span class="value highlight">¥{{ selectedContract.monthlyRent }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">押金</span>
+                <span class="value">¥{{ selectedContract.depositAmount }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">支付周期</span>
+                <span class="value">{{ selectedContract.paymentCycle }}个月/付</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">租金状态</span>
+                <div class="status-edit">
+                  <select v-model="editingStatuses.rentStatus" class="status-select">
+                    <option :value="0">未付款</option>
+                    <option :value="1">已付款</option>
+                    <option :value="2">逾期</option>
+                    <option :value="3">部分付款</option>
+                  </select>
+                  <button class="save-icon-btn" @click="saveStatusChange('rent')" title="保存状态" :disabled="savingStatus">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="detail-item">
+                <span class="label">押金状态</span>
+                <div class="status-edit">
+                  <select v-model="editingStatuses.depositStatus" class="status-select">
+                    <option :value="0">未付</option>
+                    <option :value="1">已付</option>
+                    <option :value="2">已退</option>
+                    <option :value="3">抵扣中</option>
+                  </select>
+                  <button class="save-icon-btn" @click="saveStatusChange('deposit')" title="保存状态" :disabled="savingStatus">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="detail-item">
+                <span class="label">水费单价</span>
+                <span class="value">{{ selectedContract.waterPrice ? `¥${selectedContract.waterPrice}/吨` : '包含在租金内' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">电费单价</span>
+                <span class="value">{{ selectedContract.electricPrice ? `¥${selectedContract.electricPrice}/度` : '包含在租金内' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 水电读数 -->
+          <div class="detail-section">
+            <h4 class="section-title">水电读数</h4>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <span class="label">水表初始</span>
+                <span class="value">{{ selectedContract.waterInitialReading || 0 }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">水表最新</span>
+                <div class="edit-reading">
+                  <input 
+                    type="number" 
+                    v-model="editingReadings.water" 
+                    class="reading-input"
+                    placeholder="输入读数"
+                  />
+                </div>
+              </div>
+              <div class="detail-item">
+                <span class="label">电表初始</span>
+                <span class="value">{{ selectedContract.electricInitialReading || 0 }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">电表最新</span>
+                <div class="edit-reading">
+                  <input 
+                    type="number" 
+                    v-model="editingReadings.electric" 
+                    class="reading-input"
+                    placeholder="输入读数"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="reading-actions">
+              <button class="action-btn save-btn" @click="saveMeterReadings" :disabled="savingReadings">
+                {{ savingReadings ? '保存中...' : '保存读数' }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="action-btn contact-btn" @click="contactTenant(selectedContract)">
+            联系租户
+          </button>
+          <button class="action-btn secondary-btn" @click="closeContractModal">
+            关闭
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -216,6 +452,10 @@ const props = defineProps({
   userPhone: {
     type: String,
     required: true
+  },
+  userId: {
+    type: Number,
+    default: null
   }
 })
 
@@ -232,17 +472,39 @@ const rentStatusFilter = ref('')
 
 // 加载租户数据
 const loadTenants = async () => {
-  if (!props.userPhone) {
-    console.error('用户手机号不存在')
+  if (!props.userPhone && !props.userId) {
+    console.error('用户手机号或ID不存在')
     return
   }
 
   loading.value = true
   try {
-    const response = await axios.get(`${API_BASE_URL}/landlord/tenants?landlordPhone=${props.userPhone}`)
+    let url = `${API_BASE_URL}/landlord/tenants?landlordPhone=${props.userPhone}`
+    
+    // 如果有userId，优先使用新的API endpoint
+    if (props.userId) {
+      url = `${API_BASE_URL}/admin/tenant/landlord/${props.userId}`
+    }
+
+    const response = await axios.get(url)
     if (response.data.success) {
-      tenants.value = response.data.tenants || []
-      statistics.value = response.data.statistics || {}
+      // 新接口返回的是 { success: true, contracts: [...] }
+      // 旧接口返回的是 { success: true, tenants: [...], statistics: ... }
+      // 需要适配两种格式
+      
+      if (response.data.contracts) {
+        tenants.value = response.data.contracts
+        // 统计信息可能需要另外获取或从contracts计算
+        statistics.value = {
+          totalTenants: tenants.value.length,
+          rentedHouses: tenants.value.filter(t => t.contractStatus === 1 || t.contractStatus === 2).length,
+          expiringContracts: tenants.value.filter(t => calculateDaysLeft(t.contractEndDate) <= 30).length,
+          monthlyIncome: tenants.value.reduce((sum, t) => sum + (t.monthlyRent || 0), 0)
+        }
+      } else {
+        tenants.value = response.data.tenants || []
+        statistics.value = response.data.statistics || {}
+      }
     } else {
       console.error('获取租户列表失败:', response.data.message)
       tenants.value = []
@@ -409,8 +671,125 @@ const contactTenant = (tenant) => {
 }
 
 // 查看合同详情
+const showContractModal = ref(false)
+const selectedContract = ref(null)
+const editingReadings = ref({
+  water: '',
+  electric: ''
+})
+const editingStatuses = ref({
+  contractStatus: '',
+  rentStatus: '',
+  depositStatus: ''
+})
+const savingReadings = ref(false)
+const savingStatus = ref(false)
+
 const viewContractDetails = (tenant) => {
-  alert(`查看合同详情: ${tenant.contractNumber}\n租户: ${tenant.tenantName}`)
+  selectedContract.value = tenant
+  editingReadings.value = {
+    water: tenant.lastWaterReading || '',
+    electric: tenant.lastElectricReading || ''
+  }
+  editingStatuses.value = {
+    contractStatus: tenant.contractStatus,
+    rentStatus: tenant.rentStatus,
+    depositStatus: tenant.depositStatus
+  }
+  showContractModal.value = true
+}
+
+const closeContractModal = () => {
+  showContractModal.value = false
+  selectedContract.value = null
+  editingReadings.value = { water: '', electric: '' }
+  editingStatuses.value = { contractStatus: '', rentStatus: '', depositStatus: '' }
+}
+
+// 保存状态更改
+const saveStatusChange = async (type) => {
+  if (!selectedContract.value) return
+  
+  savingStatus.value = true
+  try {
+    let url = ''
+    let data = {}
+    let successMsg = ''
+    
+    if (type === 'contract') {
+      url = `${API_BASE_URL}/admin/tenant/${selectedContract.value.id}/status`
+      data = { status: editingStatuses.value.contractStatus }
+      successMsg = '合同状态更新成功'
+    } else if (type === 'rent') {
+      url = `${API_BASE_URL}/admin/tenant/${selectedContract.value.id}/rent-status`
+      data = { rentStatus: editingStatuses.value.rentStatus }
+      successMsg = '租金状态更新成功'
+    } else if (type === 'deposit') {
+      url = `${API_BASE_URL}/admin/tenant/${selectedContract.value.id}/deposit-status`
+      data = { depositStatus: editingStatuses.value.depositStatus }
+      successMsg = '押金状态更新成功'
+    }
+    
+    const response = await axios.put(url, data)
+    
+    if (response.data.success) {
+      alert(successMsg)
+      // 更新本地数据
+      if (type === 'contract') selectedContract.value.contractStatus = editingStatuses.value.contractStatus
+      if (type === 'rent') selectedContract.value.rentStatus = editingStatuses.value.rentStatus
+      if (type === 'deposit') selectedContract.value.depositStatus = editingStatuses.value.depositStatus
+      
+      // 更新列表中的数据
+      const index = tenants.value.findIndex(t => t.id === selectedContract.value.id)
+      if (index !== -1) {
+        if (type === 'contract') tenants.value[index].contractStatus = editingStatuses.value.contractStatus
+        if (type === 'rent') tenants.value[index].rentStatus = editingStatuses.value.rentStatus
+        if (type === 'deposit') tenants.value[index].depositStatus = editingStatuses.value.depositStatus
+      }
+    } else {
+      alert('更新失败: ' + response.data.message)
+    }
+  } catch (error) {
+    console.error('更新状态失败:', error)
+    alert('更新失败，请稍后重试')
+  } finally {
+    savingStatus.value = false
+  }
+}
+
+// 保存水电读数
+const saveMeterReadings = async () => {
+  if (!selectedContract.value) return
+  
+  savingReadings.value = true
+  try {
+    const response = await axios.post(`${API_BASE_URL}/admin/tenant/meter-readings`, {
+      contractId: selectedContract.value.id,
+      waterReading: editingReadings.value.water,
+      electricReading: editingReadings.value.electric
+    })
+    
+    if (response.data.success) {
+      alert('水电读数更新成功')
+      // 更新本地数据
+      selectedContract.value.lastWaterReading = editingReadings.value.water
+      selectedContract.value.lastElectricReading = editingReadings.value.electric
+      
+      // 更新列表中的数据
+      const index = tenants.value.findIndex(t => t.id === selectedContract.value.id)
+      if (index !== -1) {
+        tenants.value[index].lastWaterReading = editingReadings.value.water
+        tenants.value[index].lastElectricReading = editingReadings.value.electric
+      }
+    } else {
+      alert('更新失败: ' + response.data.message)
+    }
+  } catch (error) {
+    console.error('更新水电读数失败:', error)
+    alert('更新失败，请稍后重试')
+  } finally {
+    savingReadings.value = false
+  }
 }
 
 // 页面加载时初始化数据
@@ -820,5 +1199,208 @@ onMounted(() => {
   .tenant-actions {
     flex-direction: column;
   }
+}
+
+/* 弹窗样式 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background: white;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  animation: modal-slide-up 0.3s ease-out;
+}
+
+@keyframes modal-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #f3f4f6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn:hover {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.detail-section {
+  margin-bottom: 2rem;
+}
+
+.detail-section:last-child {
+  margin-bottom: 0;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 1rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.detail-item.full-width {
+  grid-column: span 2;
+}
+
+.detail-item .label {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.detail-item .value {
+  font-size: 0.95rem;
+  color: #1f2937;
+  font-weight: 500;
+}
+
+.detail-item .value.highlight {
+  color: #667eea;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.modal-footer {
+  padding: 1.5rem;
+  border-top: 1px solid #f3f4f6;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.secondary-btn {
+  background: white;
+  border: 1px solid #e5e7eb;
+  color: #374151;
+}
+
+.secondary-btn:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+/* 滚动条样式 */
+.modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background-color: #e5e7eb;
+  border-radius: 3px;
+}
+
+/* 读数编辑样式 */
+.edit-reading {
+  display: flex;
+  align-items: center;
+}
+
+.reading-input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+}
+
+.reading-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+.reading-actions {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.save-btn {
+  background: #667eea;
+  color: white;
+  width: auto;
+  padding: 0.5rem 1.5rem;
+}
+
+.save-btn:hover {
+  background: #5a67d8;
+}
+
+.save-btn:disabled {
+  background: #a0aec0;
+  cursor: not-allowed;
 }
 </style>
