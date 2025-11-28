@@ -57,7 +57,7 @@ const textarea = ref(null)
 const currentUser = ref(null)
 
 // API Configuration
-const BACKEND_URL = 'http://39.108.142.250:8080/api/smart-matching'
+const BACKEND_URL = 'http://localhost:8080/api/smart-matching'
 
 // User Avatar
 const userAvatar = ref('/models/image/default-avatar.png')

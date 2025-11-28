@@ -6,6 +6,7 @@ E:\wslop\End\Springboot\src\main\java\com\example\homesee\service\ViewingAppoint
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\controller\DatabaseController.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\service\UserService.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\repository\ChatMessageRepository.java
+E:\wslop\End\Springboot\src\main\java\com\example\homesee\service\AdminChannelService.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\repository\UserRepository.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\repository\SocialPostRepository.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\repository\ViewingAppointmentRepository.java
@@ -42,6 +43,7 @@ E:\wslop\End\Springboot\src\main\java\com\example\homesee\service\SmartMatchingS
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\repository\SocialLikeRepository.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\repository\RoomVrSceneRepository.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\controller\TenantMatchingController.java
+E:\wslop\End\Springboot\src\main\java\com\example\homesee\controller\AdminChannelController.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\controller\LandlordTenantMatchingController.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\controller\RoomInfoFilterController.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\repository\FriendshipRepository.java

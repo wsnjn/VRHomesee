@@ -89,6 +89,12 @@ public class User {
     @Column(name = "certification_time")
     private LocalDateTime certificationTime;
 
+    @Column(name = "chat_muted_until")
+    private LocalDateTime chatMutedUntil;
+
+    @Column(name = "social_banned_until")
+    private LocalDateTime socialBannedUntil;
+
     // 构造函数
     public User() {
     }
@@ -315,5 +321,21 @@ public class User {
 
     public void setCertificationTime(LocalDateTime certificationTime) {
         this.certificationTime = certificationTime;
+    }
+
+    public LocalDateTime getChatMutedUntil() {
+        return chatMutedUntil;
+    }
+
+    public void setChatMutedUntil(LocalDateTime chatMutedUntil) {
+        this.chatMutedUntil = chatMutedUntil;
+    }
+
+    public LocalDateTime getSocialBannedUntil() {
+        return socialBannedUntil;
+    }
+
+    public void setSocialBannedUntil(LocalDateTime socialBannedUntil) {
+        this.socialBannedUntil = socialBannedUntil;
     }
 }

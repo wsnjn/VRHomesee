@@ -10,7 +10,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/database")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://39.108.142.250:9999,http://localhost:5173")
 public class DatabaseController {
 
     @Autowired
