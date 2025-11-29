@@ -6,7 +6,11 @@
         <h2>房屋租赁管理系统 - 管理端</h2>
       </div>
       <div class="nav-links">
-        <span class="user-info">管理员: {{ currentUser }}</span>
+        <div class="user-profile-box" v-if="user">
+          <img :src="getAvatarUrl()" class="nav-avatar" alt="avatar" />
+          <span class="user-info">{{ user.nickname || user.username }}</span>
+        </div>
+        <span v-else class="user-info">管理员: {{ currentUser }}</span>
         <router-link to="/landlord-admin" class="nav-btn">房东管理端</router-link>
         <router-link to="/" class="nav-btn">客户端</router-link>
         <button @click="logout" class="logout-btn">退出登录</button>
@@ -203,6 +207,14 @@
           <house-management />
         </div>
 
+        <!-- 房屋状态 -->
+        <div v-if="activeTab === 'house-status'">
+          <house-status 
+            :houses="rawHouses"
+            :statistics="houseStatusStats"
+          />
+        </div>
+
         <!-- 用户管理 -->
         <div v-if="activeTab === 'user-management'">
           <user-management />
@@ -218,18 +230,14 @@
           <channel-management />
         </div>
 
-        <!-- 其他页面占位 -->
-        <div v-else-if="activeTab !== 'dashboard' && activeTab !== 'resource-management' && activeTab !== 'channel-management' && activeTab !== 'house-management' && activeTab !== 'user-management' && activeTab !== 'tenant-matching'" class="page-placeholder">
-          <h2>{{ getTabTitle(activeTab) }}</h2>
-          <p>功能开发中...</p>
-        </div>
+
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import * as echarts from 'echarts'
@@ -238,7 +246,9 @@ import TenantMatching from './TenantMatching.vue'
 import HouseManagement from './HouseManagement.vue'
 import UserManagement from './UserManagement.vue'
 import ResourceManagement from './community/ResourceManagement.vue'
+
 import ChannelManagement from './community/ChannelManagement.vue'
+import HouseStatus from './HouseStatus.vue'
 
 const router = useRouter()
 
@@ -248,6 +258,7 @@ const API_BASE_URL = 'http://localhost:8080/api'
 // 响应式数据
 const activeTab = ref('dashboard')
 const currentUser = ref('root')
+const user = ref(null)
 const currentTime = ref('')
 let timer = null
 
@@ -275,6 +286,17 @@ const userStatistics = ref({
 const expiringContracts = ref([])
 const contractTrends = ref({})
 const cityDistribution = ref({})
+
+// 房屋状态统计
+const houseStatusStats = computed(() => {
+  const houses = rawHouses.value
+  return {
+    available: houses.filter(h => h.status === 0).length,
+    rented: houses.filter(h => h.status === 1).length,
+    offline: houses.filter(h => h.status === 2).length,
+    preRent: houses.filter(h => h.status === 3).length
+  }
+})
 
 // Chart Refs
 const contractChartRef = ref(null)
@@ -729,6 +751,34 @@ const loadData = async () => {
   }
 }
 
+// 获取用户信息
+const fetchUserInfo = async (userId) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/user/${userId}`)
+    if (response.data.success) {
+      user.value = response.data.user
+      localStorage.setItem('user', JSON.stringify(response.data.user))
+      currentUser.value = user.value.username
+    }
+  } catch (error) {
+    console.error('获取用户信息失败:', error)
+  }
+}
+
+// 获取头像URL
+const getAvatarUrl = () => {
+  if (!user.value || !user.value.avatar) {
+    return '/models/image/default-avatar.png'
+  }
+  
+  if (user.value.avatar.startsWith('http')) {
+    return user.value.avatar
+  }
+  
+  const FILE_SERVER_HOST = 'http://39.108.142.250:8088'
+  return `${FILE_SERVER_HOST}/api/files/download/${user.value.avatar}`
+}
+
 // 退出登录
 const logout = () => {
   localStorage.removeItem('user')
@@ -737,6 +787,19 @@ const logout = () => {
 }
 
 onMounted(() => {
+  // 获取当前用户信息
+  const userData = localStorage.getItem('user')
+  if (userData) {
+    try {
+      const localUser = JSON.parse(userData)
+      user.value = localUser
+      currentUser.value = localUser.username
+      fetchUserInfo(localUser.id)
+    } catch (e) {
+      console.error('解析用户信息失败', e)
+    }
+  }
+
   loadData()
   timer = setInterval(updateTime, 1000)
   updateTime()
@@ -777,6 +840,21 @@ onUnmounted(() => {
   display: flex;
   gap: 1rem;
   align-items: center;
+}
+
+.user-profile-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: 10px;
+}
+
+.nav-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 .logout-btn {

@@ -117,7 +117,7 @@
               <td>
                 <div class="user-info">
                   <div class="user-avatar">
-                    <img :src="user.avatar || '/models/default-avatar.png'" :alt="user.username" />
+                    <img :src="getAvatarUrl(user.avatar)" :alt="user.username" />
                   </div>
                   <div class="user-details">
                     <strong>{{ user.username }}</strong>
@@ -644,6 +644,20 @@ const truncateText = (text, maxLength) => {
   if (!text) return ''
   if (text.length <= maxLength) return text
   return text.substring(0, maxLength) + '...'
+}
+
+// 获取头像URL
+const getAvatarUrl = (avatar) => {
+  if (!avatar) {
+    return '/models/image/default-avatar.png'
+  }
+  
+  if (avatar.startsWith('http')) {
+    return avatar
+  }
+  
+  const FILE_SERVER_HOST = 'http://39.108.142.250:8088'
+  return `${FILE_SERVER_HOST}/api/files/download/${avatar}`
 }
 
 // 页面加载时初始化数据

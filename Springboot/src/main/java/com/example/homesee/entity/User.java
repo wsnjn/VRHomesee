@@ -48,7 +48,7 @@ public class User {
     private String idCard;
 
     @Column(name = "avatar", length = 255)
-    private String avatar;
+    private String avatar = "default-avatar.png";
 
     @Column(name = "wechat", length = 50)
     private String wechat;
