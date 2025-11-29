@@ -80,6 +80,10 @@ const navigateToCommunity = () => {
   router.push('/community')
 }
 
+const navigateToVirtualWorld = () => {
+  router.push('/virtual-world')
+}
+
 const navigateToUserProfile = () => {
   router.push('/user-profile')
   showUserMenu.value = false
@@ -121,7 +125,7 @@ const fetchUserAppointments = async () => {
   
   loadingAppointments.value = true
   try {
-    const response = await fetch(`http://39.108.142.250:8080/api/viewing-appointment/user/${user.value.id}`)
+    const response = await fetch(`http://localhost:8080/api/viewing-appointment/user/${user.value.id}`)
     if (response.ok) {
       appointments.value = await response.json()
     } else {
@@ -289,6 +293,15 @@ const formatDate = (dateString) => {
             <h3>社区交流</h3>
             <p>与邻居交流，分享生活点滴，建立社区联系</p>
             <span class="link-text">进入社区 <span class="arrow">→</span></span>
+          </div>
+
+          <div class="feature-card" @click="navigateToVirtualWorld">
+            <div class="card-icon virtual-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+            </div>
+            <h3>虚拟世界</h3>
+            <p>探索全息交互的未来看房体验，感受科技魅力</p>
+            <span class="link-text">进入虚拟世界 <span class="arrow">→</span></span>
           </div>
         </div>
       </section>
@@ -603,6 +616,7 @@ const formatDate = (dateString) => {
 .safe-icon { background: linear-gradient(135deg, #a18cd1, #fbc2eb); }
 .fix-icon { background: linear-gradient(135deg, #84fab0, #8fd3f4); }
 .community-icon { background: linear-gradient(135deg, #fccb90, #d57eeb); }
+.virtual-icon { background: linear-gradient(135deg, #00f2ff, #007bff); }
 
 .feature-card h3 {
   font-size: 1.5rem;

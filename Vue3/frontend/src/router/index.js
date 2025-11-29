@@ -23,7 +23,10 @@ const router = createRouter({
     { path: '/admin', name: 'admin', component: () => import('../views/admin/Admin.vue'), meta: { requiresAuth: true, allowedUserTypes: [3] } },
 
     // 房东端路由（仅房东和管理员可访问）
-    { path: '/landlord-admin', name: 'landlord-admin', component: () => import('../views/landlord/LandlordAdmin.vue'), meta: { requiresAuth: true, allowedUserTypes: [2, 3] } }
+    { path: '/landlord-admin', name: 'landlord-admin', component: () => import('../views/landlord/LandlordAdmin.vue'), meta: { requiresAuth: true, allowedUserTypes: [2, 3] } },
+
+    // 虚拟世界 (全息交互演示)
+    { path: '/virtual-world', name: 'virtual-world', component: () => import('../views/VirtualWorld.vue'), meta: { requiresAuth: true, allowedUserTypes: [1, 2, 3] } }
   ],
 })
 
