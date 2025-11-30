@@ -25,8 +25,17 @@ const router = createRouter({
     // 房东端路由（仅房东和管理员可访问）
     { path: '/landlord-admin', name: 'landlord-admin', component: () => import('../views/landlord/LandlordAdmin.vue'), meta: { requiresAuth: true, allowedUserTypes: [2, 3] } },
 
-    // 虚拟世界 (全息交互演示)
-    { path: '/virtual-world', name: 'virtual-world', component: () => import('../views/VirtualWorld.vue'), meta: { requiresAuth: true, allowedUserTypes: [1, 2, 3] } }
+    // 交互方块 (Interactive Cube) - 父级入口
+    { path: '/interactive-cube', name: 'interactive-cube', component: () => import('../views/InteractiveCube.vue'), meta: { requiresAuth: true, allowedUserTypes: [1, 2, 3] } },
+
+    // 虚拟世界 (全息交互演示) - 子模块
+    { path: '/interactive-cube/virtual-world', name: 'virtual-world', component: () => import('../views/VirtualWorld.vue'), meta: { requiresAuth: true, allowedUserTypes: [1, 2, 3] } },
+
+    // 圣诞树 (交互演示) - 子模块
+    { path: '/interactive-cube/christmas-tree', name: 'christmas-tree', component: () => import('../views/ChristmasTree.vue'), meta: { requiresAuth: true, allowedUserTypes: [1, 2, 3] } },
+
+    // 语音识别测试页面
+    { path: '/speech-test', name: 'speech-test', component: () => import('../views/SpeechTest.vue'), meta: { requiresAuth: true, allowedUserTypes: [1, 2, 3] } }
   ],
 })
 

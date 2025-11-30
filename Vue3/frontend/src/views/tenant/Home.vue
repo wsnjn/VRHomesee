@@ -81,7 +81,7 @@ const navigateToCommunity = () => {
 }
 
 const navigateToVirtualWorld = () => {
-  router.push('/virtual-world')
+  router.push('/interactive-cube')
 }
 
 const navigateToUserProfile = () => {
@@ -295,13 +295,14 @@ const formatDate = (dateString) => {
             <span class="link-text">进入社区 <span class="arrow">→</span></span>
           </div>
 
+
           <div class="feature-card" @click="navigateToVirtualWorld">
             <div class="card-icon virtual-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
             </div>
-            <h3>虚拟世界</h3>
-            <p>探索全息交互的未来看房体验，感受科技魅力</p>
-            <span class="link-text">进入虚拟世界 <span class="arrow">→</span></span>
+            <h3>交互方块</h3>
+            <p>探索全息交互的未来实验场，体验多维空间</p>
+            <span class="link-text">进入方块 <span class="arrow">→</span></span>
           </div>
         </div>
       </section>

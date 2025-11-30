@@ -167,11 +167,11 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import * as THREE from 'three'
 
-// DOM Refs
+// DOM 引用
 const container = ref(null)
 const videoElement = ref(null)
 
-// State
+// 状态
 const loading = ref(true)
 const handTrackingActive = ref(false)
 const voiceActive = ref(false)
@@ -186,11 +186,11 @@ const voiceTranscript = ref('')
 const aiResponse = ref('')
 const notification = ref(null)
 
-// Flight Physics
+// 飞行物理
 const cameraPos = ref({ x: 0, y: 0, z: 0 })
 const currentSpeed = ref(0)
-const baseSpeed = 0.5 // Standard cruise
-const boostSpeed = 5.0 // OK gesture boost
+const baseSpeed = 0.5 // 标准巡航速度
+const boostSpeed = 5.0 // OK手势加速
 const maxSpeed = baseSpeed
 const isPaused = ref(false)
 const isBoosting = ref(false)
@@ -198,7 +198,7 @@ const isWarping = ref(false)
 const warpCharge = ref(0)
 const currentSector = ref(1)
 
-// Steering
+// 转向控制
 const mousePos = ref({ x: 0, y: 0 })
 const targetRotation = ref({ x: 0, y: 0 })
 
@@ -213,7 +213,7 @@ let animationId
 // MediaPipe
 let hands
 
-// Voice
+// 语音
 let recognition
 
 onMounted(async () => {
@@ -232,14 +232,14 @@ onUnmounted(() => {
   if (recognition) recognition.stop()
 })
 
-// --- Procedural Generation Utils ---
+// --- 程序化生成工具 ---
 const createPlanetTexture = (type) => {
   const canvas = document.createElement('canvas')
-  canvas.width = 2048 // Higher res
+  canvas.width = 2048 // 更高分辨率
   canvas.height = 1024
   const ctx = canvas.getContext('2d')
   
-  // Base color
+  // 基础颜色
   let baseColor, noiseColor
   if (type === 'terran') { baseColor = '#1a237e'; noiseColor = '#4caf50'; }
   else if (type === 'desert') { baseColor = '#e65100'; noiseColor = '#ffcc80'; }
@@ -250,7 +250,7 @@ const createPlanetTexture = (type) => {
   ctx.fillStyle = baseColor
   ctx.fillRect(0, 0, 2048, 1024)
 
-  // Detailed Noise
+  // 细节噪点
   for (let i = 0; i < 10000; i++) {
     const x = Math.random() * 2048
     const y = Math.random() * 1024
@@ -266,7 +266,7 @@ const createPlanetTexture = (type) => {
 }
 
 const createGalaxy = () => {
-  const particleCount = 50000 // More stars
+  const particleCount = 50000 // 更多星星
   const geometry = new THREE.BufferGeometry()
   const positions = new Float32Array(particleCount * 3)
   const colors = new Float32Array(particleCount * 3)
@@ -274,8 +274,8 @@ const createGalaxy = () => {
 
   for (let i = 0; i < particleCount; i++) {
     const i3 = i * 3
-    const radius = Math.random() * 100000 + 20000 // Truly Massive Galaxy
-    const spinAngle = radius * 0.0001 // Slower spin for scale
+    const radius = Math.random() * 100000 + 20000 // 真正巨大的星系
+    const spinAngle = radius * 0.0001 // 较慢的自转以适应规模
     const branchAngle = (i % 5) * ((Math.PI * 2) / 5)
     
     const randomX = (Math.random() - 0.5) * 2000
@@ -305,16 +305,16 @@ const createGalaxy = () => {
   })
 
   const galaxy = new THREE.Points(geometry, material)
-  galaxy.position.z = -5000 // Very far
+  galaxy.position.z = -5000 // 非常远
   return galaxy
 }
 
-// --- Three.js Setup ---
+// --- Three.js 设置 ---
 const initThree = () => {
   scene = new THREE.Scene()
-  scene.fog = new THREE.FogExp2(0x000000, 0.0002) // Less fog for vastness
+  scene.fog = new THREE.FogExp2(0x000000, 0.0002) // 减少雾气以体现广阔感
 
-  camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 50000) // Huge far plane
+  camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 50000) // 巨大的远裁剪面
   camera.position.set(0, 0, 100)
 
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
@@ -322,34 +322,34 @@ const initThree = () => {
   renderer.setPixelRatio(window.devicePixelRatio)
   container.value.appendChild(renderer.domElement)
 
-  // Lights
-  const ambientLight = new THREE.AmbientLight(0x404040, 2.0) // Brighter ambient
+  // 灯光
+  const ambientLight = new THREE.AmbientLight(0x808080, 4.0) // 更亮的环境光
   scene.add(ambientLight)
   
-  // Sun Light (Directional for better shadows on massive objects)
-  const sunLight = new THREE.DirectionalLight(0xffffff, 3.0)
+  // 太阳光 (定向光以在巨大物体上产生更好的阴影)
+  const sunLight = new THREE.DirectionalLight(0xffffff, 5.0)
   sunLight.position.set(1, 0.5, 1)
   scene.add(sunLight)
   
-  // Add a subtle backlight for rim lighting
+  // 添加微妙的背光用于边缘照明
   const backLight = new THREE.DirectionalLight(0x5050ff, 0.5)
   backLight.position.set(-1, 0, -1)
   scene.add(backLight)
 
-  // 1. Infinite Starfield (Static Background)
+  // 1. 无限星空 (静态背景)
   const starGeo = new THREE.BufferGeometry()
   const starPos = new Float32Array(50000 * 3)
-  // Spread stars across the entire galaxy volume
+  // 将星星散布在整个星系体积中
   for(let i=0; i<150000; i++) starPos[i] = (Math.random() - 0.5) * 1000000 
   starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3))
-  stars = new THREE.Points(starGeo, new THREE.PointsMaterial({color: 0xffffff, size: 20})) // Larger stars for distance
+  stars = new THREE.Points(starGeo, new THREE.PointsMaterial({color: 0xffffff, size: 20})) // 更大的星星以适应距离
   scene.add(stars)
 
-  // 2. Galaxy (Visual Core)
+  // 2. 星系 (视觉核心)
   galaxyPoints = createGalaxy()
   scene.add(galaxyPoints)
 
-  // 3. Generate Static Universe (Fixed Planets)
+  // 3. 生成静态宇宙 (固定行星)
   generateUniverse()
 
   window.addEventListener('resize', onWindowResize)
@@ -357,12 +357,12 @@ const initThree = () => {
 
 const generateUniverse = () => {
   const types = ['terran', 'desert', 'ice', 'gas', 'lava']
-  const universeRadius = 500000 // Massive scale
-  const planetCount = 100 // Number of major planets
+  const universeRadius = 500000 // 巨大规模
+  const planetCount = 100 // 主要行星数量
   
   for (let i = 0; i < planetCount; i++) {
     const type = types[Math.floor(Math.random() * types.length)]
-    // Massive planets: 1000 - 5000 radius
+    // 巨大行星: 1000 - 5000 半径
     const size = Math.random() * 4000 + 1000 
     const geometry = new THREE.SphereGeometry(size, 128, 128)
     const texture = createPlanetTexture(type)
@@ -377,11 +377,11 @@ const generateUniverse = () => {
     
     const planet = new THREE.Mesh(geometry, material)
     
-    // Position: Random distribution in the galaxy volume
-    // Using cylindrical distribution for a galaxy shape
+    // 位置: 在星系体积中随机分布
+    // 使用圆柱分布形成星系形状
     const r = Math.random() * universeRadius
     const theta = Math.random() * Math.PI * 2
-    const y = (Math.random() - 0.5) * 20000 // Thinner disk
+    const y = (Math.random() - 0.5) * 20000 // 较薄的圆盘
     
     planet.position.set(
       r * Math.cos(theta),
@@ -389,7 +389,7 @@ const generateUniverse = () => {
       r * Math.sin(theta)
     )
     
-    // Metadata
+    // 元数据
     planet.userData = {
       name: `PLANET-${Math.floor(Math.random()*90000)+10000}`,
       type: type.toUpperCase(),
@@ -400,13 +400,41 @@ const generateUniverse = () => {
       landingProb: type === 'terran' ? Math.floor(Math.random()*40+60) : Math.floor(Math.random()*20)
     }
     
+    // 添加粒子光环 (行星周围的星状粒子)
+    const auraGeo = new THREE.BufferGeometry()
+    const auraCount = 200
+    const auraPos = new Float32Array(auraCount * 3)
+    
+    for(let j=0; j<auraCount; j++) {
+      // 行星周围壳层中的随机点
+      const r = size * (1.2 + Math.random() * 0.8) // 1.2倍到2.0倍半径
+      const theta = Math.random() * Math.PI * 2
+      const phi = Math.acos(2 * Math.random() - 1)
+      
+      auraPos[j*3] = r * Math.sin(phi) * Math.cos(theta)
+      auraPos[j*3+1] = r * Math.sin(phi) * Math.sin(theta)
+      auraPos[j*3+2] = r * Math.cos(phi)
+    }
+    
+    auraGeo.setAttribute('position', new THREE.BufferAttribute(auraPos, 3))
+    const auraMat = new THREE.PointsMaterial({
+      color: 0xffffff,
+      size: size * 0.05, // 粒子大小随行星缩放
+      transparent: true,
+      opacity: 0.8,
+      blending: THREE.AdditiveBlending
+    })
+    
+    const aura = new THREE.Points(auraGeo, auraMat)
+    planet.add(aura) // 附加到行星
+    
     scene.add(planet)
     planets.push(planet)
   }
 }
 
 const onMouseMove = (event) => {
-  // Normalize mouse pos -1 to 1
+  // 归一化鼠标位置 -1 到 1
   mousePos.value.x = (event.clientX / window.innerWidth) * 2 - 1
   mousePos.value.y = -(event.clientY / window.innerHeight) * 2 + 1
 }
@@ -414,45 +442,45 @@ const onMouseMove = (event) => {
 const animate = () => {
   animationId = requestAnimationFrame(animate)
   
-  // Flight Physics
+  // 飞行物理
   let targetSpeed = 0
   if (!isPaused.value && !isWarping.value) {
     targetSpeed = isBoosting.value ? boostSpeed : baseSpeed
   }
   
-  // Smooth acceleration
+  // 平滑加速
   currentSpeed.value += (targetSpeed - currentSpeed.value) * 0.02
 
-  // 6DOF Movement (Move Camera through Static Space)
+  // 6自由度移动 (在静态空间中移动相机)
   if (isWarping.value) {
-    // Warp moves VERY fast forward
+    // 跃迁向前移动非常快
     const warpVec = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion)
-    camera.position.add(warpVec.multiplyScalar(5000)) // Warp speed
-    stars.scale.z = 50 // Visual streak
+    camera.position.add(warpVec.multiplyScalar(5000)) // 跃迁速度
+    stars.scale.z = 50 // 视觉拖尾
   } else {
-    // Normal flight
+    // 正常飞行
     const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion)
-    camera.position.add(forward.multiplyScalar(currentSpeed.value * 100)) // Speed scale
+    camera.position.add(forward.multiplyScalar(currentSpeed.value * 100)) // 速度缩放
     stars.scale.z = 1
   }
 
-  // Steering (Mouse)
+  // 转向 (鼠标)
   if (!isPaused.value) {
     const targetYaw = mousePos.value.x * -1.5 
     const targetPitch = mousePos.value.y * 1.0
     
-    // Smooth rotation
+    // 平滑旋转
     camera.rotation.y += (targetYaw - camera.rotation.y) * 0.05
     camera.rotation.x += (targetPitch - camera.rotation.x) * 0.05
-    camera.rotation.z = -camera.rotation.y * 0.5 // Bank
+    camera.rotation.z = -camera.rotation.y * 0.5 // 倾斜
   }
   
-  // Rotate Planets (They stay in place, just spin)
+  // 旋转行星 (它们保持在原位，只是自转)
   planets.forEach(p => {
     p.rotation.y += 0.0001
   })
 
-  // Update Camera Pos for UI
+  // 更新 UI 相机位置
   cameraPos.value = camera.position
 
   renderer.render(scene, camera)
@@ -464,7 +492,7 @@ const onWindowResize = () => {
   renderer.setSize(window.innerWidth, window.innerHeight)
 }
 
-// --- Interaction Logic ---
+// --- 交互逻辑 ---
 const toggleHandTracking = async () => {
   if (handTrackingActive.value) {
     if (videoElement.value.srcObject) {
@@ -523,7 +551,7 @@ const initializeHands = async () => {
 }
 
 const onHandResults = (results) => {
-  // Removed canvas drawing logic to hide skeletons
+  // 移除画布绘制逻辑以隐藏骨架
   
   leftHandDetected.value = false
   rightHandDetected.value = false
@@ -549,7 +577,7 @@ const onHandResults = (results) => {
 }
 
 const handleLeftHand = (landmarks) => {
-  // Gesture Detection
+  // 手势检测
   const isFist = detectFist(landmarks)
   const isOK = detectOK(landmarks)
   
@@ -594,12 +622,12 @@ const detectFist = (landmarks) => {
 }
 
 const detectOK = (landmarks) => {
-  // Thumb tip (4) close to Index tip (8)
+  // 拇指尖 (4) 靠近食指尖 (8)
   const thumb = landmarks[4]
   const index = landmarks[8]
   const dist = Math.sqrt(Math.pow(thumb.x - index.x, 2) + Math.pow(thumb.y - index.y, 2))
   
-  // Other fingers extended
+  // 其他手指伸展
   const middle = landmarks[12].y < landmarks[10].y
   const ring = landmarks[16].y < landmarks[14].y
   
@@ -636,7 +664,7 @@ const engageWarp = () => {
     warpCharge.value = 0
     currentSector.value++
     
-    // Generate new system slightly ahead
+    // 在稍前方生成新星系
     generateSolarSystem(camera.position.z - 2000)
     showNotification(`ARRIVED AT SECTOR ${currentSector.value}`, 'info')
   }, 2000)
@@ -647,7 +675,7 @@ const showNotification = (text, type) => {
   setTimeout(() => notification.value = null, 3000)
 }
 
-// --- Voice ---
+// --- 语音 ---
 const toggleVoice = () => {
   if (voiceActive.value) {
     recognition.stop()
@@ -724,8 +752,8 @@ const processCommand = (cmd) => {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.15; /* Significantly reduced opacity */
-  filter: grayscale(80%) contrast(1.2); /* Desaturate and increase contrast */
+  opacity: 0.15; /* 显著降低不透明度 */
+  filter: grayscale(80%) contrast(1.2); /* 去饱和并增加对比度 */
 }
 
 .video-overlay {
@@ -734,7 +762,7 @@ const processCommand = (cmd) => {
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, #000 90%); /* Strong vignette */
+  background: radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, #000 90%); /* 强烈的晕影 */
   pointer-events: none;
 }
 
@@ -745,9 +773,9 @@ const processCommand = (cmd) => {
   width: 100%;
   height: 100%;
   z-index: 1;
-  pointer-events: none; /* Allow clicks to pass through if needed, but OrbitControls needs events on something. Actually OrbitControls attaches to domElement. We might need to adjust z-index or pointer-events */
+  pointer-events: none; /* 如果需要，允许点击穿透，但 OrbitControls 需要事件。实际上 OrbitControls 附加到 domElement。我们可能需要调整 z-index 或 pointer-events */
 }
-/* Fix for OrbitControls: It needs to receive events. */
+/* OrbitControls 修复：它需要接收事件。 */
 .three-container {
   pointer-events: auto; 
 }

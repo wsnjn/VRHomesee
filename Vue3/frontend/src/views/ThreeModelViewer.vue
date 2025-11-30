@@ -1,6 +1,6 @@
 <template>
   <div class="model-wrapper" :class="{ 'speaking': isSpeaking }">
-    <!-- Cloud Message Bubble -->
+    <!-- 云朵消息气泡 -->
     <div v-if="displayMessage" class="cloud-bubble" :class="{ 'fade-out': isFadingOut && !isPermanentMessage }">
       <div class="cloud-content">
         <span>{{ displayMessage }}</span>
@@ -11,7 +11,7 @@
       <div class="cloud-tail"></div>
     </div>
 
-    <!-- 3D Model Container -->
+    <!-- 3D 模型容器 -->
     <div ref="modelContainer" class="model-container" @click="handleWakeUp"></div>
   </div>
 </template>
@@ -32,16 +32,16 @@ const isSpeaking = ref(false)
 const isLoading = ref(false)
 const isPermanentMessage = ref(false)
 
-// Three.js refs
+// Three.js 引用
 let scene, camera, renderer, controls, mixer, animationFrameId
 
-// Speech Recognition
+// 语音识别
 let recognition = null
 let isListening = false
 const WAKE_WORD = '小花'
 const STOP_WORDS = ['好了没你事了', '关闭', '退下', '闭嘴', '停止', '再见']
 
-// API Configuration
+// API 配置
 const BACKEND_URL = 'http://localhost:8080/api/smart-matching'
 
 const displayMessage = computed(() => currentMessage.value)
@@ -59,7 +59,7 @@ onBeforeUnmount(() => {
   window.speechSynthesis.cancel()
 })
 
-// --- Three.js Initialization ---
+// --- Three.js 初始化 ---
 const initThree = () => {
   scene = new THREE.Scene()
   
@@ -116,7 +116,7 @@ const animate = () => {
   renderer.render(scene, camera)
 }
 
-// --- Speech & AI Logic ---
+// --- 语音 & AI 逻辑 ---
 const inConversation = ref(false)
 let conversationTimeout = null
 
@@ -130,31 +130,51 @@ const initSpeechRecognition = () => {
 
   recognition = new SpeechRecognition()
   recognition.lang = 'zh-CN'
-  recognition.continuous = false // Disable continuous for click-to-talk
-  recognition.interimResults = false
+  recognition.continuous = false // 禁用连续模式，用于点击对话
+  recognition.interimResults = true // 启用临时结果用于调试
+  recognition.maxAlternatives = 3 // 获取多个备选结果
 
   recognition.onstart = () => {
-    console.log("Speech recognition started")
+    console.log("语音识别已启动")
+    console.log("正在监听麦克风...")
     isListening = true
     showPermanentMessage("正在聆听...")
   }
 
   recognition.onresult = async (event) => {
     isListening = false
+    
     const lastResult = event.results[event.results.length - 1]
     const transcript = lastResult[0].transcript.trim()
-    console.log('Heard:', transcript)
+    const confidence = lastResult[0].confidence
+    
+    // 只显示最终结果，减少控制台噪音
+    if (lastResult.isFinal) {
+      console.log("=== 语音识别完成 ===")
+      console.log('识别结果:', transcript)
+      console.log('置信度:', confidence)
+      
+      // 检查是否获取到有效语音
+      if (!transcript || transcript === "？？？" || transcript === "..." || transcript.length < 1) {
+        console.log("未检测到有效语句或识别失败")
+        showTemporaryMessage("未检测到语音，请重试")
+        return
+      }
 
-    if (checkStopCommand(transcript)) {
-      stopInteraction()
-      return
+      if (checkStopCommand(transcript)) {
+        stopInteraction()
+        return
+      }
+
+      await processQuery(transcript)
+    } else {
+      // 实时显示识别进度（可选）
+      console.log("识别中:", transcript)
     }
-
-    await processQuery(transcript)
   }
 
   recognition.onend = () => {
-    console.log("Recognition ended")
+    console.log("语音识别已结束")
     isListening = false
     if (!isLoading.value && !isSpeaking.value) {
         showTemporaryMessage("点击模型开始对话")
@@ -224,21 +244,25 @@ const initSpeechRecognitionWithFallback = () => {
 
 const toggleListening = () => {
   if (isListening) {
+    console.log("停止语音识别")
     recognition.stop()
     isListening = false
   } else {
+    console.log("开始语音识别")
     window.speechSynthesis.cancel()
     isSpeaking.value = false
     try {
       recognition.start()
+      console.log("语音识别已启动，等待用户说话...")
     } catch (e) {
-      console.error("Failed to start recognition:", e)
+      console.error("启动语音识别失败:", e)
+      showTemporaryMessage("语音识别启动失败，请检查麦克风权限")
     }
   }
 }
 
 const startListening = () => {
-    // No-op for auto-start, wait for user click
+    // 自动启动无操作，等待用户点击
     showTemporaryMessage("点击模型开始对话")
 }
 
@@ -248,7 +272,7 @@ const resetConversationTimeout = () => {
     inConversation.value = false
     showTemporaryMessage("再见！")
     setTimeout(() => currentMessage.value = '', 2000)
-  }, 30000) // 30 seconds timeout
+  }, 30000) // 30秒超时
 }
 
 const checkStopCommand = (text) => {
@@ -270,7 +294,7 @@ const handleWakeUp = () => {
 const processQuery = async (text) => {
   resetConversationTimeout()
   
-  // Show thinking state
+  // 显示思考状态
   isLoading.value = true
   showPermanentMessage("正在思考...")
   
@@ -289,11 +313,11 @@ const processQuery = async (text) => {
     if (data.success) {
       const aiContent = data.data.content
       
-      // Parse Action
+      // 解析动作
       const actionMatch = aiContent.match(/<!-- ACTION: (.*?) -->/)
       let cleanContent = aiContent.replace(/<!-- ACTION: .*? -->/, '')
       
-      // Strip HTML for TTS
+      // 去除 HTML 标签用于语音合成
       const ttsText = cleanContent.replace(/<[^>]*>/g, '')
       
       showTemporaryMessage(cleanContent)
@@ -332,7 +356,7 @@ const handleAction = (action) => {
 const speak = (text) => {
   if (!window.speechSynthesis) return
   
-  window.speechSynthesis.cancel() // Cancel previous
+  window.speechSynthesis.cancel() // 取消之前的语音
   isSpeaking.value = true
   
   const utter = new SpeechSynthesisUtterance(text)
@@ -391,7 +415,7 @@ const showPermanentMessage = (text) => {
   transform: scale(1.1);
 }
 
-/* Cloud Bubble Styles */
+/* 云朵气泡样式 */
 .cloud-bubble {
   position: absolute;
   bottom: 140px;
@@ -436,7 +460,7 @@ const showPermanentMessage = (text) => {
   align-items: center;
 }
 
-/* Typing Indicator */
+/* 打字指示器 */
 .typing-indicator span {
   display: inline-block;
   width: 6px;
