@@ -161,7 +161,7 @@ const loadRequests = async () => {
   
   loading.value = true
   try {
-    const res = await axios.get(`http://39.108.142.250:8080/api/maintenance/landlord/${props.userId}`)
+    const res = await axios.get(`http://localhost:8080/api/maintenance/landlord/${props.userId}`)
     if (res.data.success) {
       requests.value = res.data.data || []
     }
@@ -198,7 +198,7 @@ const submitComplete = async () => {
       costBearer: completeForm.value.costBearer
     }
 
-    const res = await axios.post('http://39.108.142.250:8080/api/maintenance/update', updateData)
+    const res = await axios.post('http://localhost:8080/api/maintenance/update', updateData)
     if (res.data.success) {
       // Update local state
       req.requestStatus = 2
@@ -232,7 +232,7 @@ const updateStatus = async (req, newStatus) => {
       costBearer: req.costBearer
     }
 
-    const res = await axios.post('http://39.108.142.250:8080/api/maintenance/update', updateData)
+    const res = await axios.post('http://localhost:8080/api/maintenance/update', updateData)
     if (res.data.success) {
       req.requestStatus = newStatus
       if (newStatus === 2) {

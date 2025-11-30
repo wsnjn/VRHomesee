@@ -248,7 +248,7 @@
 import { ref, computed, defineProps, defineEmits } from 'vue'
 import axios from 'axios'
 
-const API_BASE_URL = 'http://39.108.142.250:8080/api'
+const API_BASE_URL = 'http://localhost:8080/api'
 
 const props = defineProps({
   statistics: {

@@ -64,7 +64,7 @@ const currentSceneKey = ref('1')
 const houseTourData = ref(fullHouseTourData)
 const loading = ref(true)
 
-const API_BASE_URL = 'http://39.108.142.250:8080/api'
+const API_BASE_URL = 'http://localhost:8080/api'
 
 // 计算当前场景
 const currentScene = computed(() => {

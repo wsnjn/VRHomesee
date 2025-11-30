@@ -111,7 +111,7 @@ const filteredPosts = computed(() => {
 const fetchFriends = async () => {
   if (!currentUserId) return
   try {
-    const res = await fetch(`http://39.108.142.250:8080/api/community/friends/${currentUserId}`)
+    const res = await fetch(`http://localhost:8080/api/community/friends/${currentUserId}`)
     const data = await res.json()
     if (data.success) {
       friends.value = data.data
@@ -123,7 +123,7 @@ const fetchFriends = async () => {
 
 const fetchPosts = async () => {
   try {
-    const res = await fetch(`http://39.108.142.250:8080/api/community/posts/with-user-info?userId=${currentUserId}`)
+    const res = await fetch(`http://localhost:8080/api/community/posts/with-user-info?userId=${currentUserId}`)
     const data = await res.json()
     if (data.success) {
       posts.value = data.data.map(post => ({
@@ -142,7 +142,7 @@ const fetchPosts = async () => {
 
 const toggleLike = async (post) => {
   try {
-    const res = await fetch(`http://39.108.142.250:8080/api/community/posts/${post.id}/like`, {
+    const res = await fetch(`http://localhost:8080/api/community/posts/${post.id}/like`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId: currentUserId })
@@ -167,7 +167,7 @@ const toggleComments = async (post) => {
 
 const loadComments = async (post) => {
   try {
-    const res = await fetch(`http://39.108.142.250:8080/api/community/posts/${post.id}/comments`)
+    const res = await fetch(`http://localhost:8080/api/community/posts/${post.id}/comments`)
     const data = await res.json()
     if (data.success) {
       post.comments = data.data
@@ -181,7 +181,7 @@ const submitComment = async (post) => {
   if (!post.newComment.trim()) return
   
   try {
-    const res = await fetch(`http://39.108.142.250:8080/api/community/posts/${post.id}/comment`, {
+    const res = await fetch(`http://localhost:8080/api/community/posts/${post.id}/comment`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 

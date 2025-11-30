@@ -37,7 +37,7 @@ const fetchUserAppointments = async () => {
   
   loadingAppointments.value = true
   try {
-    const url = `http://39.108.142.250:8080/api/viewing-appointment/user/${user.value.id}`
+    const url = `http://localhost:8080/api/viewing-appointment/user/${user.value.id}`
     console.log('请求URL:', url)
     
     const response = await fetch(url)
