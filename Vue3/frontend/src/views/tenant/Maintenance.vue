@@ -217,7 +217,7 @@ const fetchActiveLease = async () => {
   if (!currentUserId) return
   try {
     // Use the new endpoint to get all contracts for the tenant
-    const res = await fetch(`http://localhost:8080/api/admin/tenant/tenant/${currentUserId}`)
+    const res = await fetch(`http://39.108.142.250:8080/api/admin/tenant/tenant/${currentUserId}`)
     const data = await res.json()
     if (data.success && data.contracts && data.contracts.length > 0) {
       // Find the active contract (status 1=Signed or 2=In Progress)
@@ -238,7 +238,7 @@ const fetchActiveLease = async () => {
 
 const fetchHouseDetails = async (roomId) => {
   try {
-    const res = await fetch(`http://localhost:8080/api/room-info/${roomId}`)
+    const res = await fetch(`http://39.108.142.250:8080/api/room-info/${roomId}`)
     const data = await res.json()
     if (data.success && data.room) {
       houseDetails.value = data.room
@@ -252,7 +252,7 @@ const fetchRequests = async () => {
   if (!activeLease.value) return
   
   try {
-      const res = await fetch(`http://localhost:8080/api/maintenance/list/${activeLease.value.id}`)
+      const res = await fetch(`http://39.108.142.250:8080/api/maintenance/list/${activeLease.value.id}`)
       const data = await res.json()
       if (data.success) {
           requests.value = data.data
@@ -272,7 +272,7 @@ const submitRequest = async () => {
   }
 
   try {
-    const res = await fetch('http://localhost:8080/api/maintenance/create', {
+    const res = await fetch('http://39.108.142.250:8080/api/maintenance/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
