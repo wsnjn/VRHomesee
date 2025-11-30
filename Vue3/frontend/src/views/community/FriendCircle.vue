@@ -206,7 +206,7 @@ const filteredPosts = computed(() => {
 const fetchFriends = async () => {
   if (!currentUserId) return
   try {
-    const res = await fetch(`http://localhost:8080/api/community/friends/${currentUserId}`)
+    const res = await fetch(`http://39.108.142.250:8080/api/community/friends/${currentUserId}`)
     const data = await res.json()
     if (data.success) {
       friends.value = data.data
@@ -219,7 +219,7 @@ const fetchFriends = async () => {
 const checkLease = async () => {
   if (!currentUserId) return
   try {
-    const res = await fetch(`http://localhost:8080/api/admin/tenant/tenant/${currentUserId}`)
+    const res = await fetch(`http://39.108.142.250:8080/api/admin/tenant/tenant/${currentUserId}`)
     const data = await res.json()
     if (data.success && data.contracts && data.contracts.length > 0) {
       const active = data.contracts.find(c => c.contractStatus === 1 || c.contractStatus === 2)
@@ -235,7 +235,7 @@ const checkLease = async () => {
 
 const fetchPosts = async () => {
   try {
-    const res = await fetch(`http://localhost:8080/api/community/posts/with-user-info?userId=${currentUserId}`)
+    const res = await fetch(`http://39.108.142.250:8080/api/community/posts/with-user-info?userId=${currentUserId}`)
     const data = await res.json()
     if (data.success) {
       posts.value = data.data.map(post => ({
@@ -325,7 +325,7 @@ const submitPost = async () => {
       visibility: parseInt(visibility.value)
     }
 
-    const res = await fetch('http://localhost:8080/api/community/posts/create', {
+    const res = await fetch('http://39.108.142.250:8080/api/community/posts/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -367,7 +367,7 @@ const deletePost = async (postId) => {
   if (!confirm('确定要删除这条动态吗？')) return
   
   try {
-    const res = await fetch(`http://localhost:8080/api/community/posts/${postId}`, {
+    const res = await fetch(`http://39.108.142.250:8080/api/community/posts/${postId}`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId: currentUserId })
@@ -389,7 +389,7 @@ const deletePost = async (postId) => {
 const changeVisibility = async (post) => {
   const newVisibility = post.visibility === 1 ? 0 : 1
   try {
-    const res = await fetch(`http://localhost:8080/api/community/posts/${post.id}/visibility`, {
+    const res = await fetch(`http://39.108.142.250:8080/api/community/posts/${post.id}/visibility`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
@@ -415,7 +415,7 @@ const changeVisibility = async (post) => {
 
 const toggleLike = async (post) => {
   try {
-    const res = await fetch(`http://localhost:8080/api/community/posts/${post.id}/like`, {
+    const res = await fetch(`http://39.108.142.250:8080/api/community/posts/${post.id}/like`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId: currentUserId })
@@ -440,7 +440,7 @@ const toggleComments = async (post) => {
 
 const loadComments = async (post) => {
   try {
-    const res = await fetch(`http://localhost:8080/api/community/posts/${post.id}/comments`)
+    const res = await fetch(`http://39.108.142.250:8080/api/community/posts/${post.id}/comments`)
     const data = await res.json()
     if (data.success) {
       post.comments = data.data
@@ -454,7 +454,7 @@ const submitComment = async (post) => {
   if (!post.newComment.trim()) return
   
   try {
-    const res = await fetch(`http://localhost:8080/api/community/posts/${post.id}/comment`, {
+    const res = await fetch(`http://39.108.142.250:8080/api/community/posts/${post.id}/comment`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 

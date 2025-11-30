@@ -14,7 +14,7 @@ const avatarUploading = ref(false)
 const avatarFile = ref(null)
 
 // API基础URL
-const API_BASE_URL = 'http://localhost:8080/api'
+const API_BASE_URL = 'http://39.108.142.250:8080/api'
 
 // 用户类型映射
 const userTypeMap = {
