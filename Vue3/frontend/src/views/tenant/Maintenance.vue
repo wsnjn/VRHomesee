@@ -217,7 +217,7 @@ const newRequest = ref({
   requestDescription: '',
   expectedFixDate: ''
 })
-39.108.142.250:8080
+
 const fetchActiveLease = async () => {
   if (!currentUserId) return
   try {
@@ -238,7 +238,7 @@ const fetchActiveLease = async () => {
     }
   } catch (e) {
     console.error(e)
-  }39.108.142.250:8080
+  }
 }
 
 const fetchHouseDetails = async (roomId) => {
@@ -249,10 +249,10 @@ const fetchHouseDetails = async (roomId) => {
       houseDetails.value = data.room
     }
   } catch (e) {
-    console.error('获取房屋详情失败:', e)
+    console.error(e)
   }
 }
-39.108.142.250:8080
+
 const fetchRequests = async () => {
   if (!activeLease.value) return
   
@@ -272,7 +272,7 @@ const submitRequest = async () => {
   
   const payload = {
     tenantManagementId: activeLease.value.id,
-    ...newRequest.value,39.108.142.250:8080
+    ...newRequest.value,
     requestStatus: 0
   }
 

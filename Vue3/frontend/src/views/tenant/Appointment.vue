@@ -208,7 +208,7 @@ import { userState } from '../../state/user.js'
 
 const router = useRouter()
 const route = useRoute()
-39.108.142.250:8080
+
 // API基础URL
 const API_BASE_URL = 'http://localhost:8080/api'
 

@@ -185,7 +185,7 @@ const API_BASE_URL = 'http://localhost:8080/api'
 // 响应式数据
 const loading = ref(false)
 const houses = ref([])
-const provinces = ref([])39.108.142.250:8080
+const provinces = ref([])
 const cities = ref([])
 const districts = ref([])
 const streets = ref([])

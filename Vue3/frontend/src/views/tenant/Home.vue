@@ -125,7 +125,7 @@ const formatDate = (dateString) => {
     <!-- Hero Section -->
     <header class="hero-section">
       <div class="hero-content">
-        <h1 class="hero-title">发现理想生活</h139.108.142.250:8080
+       <h1 class="hero-title">发现理想生活</h1>
         <p class="hero-subtitle">专业的租房平台，为您提供优质的房屋租赁服务</p>
         <div class="hero-actions">
           <button class="primary-btn" @click="navigateToHouseSelection">
