@@ -34,6 +34,9 @@ const router = createRouter({
     // 圣诞树 (交互演示) - 子模块
     { path: '/interactive-cube/christmas-tree', name: 'christmas-tree', component: () => import('../views/ChristmasTree.vue'), meta: { requiresAuth: true, allowedUserTypes: [1, 2, 3] } },
 
+    // AR手势射击游戏 (AR Gesture Game) - 子模块
+    { path: '/interactive-cube/ar-gesture-game', name: 'ar-gesture-game', component: () => import('../views/ARGestureGame.vue'), meta: { requiresAuth: true, allowedUserTypes: [1, 2, 3] } },
+
     // 语音识别测试页面
     { path: '/speech-test', name: 'speech-test', component: () => import('../views/SpeechTest.vue'), meta: { requiresAuth: true, allowedUserTypes: [1, 2, 3] } }
   ],

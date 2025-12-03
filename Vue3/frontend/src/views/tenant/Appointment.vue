@@ -78,7 +78,7 @@
             </div>
 
             <div class="form-group">
-              <label for="tenantCount">租客人数</label>
+              <label for="tenantCount">租客人数 *</label>
               <input
                 id="tenantCount"
                 type="number"
@@ -86,18 +86,20 @@
                 min="1"
                 max="10"
                 placeholder="请输入租客人数"
+                required
               />
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label for="expectedMoveInDate">期望入住日期</label>
+              <label for="expectedMoveInDate">期望入住日期 *</label>
               <input
                 id="expectedMoveInDate"
                 type="date"
                 v-model="appointmentForm.expectedMoveInDate"
                 :min="minDate"
+                required
               />
             </div>
 
@@ -206,9 +208,9 @@ import { userState } from '../../state/user.js'
 
 const router = useRouter()
 const route = useRoute()
-
+39.108.142.250:8080
 // API基础URL
-const API_BASE_URL = 'http://39.108.142.250:8080/api'
+const API_BASE_URL = 'http://localhost:8080/api'
 
 // 响应式数据
 const loading = ref(false)
@@ -312,6 +314,16 @@ const validateForm = () => {
 
   if (!form.preferredTimeSlot) {
     alert('请选择期望时间段')
+    return false
+  }
+
+  if (!form.tenantCount) {
+    alert('请输入租客人数')
+    return false
+  }
+
+  if (!form.expectedMoveInDate) {
+    alert('请选择期望入住日期')
     return false
   }
 

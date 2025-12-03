@@ -161,12 +161,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch, onUnmounted } from 'vue'
 import { userState } from '../../state/user'
 
 const posts = ref([])
 const newPostContent = ref('')
-const currentUserId = userState.user ? userState.user.id : 0
+const currentUserId = computed(() => userState.user ? userState.user.id : 0)
+const userInfoCache = ref({})
 const mediaPreview = ref(null)
 const hasActiveLease = ref(false)
 const visibility = ref('0') // 0-公开, 1-仅好友
@@ -188,7 +189,7 @@ const filteredPosts = computed(() => {
   const friendIds = friends.value.map(f => f.friendId)
   
   return posts.value.filter(post => {
-    const isSelf = post.userId === currentUserId
+    const isSelf = post.userId === currentUserId.value
     const isFriend = friendIds.includes(post.userId)
     
     // 核心规则：只显示自己和朋友的动态
@@ -204,9 +205,9 @@ const filteredPosts = computed(() => {
 })
 
 const fetchFriends = async () => {
-  if (!currentUserId) return
-  try {
-    const res = await fetch(`http://39.108.142.250:8080/api/community/friends/${currentUserId}`)
+  if (!currentUserId.value) return
+  try {39.108.142.250:8080
+    const res = await fetch(`http://localhost:8080/api/community/friends/${currentUserId.value}`)
     const data = await res.json()
     if (data.success) {
       friends.value = data.data
@@ -217,9 +218,9 @@ const fetchFriends = async () => {
 }
 
 const checkLease = async () => {
-  if (!currentUserId) return
-  try {
-    const res = await fetch(`http://39.108.142.250:8080/api/admin/tenant/tenant/${currentUserId}`)
+  if (!currentUserId.value) return
+  try {39.108.142.250:8080
+    const res = await fetch(`http://localhost:8080/api/admin/tenant/tenant/${currentUserId.value}`)
     const data = await res.json()
     if (data.success && data.contracts && data.contracts.length > 0) {
       const active = data.contracts.find(c => c.contractStatus === 1 || c.contractStatus === 2)
@@ -234,8 +235,8 @@ const checkLease = async () => {
 }
 
 const fetchPosts = async () => {
-  try {
-    const res = await fetch(`http://39.108.142.250:8080/api/community/posts/with-user-info?userId=${currentUserId}`)
+  try {39.108.142.250:8080
+    const res = await fetch(`http://localhost:8080/api/community/posts/with-user-info?userId=${currentUserId.value}`)
     const data = await res.json()
     if (data.success) {
       posts.value = data.data.map(post => ({
@@ -319,13 +320,13 @@ const submitPost = async () => {
     }
 
     const payload = {
-      userId: currentUserId,
+      userId: currentUserId.value,
       content: newPostContent.value,
       mediaUrls: mediaUrl,
       visibility: parseInt(visibility.value)
     }
-
-    const res = await fetch('http://39.108.142.250:8080/api/community/posts/create', {
+39.108.142.250:8080
+    const res = await fetch('http://localhost:8080/api/community/posts/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -366,11 +367,11 @@ const closeMenu = () => {
 const deletePost = async (postId) => {
   if (!confirm('确定要删除这条动态吗？')) return
   
-  try {
-    const res = await fetch(`http://39.108.142.250:8080/api/community/posts/${postId}`, {
+  try {39.108.142.250:8080
+    const res = await fetch(`http://localhost:8080/api/community/posts/${postId}`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId: currentUserId })
+      body: JSON.stringify({ userId: currentUserId.value })
     })
     
     const data = await res.json()
@@ -388,12 +389,12 @@ const deletePost = async (postId) => {
 
 const changeVisibility = async (post) => {
   const newVisibility = post.visibility === 1 ? 0 : 1
-  try {
-    const res = await fetch(`http://39.108.142.250:8080/api/community/posts/${post.id}/visibility`, {
+  try {39.108.142.250:8080
+    const res = await fetch(`http://localhost:8080/api/community/posts/${post.id}/visibility`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
-        userId: currentUserId,
+        userId: currentUserId.value,
         visibility: newVisibility 
       })
     })
@@ -414,11 +415,11 @@ const changeVisibility = async (post) => {
 // --- Interaction Logic ---
 
 const toggleLike = async (post) => {
-  try {
-    const res = await fetch(`http://39.108.142.250:8080/api/community/posts/${post.id}/like`, {
+  try {39.108.142.250:8080
+    const res = await fetch(`http://localhost:8080/api/community/posts/${post.id}/like`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId: currentUserId })
+      body: JSON.stringify({ userId: currentUserId.value })
     })
     const data = await res.json()
     if (data.success) {
@@ -439,8 +440,8 @@ const toggleComments = async (post) => {
 }
 
 const loadComments = async (post) => {
-  try {
-    const res = await fetch(`http://39.108.142.250:8080/api/community/posts/${post.id}/comments`)
+  try {39.108.142.250:8080
+    const res = await fetch(`http://localhost:8080/api/community/posts/${post.id}/comments`)
     const data = await res.json()
     if (data.success) {
       post.comments = data.data
@@ -453,12 +454,12 @@ const loadComments = async (post) => {
 const submitComment = async (post) => {
   if (!post.newComment.trim()) return
   
-  try {
-    const res = await fetch(`http://39.108.142.250:8080/api/community/posts/${post.id}/comment`, {
+  try {39.108.142.250:8080
+    const res = await fetch(`http://localhost:8080/api/community/posts/${post.id}/comment`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
-        userId: currentUserId,
+        userId: currentUserId.value,
         content: post.newComment 
       })
     })
@@ -486,10 +487,40 @@ const sharePost = (post) => {
   })
 }
 
+const getUserInfo = async (userId) => {
+  if (userInfoCache.value[userId]) return userInfoCache.value[userId]
+  
+  // Prevent multiple fetches
+  if (userInfoCache.value[userId] === 'loading') return
+  userInfoCache.value[userId] = 'loading'
+
+  try {
+    const res = await fetch(`http://localhost:8080/api/user/${userId}`)
+    const data = await res.json()
+    if (data.success) {
+      userInfoCache.value[userId] = data.user
+    } else {
+      delete userInfoCache.value[userId]
+    }
+  } catch (e) {
+    console.error(e)
+    delete userInfoCache.value[userId]
+  }
+}
+
 const getFriendName = (userId) => {
-  if (userId === currentUserId) return '我'
+  if (userId === currentUserId.value) return '我'
   const friend = friends.value.find(f => f.friendId === userId)
-  return friend ? (friend.realName || friend.username) : `用户${userId}`
+  if (friend) return friend.realName || friend.username
+  
+  // Try cache
+  const cached = userInfoCache.value[userId]
+  if (cached && cached !== 'loading') return cached.username || cached.realName
+  
+  // Fetch if not found
+  if (!cached) getUserInfo(userId)
+  
+  return `用户${userId}`
 }
 
 // Add click outside listener
@@ -497,10 +528,7 @@ onMounted(() => {
   document.addEventListener('click', closeMenu)
 })
 
-import { onUnmounted } from 'vue'
-onUnmounted(() => {
-  document.removeEventListener('click', closeMenu)
-})
+
 
 const formatDate = (str) => {
   if (!str) return ''
@@ -537,24 +565,6 @@ const getMediaUrls = (mediaUrls) => {
   return []
 }
 
-const isAudio = (url) => {
-  return url && url.match(/\.(mp3|wav|aac|flac|m4a)$/i) != null
-}
-
-// 构建完整的文件URL
-const buildFileUrl = (filename) => {
-  if (!filename) return ''
-  
-  // 如果是完整的HTTP URL，直接使用
-  if (filename.startsWith('http')) {
-    return filename
-  }
-  
-  // 使用文件服务器获取文件
-  const FILE_SERVER_HOST = 'http://39.108.142.250:8088'
-  return `${FILE_SERVER_HOST}/api/files/download/${filename}`
-}
-
 const getAvatarUrl = (avatarName) => {
   if (!avatarName) {
     return '/models/image/default-avatar.png'
@@ -570,18 +580,40 @@ const getAvatarUrl = (avatarName) => {
   return `${FILE_SERVER_HOST}/api/files/download/${avatarName}`
 }
 
+let pollInterval = null
+
+watch(currentUserId, (newId) => {
+  if (newId) {
+    posts.value = []
+    friends.value = []
+    fetchFriends()
+    fetchPosts()
+  }
+})
+
 onMounted(() => {
   checkLease()
   fetchFriends()
   fetchPosts()
+  
+  // Poll for new posts and comments every 5 seconds
+  pollInterval = setInterval(() => {
+    fetchPosts()
+  }, 5000)
+})
+
+
+onUnmounted(() => {
+  if (pollInterval) clearInterval(pollInterval)
+  document.removeEventListener('click', closeMenu)
 })
 </script>
 
 <style scoped>
 .friend-circle-container {
-  max-width: 680px;
+  max-width: 720px;
   margin: 0 auto;
-  padding: 16px;
+  padding: 24px;
   font-family: 'Inter', sans-serif;
   color: #1f2937;
   min-height: 100vh;
@@ -592,16 +624,17 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #f3f4f6;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .friend-circle-header h1 {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 700;
   color: #111827;
   margin: 0;
+  letter-spacing: -0.025em;
 }
 
 .filter-controls {
@@ -618,51 +651,60 @@ onMounted(() => {
   font-size: 14px;
   cursor: pointer;
   transition: all 0.2s;
+  font-weight: 500;
 }
 
 .filter-select:hover {
   border-color: #6366f1;
+  color: #6366f1;
 }
 
 .create-post-card {
   background: white;
-  padding: 16px;
-  border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 16px;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  margin-bottom: 24px;
   border: 1px solid #f3f4f6;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.create-post-card:focus-within {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
 }
 
 .input-wrapper {
   display: flex;
-  gap: 12px;
-  margin-bottom: 12px;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
 .avatar {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   background: linear-gradient(135deg, #6366f1, #8b5cf6);
   color: white;
-  border-radius: 10px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
   flex-shrink: 0;
-  font-size: 14px;
+  font-size: 16px;
+  box-shadow: 0 2px 4px rgba(99, 102, 241, 0.2);
 }
 
 .create-post-card textarea {
   flex: 1;
-  height: 60px;
+  height: 80px;
   border: none;
   resize: none;
   outline: none;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 15px;
   padding: 8px 0;
   background: transparent;
+  line-height: 1.5;
 }
 
 .create-post-card textarea::placeholder {
@@ -670,8 +712,8 @@ onMounted(() => {
 }
 
 .media-preview {
-  margin-bottom: 15px;
-  padding-left: 55px;
+  margin-bottom: 16px;
+  padding-left: 56px;
 }
 
 .preview-container {
@@ -714,9 +756,9 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 15px;
+  padding-top: 16px;
   border-top: 1px solid #f3f4f6;
-  padding-left: 55px;
+  padding-left: 56px;
 }
 
 .post-settings {
@@ -726,12 +768,12 @@ onMounted(() => {
 }
 
 .visibility-select {
-  padding: 6px 12px;
+  padding: 8px 12px;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   background: white;
   color: #374151;
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -748,15 +790,15 @@ onMounted(() => {
 
 .media-buttons {
   display: flex;
-  gap: 8px;
+  gap: 12px;
 }
 
 .action-btn {
   background: transparent;
   border: none;
   color: #6b7280;
-  padding: 6px 12px;
-  border-radius: 20px;
+  padding: 8px 12px;
+  border-radius: 8px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -777,92 +819,93 @@ onMounted(() => {
 }
 
 .submit-btn {
-  background: #6366f1;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
   color: white;
   border: none;
   padding: 8px 24px;
   border-radius: 20px;
   cursor: pointer;
   font-weight: 600;
-  transition: background 0.2s;
+  font-size: 14px;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(99, 102, 241, 0.2);
 }
 
 .submit-btn:hover:not(:disabled) {
-  background: #4f46e5;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(99, 102, 241, 0.3);
 }
 
 .submit-btn:disabled {
   background: #e5e7eb;
   color: #9ca3af;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .lease-warning {
-  margin-top: 10px;
-  padding-left: 55px;
-  font-size: 12px;
-  color: #ef4444;
+  margin-top: 12px;
+  padding: 10px;
+  background: #fff7ed;
+  color: #c2410c;
+  border-radius: 8px;
+  font-size: 13px;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
+}
+
+.feed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .post-card {
   background: white;
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 12px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  border-radius: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
   border: 1px solid #f3f4f6;
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+
+.post-card:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.04);
 }
 
 .post-header {
+  padding: 20px;
   display: flex;
   align-items: center;
-  margin-bottom: 12px;
+  gap: 12px;
 }
 
 .avatar-container {
-  margin-right: 12px;
+  flex-shrink: 0;
 }
 
 .post-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 1px solid #e5e7eb;
-}
-
-.visibility-badge {
-  font-size: 12px;
-  padding: 2px 8px;
+  width: 44px;
+  height: 44px;
   border-radius: 12px;
-  margin-left: auto;
-  font-weight: 500;
-}
-
-.visibility-badge.public {
-  background: #eff6ff;
-  color: #3b82f6;
-  border: 1px solid #bfdbfe;
-}
-
-.visibility-badge.friends-only {
-  background: #fffbeb;
-  color: #b45309;
-  border: 1px solid #fde68a;
+  object-fit: cover;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .user-info {
   flex: 1;
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
 
 .username {
   font-weight: 600;
   color: #111827;
+  font-size: 15px;
 }
 
 .time {
@@ -870,92 +913,40 @@ onMounted(() => {
   color: #9ca3af;
 }
 
+.visibility-badge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.visibility-badge.public {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.visibility-badge.friends-only {
+  background: #fdf2f8;
+  color: #db2777;
+}
+
+.more-menu-container {
+  position: relative;
+}
+
 .more-btn {
-  background: none;
+  background: transparent;
   border: none;
   color: #9ca3af;
-  cursor: pointer;
-  padding: 4px;
+  padding: 8px;
   border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
 .more-btn:hover {
   background: #f3f4f6;
-  color: #4b5563;
-}
-
-.post-content {
-  margin-bottom: 12px;
-  font-size: 14px;
-  line-height: 1.5;
   color: #374151;
-}
-
-.post-content p {
-  margin: 0 0 12px 0;
-}
-
-.post-media img, .post-media video {
-  max-width: 100%;
-  max-height: 400px;
-  width: auto;
-  height: auto;
-  border-radius: 12px;
-  margin-top: 8px;
-  object-fit: contain;
-}
-
-.post-media audio {
-  width: 100%;
-  max-width: 400px;
-  margin-top: 8px;
-  border-radius: 8px;
-}
-
-.media-item {
-  margin-bottom: 8px;
-}
-
-.media-item:last-child {
-  margin-bottom: 0;
-}
-
-.post-footer {
-  display: flex;
-  justify-content: space-between;
-  border-top: 1px solid #f3f4f6;
-  padding-top: 10px;
-}
-
-.footer-btn {
-  flex: 1;
-  background: none;
-  border: none;
-  color: #6b7280;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 6px;
-  border-radius: 8px;
-  font-size: 14px;
-  transition: all 0.2s;
-}
-
-.footer-btn:hover {
-  background: #f3f4f6;
-}
-
-.like-btn.active { color: #ef4444; }
-.like-btn:hover { color: #ef4444; background: #fef2f2; }
-.comment-btn:hover { color: #3b82f6; background: #eff6ff; }
-.share-btn:hover { color: #10b981; background: #ecfdf5; }
-.share-btn:hover { color: #10b981; background: #ecfdf5; }
-
-.more-menu-container {
-  position: relative;
-  margin-left: 8px;
 }
 
 .dropdown-menu {
@@ -964,18 +955,11 @@ onMounted(() => {
   right: 0;
   background: white;
   border-radius: 12px;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid #f3f4f6;
   padding: 6px;
   min-width: 140px;
-  z-index: 20;
-  border: 1px solid #f3f4f6;
-  transform-origin: top right;
-  animation: scaleIn 0.1s ease-out;
-}
-
-@keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  z-index: 10;
 }
 
 .dropdown-menu button {
@@ -985,14 +969,12 @@ onMounted(() => {
   width: 100%;
   padding: 10px 12px;
   border: none;
-  background: none;
-  text-align: left;
-  cursor: pointer;
-  font-size: 14px;
+  background: transparent;
   color: #4b5563;
+  font-size: 13px;
+  cursor: pointer;
   border-radius: 8px;
   transition: all 0.2s;
-  font-weight: 500;
 }
 
 .dropdown-menu button:hover {
@@ -1000,48 +982,114 @@ onMounted(() => {
   color: #111827;
 }
 
-.dropdown-menu .delete-btn {
+.dropdown-menu button.delete-btn {
   color: #ef4444;
 }
 
-.dropdown-menu .delete-btn:hover {
+.dropdown-menu button.delete-btn:hover {
   background: #fef2f2;
-  color: #dc2626;
 }
 
-/* Comments Styles */
+.post-content {
+  padding: 0 20px 20px;
+}
+
+.post-content p {
+  margin: 0 0 16px;
+  color: #374151;
+  line-height: 1.6;
+  font-size: 15px;
+  white-space: pre-wrap;
+}
+
+.post-media {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.media-item img, .media-item video {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.media-item img:hover {
+  opacity: 0.95;
+}
+
+.post-footer {
+  padding: 12px 20px;
+  border-top: 1px solid #f9fafb;
+  display: flex;
+  gap: 24px;
+}
+
+.footer-btn {
+  background: transparent;
+  border: none;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.footer-btn:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.footer-btn.like-btn.active {
+  color: #ef4444;
+}
+
+.footer-btn.like-btn.active svg {
+  fill: #ef4444;
+  stroke: #ef4444;
+}
+
 .comments-section {
   background: #f9fafb;
-  padding: 12px;
-  margin-top: 12px;
-  border-radius: 8px;
+  padding: 16px 20px;
+  border-top: 1px solid #f3f4f6;
 }
 
 .comment-list {
-  margin-bottom: 12px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  margin-bottom: 16px;
 }
 
 .comment-item {
   font-size: 13px;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 .comment-user {
   font-weight: 600;
-  color: #4b5563;
+  color: #111827;
   margin-right: 6px;
 }
 
 .comment-content {
-  color: #374151;
+  color: #4b5563;
 }
 
 .comment-input-area {
   display: flex;
-  gap: 8px;
+  gap: 10px;
 }
 
 .comment-input-area input {
@@ -1051,23 +1099,24 @@ onMounted(() => {
   border-radius: 20px;
   font-size: 13px;
   outline: none;
-  transition: border-color 0.2s;
+  transition: all 0.2s;
 }
 
 .comment-input-area input:focus {
   border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
 }
 
 .comment-input-area button {
   background: #6366f1;
   color: white;
   border: none;
-  padding: 0 16px;
-  border-radius: 20px;
+  padding: 6px 16px;
+  border-radius: 16px;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
 }
 
 .comment-input-area button:hover:not(:disabled) {
@@ -1076,6 +1125,8 @@ onMounted(() => {
 
 .comment-input-area button:disabled {
   background: #e5e7eb;
+  color: #9ca3af;
   cursor: not-allowed;
 }
 </style>
+```

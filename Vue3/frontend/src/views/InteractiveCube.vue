@@ -37,6 +37,22 @@
         </div>
         <div class="card-border"></div>
       </div>
+      <!-- AR手势射击游戏模块卡片 -->
+      <div class="module-card" @click="navigateTo('ar-gesture-game')">
+        <div class="card-bg"></div>
+        <div class="card-content">
+          <div class="icon">🔫</div>
+          <h3>AR手势射击</h3>
+          <p>GESTURE SHOOTER</p>
+          <div class="tags">
+            <span>AR</span>
+            <span>MEDIAPIPE</span>
+            <span>GAME</span>
+          </div>
+        </div>
+        <div class="card-border"></div>
+      </div>
+
        <div class="module-card locked">
         <div class="card-bg"></div>
         <div class="card-content">

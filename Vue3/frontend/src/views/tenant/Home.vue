@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import DinoOverlay from './DinoOverlay.vue'
+import Navbar from '../../components/Navbar.vue'
 
 const router = useRouter()
 const showUserMenu = ref(false)
@@ -34,32 +35,6 @@ const isLoggedIn = computed(() => {
   return user.value !== null
 })
 
-// 计算属性：显示的用户名（优先显示真实姓名，如果没有则显示用户名）
-const displayName = computed(() => {
-  if (!user.value) return ''
-  return user.value.realName || user.value.username || '用户'
-})
-
-// 计算属性：获取头像URL
-const avatarUrl = computed(() => {
-  if (!user.value || !user.value.avatar) {
-    return '/models/image/default-avatar.png'
-  }
-  
-  // 如果是完整的HTTP URL，直接使用
-  if (user.value.avatar.startsWith('http')) {
-    return user.value.avatar
-  }
-  
-  // 使用文件服务器获取头像
-  const FILE_SERVER_HOST = 'http://39.108.142.250:8088'
-  return `${FILE_SERVER_HOST}/api/files/download/${user.value.avatar}`
-})
-
-const navigateToLogin = () => {
-  router.push('/login')
-}
-
 const navigateToHouseSelection = () => {
   router.push('/house-selection')
 }
@@ -84,48 +59,13 @@ const navigateToVirtualWorld = () => {
   router.push('/interactive-cube')
 }
 
-const navigateToUserProfile = () => {
-  router.push('/user-profile')
-  showUserMenu.value = false
-}
-
-const logout = () => {
-  localStorage.removeItem('user')
-  localStorage.removeItem('token')
-  user.value = null
-  showUserMenu.value = false
-  router.push('/login')
-}
-
-const toggleUserMenu = () => {
-  if (isLoggedIn.value) {
-    showUserMenu.value = !showUserMenu.value
-  }
-}
-
-// 点击其他地方关闭用户菜单
-const handleClickOutside = (event) => {
-  const userMenu = document.querySelector('.user-menu')
-  const userInfo = document.querySelector('.user-info-container')
-  if (userMenu && userInfo && 
-      !userMenu.contains(event.target) && 
-      !userInfo.contains(event.target)) {
-    showUserMenu.value = false
-  }
-}
-
-// 添加全局点击事件监听
-onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-})
-
 // 获取用户预约信息
 const fetchUserAppointments = async () => {
   if (!user.value) return
   
   loadingAppointments.value = true
   try {
-    const response = await fetch(`http://39.108.142.250:8080/api/viewing-appointment/user/${user.value.id}`)
+    const response = await fetch(`http://localhost:8080/api/viewing-appointment/user/${user.value.id}`)
     if (response.ok) {
       appointments.value = await response.json()
     } else {
@@ -180,52 +120,12 @@ const formatDate = (dateString) => {
 <template>
   <div class="home-container">
     <!-- 顶部导航栏 -->
-    <nav class="navbar" :class="{ 'scrolled': isScrolled }">
-      <div class="nav-content">
-        <div class="logo-container">
-          <img src="/models/logo (1).png" alt="HOMESEE Logo" class="nav-logo-canvas">
-          <span class="logo-text">HOMESEE</span>
-        </div>
-        
-        <div class="nav-links-container">
-          <!-- 用户信息区域 -->
-          <div class="user-info-container" v-if="isLoggedIn">
-            <button id="btn-message" class="button-message" @click.stop="toggleUserMenu">
-              <div class="content-avatar">
-                <div class="status-user"></div>
-                <div class="avatar">
-                  <img :src="avatarUrl" alt="用户头像" class="user-img">
-                </div>
-              </div>
-              <div class="notice-content">
-                <div class="username">{{ displayName }}</div>
-                <div class="lable-message">{{ user.phone }}</div>
-                <div class="user-id">@{{ user.username }}</div>
-              </div>
-            </button>
-            
-            <!-- 用户菜单下拉框 -->
-            <transition name="fade">
-              <div v-if="showUserMenu" class="user-menu">
-                <div class="menu-item" @click="navigateToUserProfile">
-                  <span class="menu-icon">👤</span> 个人信息
-                </div>
-                <div class="menu-item" @click="logout">
-                  <span class="menu-icon">🚪</span> 退出登录
-                </div>
-              </div>
-            </transition>
-          </div>
-          
-          <button v-else @click="navigateToLogin" class="nav-link login-btn">登录 / 注册</button>
-        </div>
-      </div>
-    </nav>
+    <Navbar />
 
     <!-- Hero Section -->
     <header class="hero-section">
       <div class="hero-content">
-        <h1 class="hero-title">发现理想生活</h1>
+        <h1 class="hero-title">发现理想生活</h139.108.142.250:8080
         <p class="hero-subtitle">专业的租房平台，为您提供优质的房屋租赁服务</p>
         <div class="hero-actions">
           <button class="primary-btn" @click="navigateToHouseSelection">

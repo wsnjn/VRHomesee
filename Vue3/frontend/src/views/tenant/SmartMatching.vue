@@ -1,11 +1,12 @@
 <template>
   <div class="chat-container">
+    <Navbar />
+    <div class="page-header-spacer"></div>
     <div class="chat-header">
       <div class="header-content">
         <h2>智能租房助手</h2>
         <p>基于 DeepSeek AI为您提供个性化租房建议</p>
       </div>
-      <button class="back-btn" @click="goBack">返回首页</button>
     </div>
 
     <div class="chat-messages" ref="messagesContainer">
@@ -47,6 +48,7 @@
 <script setup>
 import { ref, onMounted, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import Navbar from '../../components/Navbar.vue'
 
 const router = useRouter()
 const messages = ref([])

@@ -1,13 +1,7 @@
 <template>
   <div class="house-selection">
-    <!-- 顶部返回栏 -->
-    <div class="page-header">
-      <button @click="router.push('/')" class="back-btn">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-        返回首页
-      </button>
-      <h1 class="page-title">挑选您的理想房源</h1>
-    </div>
+    <Navbar />
+    <div class="page-header-spacer"></div>
 
     <div class="content-wrapper">
       <!-- 筛选条件 -->
@@ -181,16 +175,17 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
+import Navbar from '../../components/Navbar.vue'
 
 const router = useRouter()
 
 // API基础URL
-const API_BASE_URL = 'http://39.108.142.250:8080/api'
+const API_BASE_URL = 'http://localhost:8080/api'
 
 // 响应式数据
 const loading = ref(false)
 const houses = ref([])
-const provinces = ref([])
+const provinces = ref([])39.108.142.250:8080
 const cities = ref([])
 const districts = ref([])
 const streets = ref([])
@@ -542,6 +537,10 @@ onMounted(async () => {
   background-color: #f8f9fa;
   font-family: 'Inter', sans-serif;
   padding-bottom: 4rem;
+}
+
+.page-header-spacer {
+  height: 80px;
 }
 
 .page-header {

@@ -150,6 +150,10 @@
       <div class="empty-content">
         <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#e0e0e0" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
         <p>选择一个群组或好友开始聊天</p>
+        <button class="start-chat-btn" @click="showAddFriendModal = true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          添加好友 / 发起聊天
+        </button>
       </div>
     </div>
 
@@ -211,7 +215,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, onMounted, nextTick, computed, watch } from 'vue'
 import { userState } from '../../state/user'
 
 const activeTab = ref('groups')
@@ -223,7 +227,20 @@ const groupMembers = ref([])
 const messages = ref([])
 const newMessage = ref('')
 const msgContainer = ref(null)
-const currentUserId = userState.user ? userState.user.id : 0
+const currentUserId = computed(() => userState.user ? userState.user.id : 0)
+
+watch(currentUserId, (newId) => {
+  if (newId) {
+    groups.value = []
+    friends.value = []
+    pendingRequests.value = []
+    activeGroup.value = null
+    messages.value = []
+    fetchGroups()
+    fetchFriends()
+    fetchPendingRequests()
+  }
+})
 
 const showCreateGroupModal = ref(false)
 const showAddFriendModal = ref(false)
@@ -232,9 +249,9 @@ const newGroupAnnouncement = ref('')
 const friendIdInput = ref('')
 
 const fetchGroups = async () => {
-  if (!currentUserId) return
+  if (!currentUserId.value) return
   try {
-    const res = await fetch(`http://39.108.142.250:8080/api/community/groups/user/${currentUserId}`)
+    const res = await fetch(`http://39.108.142.250:8080/api/community/groups/user/${currentUserId.value}`)
     const data = await res.json()
     if (data.success) {
       groups.value = data.data
@@ -246,7 +263,7 @@ const fetchGroups = async () => {
 
 const fetchFriends = async () => {
   try {
-    const res = await fetch(`http://39.108.142.250:8080/api/community/friends/${currentUserId}`)
+    const res = await fetch(`http://39.108.142.250:8080/api/community/friends/${currentUserId.value}`)
     const data = await res.json()
     if (data.success) {
       friends.value = data.data
@@ -258,7 +275,7 @@ const fetchFriends = async () => {
 
 const fetchPendingRequests = async () => {
   try {
-    const res = await fetch(`http://39.108.142.250:8080/api/community/friends/pending/${currentUserId}`)
+    const res = await fetch(`http://39.108.142.250:8080/api/community/friends/pending/${currentUserId.value}`)
     const data = await res.json()
     if (data.success) {
       pendingRequests.value = data.data
@@ -303,7 +320,7 @@ const sendMessage = async () => {
   if (!newMessage.value.trim() || !activeGroup.value) return
 
   const payload = {
-    senderId: currentUserId,
+    senderId: currentUserId.value,
     groupId: activeGroup.value.id,
     content: newMessage.value,
     msgType: 0
@@ -332,7 +349,7 @@ const createGroup = async () => {
   const payload = {
     groupName: newGroupName.value,
     announcement: newGroupAnnouncement.value,
-    ownerId: currentUserId,
+    ownerId: currentUserId.value,
     groupType: 0 // Normal group
   }
 
@@ -367,14 +384,14 @@ const sendFriendRequest = async () => {
       return
     }
     
-    if (searchData.user.id === currentUserId) {
+    if (searchData.user.id === currentUserId.value) {
       alert('不能添加自己为好友')
       return
     }
     
     // 发送好友请求
     const payload = {
-      userId: currentUserId,
+      userId: currentUserId.value,
       friendId: searchData.user.id
     }
 
@@ -424,7 +441,7 @@ const startPrivateChat = async (friend) => {
     const res = await fetch('http://39.108.142.250:8080/api/community/groups/private', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId: currentUserId, friendId: friend.friendId })
+      body: JSON.stringify({ userId: currentUserId.value, friendId: friend.friendId })
     })
     const data = await res.json()
     if (data.success) {
@@ -475,7 +492,7 @@ const getUserInfo = async (userId) => {
 }
 
 const getSenderName = (senderId) => {
-  if (senderId === currentUserId) return '我'
+  if (senderId === currentUserId.value) return '我'
   if (!userInfoCache.value[senderId]) {
     getUserInfo(senderId)
     return `用户 ${senderId}`
@@ -543,7 +560,7 @@ const deleteGroup = async () => {
     const res = await fetch('http://39.108.142.250:8080/api/community/groups/delete', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ groupId: activeGroup.value.id, userId: currentUserId })
+      body: JSON.stringify({ groupId: activeGroup.value.id, userId: currentUserId.value })
     })
     const data = await res.json()
     if (data.success) {
@@ -583,7 +600,7 @@ const inviteSelectedFriends = async () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           groupId: activeGroup.value.id, 
-          inviterId: currentUserId,
+          inviterId: currentUserId.value,
           inviteeId: friendId
         })
       })
@@ -1128,5 +1145,33 @@ const getAvatarSrc = (avatarName) => {
   font-size: 12px;
   color: #9ca3af;
   margin-left: 5px;
+}
+.comment-input-area button:disabled {
+  background: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.start-chat-btn {
+  margin-top: 20px;
+  background: #6366f1;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 6px rgba(99, 102, 241, 0.2);
+}
+
+.start-chat-btn:hover {
+  background: #4f46e5;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 8px rgba(99, 102, 241, 0.3);
 }
 </style>

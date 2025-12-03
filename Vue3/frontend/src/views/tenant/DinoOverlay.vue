@@ -1,6 +1,9 @@
 <template>
   <div class="dino-overlay-container">
     <div class="ghost-animation" :class="{ 'jump': isJumping }" @click="makeDinoJump">
+      <div class="speech-bubble" v-if="showBubble">
+        {{ currentMessage }}
+      </div>
       <div id="ghost">
         <div id="red">
           <!-- 15x15网格的所有元素 -->
@@ -31,17 +34,44 @@ export default {
   name: 'DinoOverlay',
   data() {
     return {
-      isJumping: false
+      isJumping: false,
+      showBubble: false,
+      currentMessage: '嗨！我是您的AI助手，想找什么样的房子？跟我说说吧！',
+      messages: [
+        '嗨！我是您的AI助手，想找什么样的房子？跟我说说吧！',
+        '点击我可以进行智能匹配哦！',
+        '有什么租房问题都可以问我！'
+      ]
     }
+  },
+  mounted() {
+    // 延迟显示气泡
+    setTimeout(() => {
+      this.showBubble = true;
+    }, 1000);
+
+    // 轮播消息
+    setInterval(() => {
+      this.rotateMessage();
+    }, 8000);
   },
   methods: {
     makeDinoJump() {
       if (!this.isJumping) {
         this.isJumping = true;
+        this.$router.push('/smart-matching');
         setTimeout(() => {
           this.isJumping = false;
         }, 600);
       }
+    },
+    rotateMessage() {
+      this.showBubble = false;
+      setTimeout(() => {
+        const randomIndex = Math.floor(Math.random() * this.messages.length);
+        this.currentMessage = this.messages[randomIndex];
+        this.showBubble = true;
+      }, 500);
     }
   }
 }
@@ -465,9 +495,48 @@ export default {
         }
         
         /* 响应式设计 */
-        @media (max-width: 768px) {
-            .dino-overlay-container {
-                padding: 20px;
-            }
+    /* Speech Bubble */
+    .speech-bubble {
+        position: absolute;
+        bottom: 140px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        padding: 10px 15px;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        font-size: 14px;
+        color: #333;
+        white-space: nowrap;
+        z-index: 1001;
+        animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .speech-bubble::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-width: 8px 8px 0;
+        border-style: solid;
+        border-color: white transparent transparent transparent;
+    }
+
+    @keyframes popIn {
+        0% {
+            opacity: 0;
+            transform: translateX(-50%) scale(0.5);
         }
-    </style>
+        100% {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .dino-overlay-container {
+            padding: 20px;
+        }
+    }
+</style>

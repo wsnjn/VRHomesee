@@ -1,5 +1,8 @@
 <template>
-  <div class="maintenance-container">
+  <div class="maintenance-page">
+    <Navbar />
+    <div class="page-header-spacer"></div>
+    <div class="maintenance-container">
     <div class="header">
       <div class="title-section">
         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
@@ -195,10 +198,12 @@
       </div>
     </div>
   </div>
+  </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import Navbar from '../../components/Navbar.vue'
 import { userState } from '../../state/user'
 
 const requests = ref([])
@@ -212,12 +217,12 @@ const newRequest = ref({
   requestDescription: '',
   expectedFixDate: ''
 })
-
+39.108.142.250:8080
 const fetchActiveLease = async () => {
   if (!currentUserId) return
   try {
     // Use the new endpoint to get all contracts for the tenant
-    const res = await fetch(`http://39.108.142.250:8080/api/admin/tenant/tenant/${currentUserId}`)
+    const res = await fetch(`http://localhost:8080/api/admin/tenant/tenant/${currentUserId}`)
     const data = await res.json()
     if (data.success && data.contracts && data.contracts.length > 0) {
       // Find the active contract (status 1=Signed or 2=In Progress)
@@ -233,12 +238,12 @@ const fetchActiveLease = async () => {
     }
   } catch (e) {
     console.error(e)
-  }
+  }39.108.142.250:8080
 }
 
 const fetchHouseDetails = async (roomId) => {
   try {
-    const res = await fetch(`http://39.108.142.250:8080/api/room-info/${roomId}`)
+    const res = await fetch(`http://localhost:8080/api/room-info/${roomId}`)
     const data = await res.json()
     if (data.success && data.room) {
       houseDetails.value = data.room
@@ -247,12 +252,12 @@ const fetchHouseDetails = async (roomId) => {
     console.error('获取房屋详情失败:', e)
   }
 }
-
+39.108.142.250:8080
 const fetchRequests = async () => {
   if (!activeLease.value) return
   
   try {
-      const res = await fetch(`http://39.108.142.250:8080/api/maintenance/list/${activeLease.value.id}`)
+      const res = await fetch(`http://localhost:8080/api/maintenance/list/${activeLease.value.id}`)
       const data = await res.json()
       if (data.success) {
           requests.value = data.data
@@ -267,12 +272,12 @@ const submitRequest = async () => {
   
   const payload = {
     tenantManagementId: activeLease.value.id,
-    ...newRequest.value,
+    ...newRequest.value,39.108.142.250:8080
     requestStatus: 0
   }
 
   try {
-    const res = await fetch('http://39.108.142.250:8080/api/maintenance/create', {
+    const res = await fetch('http://localhost:8080/api/maintenance/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -379,6 +384,15 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.maintenance-page {
+  min-height: 100vh;
+  background-color: #f8fafc;
+}
+
+.page-header-spacer {
+  height: 80px;
+}
+
 .maintenance-container {
   padding: 30px;
   max-width: 1200px;
