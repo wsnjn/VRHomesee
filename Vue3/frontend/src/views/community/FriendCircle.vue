@@ -618,6 +618,13 @@ onUnmounted(() => {
   color: #1f2937;
   min-height: 100vh;
   overflow-y: auto;
+  /* 隐藏滚动条但保持滑动功能 */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.friend-circle-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
 }
 
 .friend-circle-header {

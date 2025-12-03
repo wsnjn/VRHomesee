@@ -126,8 +126,15 @@ const currentTab = ref('chat')
 
 .content-area {
   flex: 1;
-  overflow: hidden;
+  overflow-y: auto;
   position: relative;
+  /* 隐藏滚动条但保持滑动功能 */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.content-area::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
 }
 
 /* Transitions */

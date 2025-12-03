@@ -723,6 +723,13 @@ const getAvatarSrc = (avatarName) => {
 .list-container {
   flex: 1;
   overflow-y: auto;
+  /* 隐藏滚动条但保持滑动功能 */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.list-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
 }
 
 .list-header {
@@ -827,6 +834,13 @@ const getAvatarSrc = (avatarName) => {
   flex-direction: column;
   gap: 20px;
   background: #f9fafb;
+  /* 隐藏滚动条但保持滑动功能 */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.messages-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
 }
 
 .message-wrapper {
@@ -1070,6 +1084,13 @@ const getAvatarSrc = (avatarName) => {
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   margin-bottom: 15px;
+  /* 隐藏滚动条但保持滑动功能 */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.friend-select-list::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
 }
 
 .friend-select-item {
