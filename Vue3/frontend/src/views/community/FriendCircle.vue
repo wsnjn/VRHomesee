@@ -580,6 +580,24 @@ const getAvatarUrl = (avatarName) => {
   return `${FILE_SERVER_HOST}/api/files/download/${avatarName}`
 }
 
+const isAudio = (url) => {
+  return url && url.match(/\.(mp3|wav|aac|flac|m4a)$/i) != null
+}
+
+// 构建完整的文件URL
+const buildFileUrl = (filename) => {
+  if (!filename) return ''
+  
+  // 如果是完整的HTTP URL，直接使用
+  if (filename.startsWith('http')) {
+    return filename
+  }
+  
+  // 使用文件服务器获取文件
+  const FILE_SERVER_HOST = 'http://39.108.142.250:8088'
+  return `${FILE_SERVER_HOST}/api/files/download/${filename}`
+}
+
 let pollInterval = null
 
 watch(currentUserId, (newId) => {
