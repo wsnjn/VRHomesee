@@ -146,8 +146,8 @@ const selectedUserId = ref(null);
 const selectedUserName = ref('');
 const duration = ref(60);
 
-const API_HOST = "http://39.108.142.250:8080";
-const FILE_API_HOST = "http://39.108.142.250:8088";
+const API_HOST = "http://api.homesee.xyz";
+const FILE_API_HOST = "https://files.homesee.xyz";
 
 const fetchChatMessages = async () => {
   try {

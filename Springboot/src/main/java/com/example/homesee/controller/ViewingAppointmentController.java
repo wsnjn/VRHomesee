@@ -10,7 +10,13 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/viewing-appointment")
-@CrossOrigin(origins = "http://39.108.142.250:9999,http://localhost:5173")
+@CrossOrigin(origins = {
+        "http://39.108.142.250:9999",
+        "http://localhost:5173",
+        "https://www.homesee.xyz",
+        "https://homesee.xyz"
+})
+
 public class ViewingAppointmentController {
 
     @Autowired

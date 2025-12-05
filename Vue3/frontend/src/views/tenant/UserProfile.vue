@@ -14,7 +14,7 @@ const avatarUploading = ref(false)
 const avatarFile = ref(null)
 
 // API基础URL
-const API_BASE_URL = 'http://39.108.142.250:8080/api'
+const API_BASE_URL = 'https://api.homesee.xyz/api'
 
 // 用户类型映射
 const userTypeMap = {
@@ -239,7 +239,7 @@ const getAvatarUrl = () => {
   }
   
   // 放弃本地路径，全部走文件服务器
-  const FILE_SERVER_HOST = 'http://39.108.142.250:8088'
+  const FILE_SERVER_HOST = 'https://files.homesee.xyz'
   return `${FILE_SERVER_HOST}/api/files/download/${user.value.avatar}`
 }
 
@@ -299,7 +299,7 @@ const uploadAvatar = async () => {
     formData.append('file', avatarFile.value)
     
     // 使用确定的文件服务器地址
-    const FILE_SERVER_HOST = 'http://39.108.142.250:8088'
+    const FILE_SERVER_HOST = 'https://files.homesee.xyz'
     
     const uploadResponse = await axios.post(`${FILE_SERVER_HOST}/api/files/upload`, formData, {
       headers: {

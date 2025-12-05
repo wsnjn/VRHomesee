@@ -52,7 +52,7 @@ const avatarUrl = computed(() => {
   if (user.value.avatar.startsWith('http')) {
     return user.value.avatar
   }
-  const FILE_SERVER_HOST = 'http://39.108.142.250:8088'
+  const FILE_SERVER_HOST = 'https://files.homesee.xyz'
   return `${FILE_SERVER_HOST}/api/files/download/${user.value.avatar}`
 })
 

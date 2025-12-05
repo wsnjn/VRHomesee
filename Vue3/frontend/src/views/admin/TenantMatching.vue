@@ -216,7 +216,7 @@ import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 
 // API基础URL
-const API_BASE_URL = 'http://39.108.142.250:8080/api'
+const API_BASE_URL = 'https://api.homesee.xyz/api'
 
 // 响应式数据
 const housesLoading = ref(false)

@@ -65,7 +65,7 @@ const fetchUserAppointments = async () => {
   
   loadingAppointments.value = true
   try {
-    const response = await fetch(`http://39.108.142.250:8080/api/viewing-appointment/user/${user.value.id}`)
+    const response = await fetch(`https://api.homesee.xyz/api/viewing-appointment/user/${user.value.id}`)
     if (response.ok) {
       appointments.value = await response.json()
     } else {

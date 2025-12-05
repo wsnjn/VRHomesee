@@ -253,7 +253,7 @@ import HouseStatus from './HouseStatus.vue'
 const router = useRouter()
 
 // API基础URL
-const API_BASE_URL = 'http://39.108.142.250:8080/api'
+const API_BASE_URL = 'https://api.homesee.xyz/api'
 
 // 响应式数据
 const activeTab = ref('dashboard')
@@ -775,7 +775,7 @@ const getAvatarUrl = () => {
     return user.value.avatar
   }
   
-  const FILE_SERVER_HOST = 'http://39.108.142.250:8088'
+  const FILE_SERVER_HOST = 'https://files.homesee.xyz'
   return `${FILE_SERVER_HOST}/api/files/download/${user.value.avatar}`
 }
 

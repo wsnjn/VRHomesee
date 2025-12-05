@@ -207,7 +207,7 @@ const filteredPosts = computed(() => {
 const fetchFriends = async () => {
   if (!currentUserId.value) return
   try {
-    const res = await fetch(`http://39.108.142.250:8080/api/community/friends/${currentUserId.value}`)
+    const res = await fetch(`https://api.homesee.xyz/api/community/friends/${currentUserId.value}`)
     const data = await res.json()
     if (data.success) {
       friends.value = data.data
@@ -220,7 +220,7 @@ const fetchFriends = async () => {
 const checkLease = async () => {
   if (!currentUserId.value) return
   try {
-    const res = await fetch(`http://39.108.142.250:8080/api/admin/tenant/tenant/${currentUserId.value}`)
+    const res = await fetch(`https://api.homesee.xyz/api/admin/tenant/tenant/${currentUserId.value}`)
     const data = await res.json()
     if (data.success && data.contracts && data.contracts.length > 0) {
       const active = data.contracts.find(c => c.contractStatus === 1 || c.contractStatus === 2)
@@ -236,7 +236,7 @@ const checkLease = async () => {
 
 const fetchPosts = async () => {
   try {
-    const res = await fetch(`http://39.108.142.250:8080/api/community/posts/with-user-info?userId=${currentUserId.value}`)
+    const res = await fetch(`https://api.homesee.xyz/api/community/posts/with-user-info?userId=${currentUserId.value}`)
     const data = await res.json()
     if (data.success) {
       posts.value = data.data.map(post => ({
@@ -281,7 +281,7 @@ const uploadMediaFile = async (file) => {
 
   try {
     // 直接上传到文件服务器
-    const FILE_SERVER_HOST = 'http://39.108.142.250:8088'
+    const FILE_SERVER_HOST = 'https://files.homesee.xyz'
     const res = await fetch(`${FILE_SERVER_HOST}/api/files/upload`, {
       method: 'POST',
       body: formData
@@ -326,7 +326,7 @@ const submitPost = async () => {
       visibility: parseInt(visibility.value)
     }
 
-    const res = await fetch('http://39.108.142.250:8080/api/community/posts/create', {
+    const res = await fetch('https://api.homesee.xyz/api/community/posts/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -368,7 +368,7 @@ const deletePost = async (postId) => {
   if (!confirm('确定要删除这条动态吗？')) return
   
   try {
-    const res = await fetch(`http://39.108.142.250:8080/api/community/posts/${postId}`, {
+    const res = await fetch(`https://api.homesee.xyz/api/community/posts/${postId}`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId: currentUserId.value })
@@ -390,7 +390,7 @@ const deletePost = async (postId) => {
 const changeVisibility = async (post) => {
   const newVisibility = post.visibility === 1 ? 0 : 1
   try {
-    const res = await fetch(`http://39.108.142.250:8080/api/community/posts/${post.id}/visibility`, {
+    const res = await fetch(`https://api.homesee.xyz/api/community/posts/${post.id}/visibility`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
@@ -416,7 +416,7 @@ const changeVisibility = async (post) => {
 
 const toggleLike = async (post) => {
   try {
-    const res = await fetch(`http://39.108.142.250:8080/api/community/posts/${post.id}/like`, {
+    const res = await fetch(`https://api.homesee.xyz/api/community/posts/${post.id}/like`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId: currentUserId.value })
@@ -441,7 +441,7 @@ const toggleComments = async (post) => {
 
 const loadComments = async (post) => {
   try {
-    const res = await fetch(`http://39.108.142.250:8080/api/community/posts/${post.id}/comments`)
+    const res = await fetch(`https://api.homesee.xyz/api/community/posts/${post.id}/comments`)
     const data = await res.json()
     if (data.success) {
       post.comments = data.data
@@ -455,7 +455,7 @@ const submitComment = async (post) => {
   if (!post.newComment.trim()) return
   
   try {
-    const res = await fetch(`http://39.108.142.250:8080/api/community/posts/${post.id}/comment`, {
+    const res = await fetch(`https://api.homesee.xyz/api/community/posts/${post.id}/comment`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
@@ -495,7 +495,7 @@ const getUserInfo = async (userId) => {
   userInfoCache.value[userId] = 'loading'
 
   try {
-    const res = await fetch(`http://39.108.142.250:8080/api/user/${userId}`)
+    const res = await fetch(`https://api.homesee.xyz/api/user/${userId}`)
     const data = await res.json()
     if (data.success) {
       userInfoCache.value[userId] = data.user
@@ -576,7 +576,7 @@ const getAvatarUrl = (avatarName) => {
   }
   
   // 使用文件服务器获取头像
-  const FILE_SERVER_HOST = 'http://39.108.142.250:8088'
+  const FILE_SERVER_HOST = 'https://files.homesee.xyz'
   return `${FILE_SERVER_HOST}/api/files/download/${avatarName}`
 }
 
@@ -594,7 +594,7 @@ const buildFileUrl = (filename) => {
   }
   
   // 使用文件服务器获取文件
-  const FILE_SERVER_HOST = 'http://39.108.142.250:8088'
+  const FILE_SERVER_HOST = 'https://files.homesee.xyz'
   return `${FILE_SERVER_HOST}/api/files/download/${filename}`
 }
 

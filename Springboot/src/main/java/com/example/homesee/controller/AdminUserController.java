@@ -14,7 +14,13 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/admin/user")
-@CrossOrigin(origins = "http://39.108.142.250:9999,http://localhost:5173")
+@CrossOrigin(origins = {
+        "http://39.108.142.250:9999",
+        "http://localhost:5173",
+        "https://www.homesee.xyz",
+        "https://homesee.xyz"
+})
+
 public class AdminUserController {
 
     @Autowired

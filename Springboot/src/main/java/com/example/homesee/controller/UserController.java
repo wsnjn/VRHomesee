@@ -9,7 +9,13 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/user")
-@CrossOrigin(origins = "http://39.108.142.250:9999,http://localhost:5173") // Vue开发服务器地址
+@CrossOrigin(origins = {
+        "http://39.108.142.250:9999",
+        "http://localhost:5173",
+        "https://www.homesee.xyz",
+        "https://homesee.xyz"
+})
+ // Vue开发服务器地址
 public class UserController {
 
     @Autowired

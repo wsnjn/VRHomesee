@@ -144,7 +144,7 @@ const currentPage = ref(1);
 const pageSize = 9; // 每页显示9个文件
 
 // API 配置
-const API_HOST = "http://39.108.142.250:8088";
+const API_HOST = "https://files.homesee.xyz";
 const API_ENDPOINTS = {
   LIST: `${API_HOST}/api/files/list`,
   DOWNLOAD: (fileName) => `${API_HOST}/api/files/download/${fileName}`,

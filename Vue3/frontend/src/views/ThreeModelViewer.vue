@@ -42,7 +42,7 @@ const WAKE_WORD = '小花'
 const STOP_WORDS = ['好了没你事了', '关闭', '退下', '闭嘴', '停止', '再见']
 
 // API 配置
-const BACKEND_URL = 'http://39.108.142.250:8080/api/smart-matching'
+const BACKEND_URL = 'https://api.homesee.xyz/api/smart-matching'
 
 const displayMessage = computed(() => currentMessage.value)
 

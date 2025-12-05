@@ -59,7 +59,7 @@ const textarea = ref(null)
 const currentUser = ref(null)
 
 // API Configuration
-const BACKEND_URL = 'http://39.108.142.250:8080/api/smart-matching'
+const BACKEND_URL = 'https://api.homesee.xyz/api/smart-matching'
 
 // User Avatar
 const userAvatar = ref('/models/image/default-avatar.png')
@@ -75,7 +75,7 @@ const getAvatarUrl = (avatarName) => {
   }
   
   // 使用文件服务器获取头像
-  const FILE_SERVER_HOST = 'http://39.108.142.250:8088'
+  const FILE_SERVER_HOST = 'https://files.homesee.xyz'
   return `${FILE_SERVER_HOST}/api/files/download/${avatarName}`
 }
 

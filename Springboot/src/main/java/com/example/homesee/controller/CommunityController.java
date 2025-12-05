@@ -270,7 +270,7 @@ public class CommunityController {
             String newFilename = java.util.UUID.randomUUID().toString() + extension;
 
             // Upload to file server
-            String fileServerUrl = "http://39.108.142.250:8088/api/files/upload";
+            String fileServerUrl = "https://files.homesee.xyz/api/files/upload";
 
             // Create multipart request
             org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();

@@ -23,7 +23,7 @@ public class RoomVrSceneController {
     private RoomVrSceneService roomVrSceneService;
 
     // 文件服务器地址
-    private final String FILE_SERVER_URL = "http://39.108.142.250:8088/api/files/upload";
+    private final String FILE_SERVER_URL = "https://files.homesee.xyz/api/files/upload";
 
     @GetMapping("/{roomId}")
     public ResponseEntity<Map<String, Object>> getScenes(@PathVariable Long roomId) {

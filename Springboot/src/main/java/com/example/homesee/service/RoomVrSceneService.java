@@ -16,7 +16,7 @@ public class RoomVrSceneService {
     private RoomVrSceneRepository roomVrSceneRepository;
 
     // 文件服务器地址
-    private final String FILE_SERVER_HOST = "http://39.108.142.250:8088";
+    private final String FILE_SERVER_HOST = "https://files.homesee.xyz";
 
     public List<RoomVrScene> getScenesByRoomId(Long roomId) {
         List<RoomVrScene> scenes = roomVrSceneRepository.findByRoomId(roomId);

@@ -251,7 +251,7 @@ const friendIdInput = ref('')
 const fetchGroups = async () => {
   if (!currentUserId.value) return
   try {
-    const res = await fetch(`http://39.108.142.250:8080/api/community/groups/user/${currentUserId.value}`)
+    const res = await fetch(`https://api.homesee.xyz/api/community/groups/user/${currentUserId.value}`)
     const data = await res.json()
     if (data.success) {
       groups.value = data.data
@@ -263,7 +263,7 @@ const fetchGroups = async () => {
 
 const fetchFriends = async () => {
   try {
-    const res = await fetch(`http://39.108.142.250:8080/api/community/friends/${currentUserId.value}`)
+    const res = await fetch(`https://api.homesee.xyz/api/community/friends/${currentUserId.value}`)
     const data = await res.json()
     if (data.success) {
       friends.value = data.data
@@ -275,7 +275,7 @@ const fetchFriends = async () => {
 
 const fetchPendingRequests = async () => {
   try {
-    const res = await fetch(`http://39.108.142.250:8080/api/community/friends/pending/${currentUserId.value}`)
+    const res = await fetch(`https://api.homesee.xyz/api/community/friends/pending/${currentUserId.value}`)
     const data = await res.json()
     if (data.success) {
       pendingRequests.value = data.data
@@ -293,7 +293,7 @@ const selectGroup = async (group) => {
 
 const fetchGroupMembers = async (groupId) => {
   try {
-    const res = await fetch(`http://39.108.142.250:8080/api/community/groups/${groupId}/members`)
+    const res = await fetch(`https://api.homesee.xyz/api/community/groups/${groupId}/members`)
     const data = await res.json()
     if (data.success) {
       groupMembers.value = data.data
@@ -305,7 +305,7 @@ const fetchGroupMembers = async (groupId) => {
 
 const fetchMessages = async (groupId) => {
   try {
-    const res = await fetch(`http://39.108.142.250:8080/api/community/messages/group/${groupId}`)
+    const res = await fetch(`https://api.homesee.xyz/api/community/messages/group/${groupId}`)
     const data = await res.json()
     if (data.success) {
       messages.value = data.data
@@ -327,7 +327,7 @@ const sendMessage = async () => {
   }
 
   try {
-    const res = await fetch('http://39.108.142.250:8080/api/community/messages/send', {
+    const res = await fetch('https://api.homesee.xyz/api/community/messages/send', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -354,7 +354,7 @@ const createGroup = async () => {
   }
 
   try {
-    const res = await fetch('http://39.108.142.250:8080/api/community/groups/create', {
+    const res = await fetch('https://api.homesee.xyz/api/community/groups/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -376,7 +376,7 @@ const sendFriendRequest = async () => {
   
   try {
     // 先通过手机号查找用户
-    const searchRes = await fetch(`http://39.108.142.250:8080/api/user/search/phone?phone=${friendIdInput.value}`)
+    const searchRes = await fetch(`https://api.homesee.xyz/api/user/search/phone?phone=${friendIdInput.value}`)
     const searchData = await searchRes.json()
     
     if (!searchData.success || !searchData.user) {
@@ -395,7 +395,7 @@ const sendFriendRequest = async () => {
       friendId: searchData.user.id
     }
 
-    const res = await fetch('http://39.108.142.250:8080/api/community/friends/request', {
+    const res = await fetch('https://api.homesee.xyz/api/community/friends/request', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -421,7 +421,7 @@ const respondToRequest = async (requestId, status) => {
   }
 
   try {
-    const res = await fetch('http://39.108.142.250:8080/api/community/friends/respond', {
+    const res = await fetch('https://api.homesee.xyz/api/community/friends/respond', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -438,7 +438,7 @@ const respondToRequest = async (requestId, status) => {
 
 const startPrivateChat = async (friend) => {
   try {
-    const res = await fetch('http://39.108.142.250:8080/api/community/groups/private', {
+    const res = await fetch('https://api.homesee.xyz/api/community/groups/private', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId: currentUserId.value, friendId: friend.friendId })
@@ -480,7 +480,7 @@ const getUserInfo = async (userId) => {
   userInfoCache.value[userId] = { username: `用户 ${userId}`, avatar: '' }
   
   try {
-    const res = await fetch(`http://39.108.142.250:8080/api/user/${userId}`)
+    const res = await fetch(`https://api.homesee.xyz/api/user/${userId}`)
     const data = await res.json()
     if (data.success) {
       userInfoCache.value[userId] = data.user
@@ -514,7 +514,7 @@ const getAvatarUrl = (userId) => {
   }
   
   // 使用文件服务器获取头像
-  const FILE_SERVER_HOST = 'http://39.108.142.250:8088'
+  const FILE_SERVER_HOST = 'https://files.homesee.xyz'
   return `${FILE_SERVER_HOST}/api/files/download/${avatar}`
 }
 
@@ -557,7 +557,7 @@ const deleteGroup = async () => {
   if (!activeGroup.value || !confirm('确定要删除该群组吗？')) return
   
   try {
-    const res = await fetch('http://39.108.142.250:8080/api/community/groups/delete', {
+    const res = await fetch('https://api.homesee.xyz/api/community/groups/delete', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ groupId: activeGroup.value.id, userId: currentUserId.value })
@@ -595,7 +595,7 @@ const inviteSelectedFriends = async () => {
     // Invite one by one for now as backend supports single invite
     // Or update backend to support batch. Let's do loop for simplicity.
     for (const friendId of selectedInviteFriends.value) {
-      const res = await fetch('http://39.108.142.250:8080/api/community/groups/invite', {
+      const res = await fetch('https://api.homesee.xyz/api/community/groups/invite', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -630,7 +630,7 @@ const getAvatarSrc = (avatarName) => {
   }
   
   // 使用文件服务器获取头像
-  const FILE_SERVER_HOST = 'http://39.108.142.250:8088'
+  const FILE_SERVER_HOST = 'https://files.homesee.xyz'
   return `${FILE_SERVER_HOST}/api/files/download/${avatarName}`
 }
 </script>
