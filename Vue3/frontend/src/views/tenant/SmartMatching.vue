@@ -13,7 +13,7 @@
       <div v-for="(msg, index) in messages" :key="index" :class="['message', msg.role === 'user' ? 'user-message' : 'ai-message']">
         <div class="message-avatar">
           <img v-if="msg.role === 'user'" :src="userAvatar" alt="User">
-          <div v-else class="ai-avatar">AI</div>
+          <img v-else src="/models/IMG_20251208_160325.png" alt="AI" class="ai-avatar-img">
         </div>
         <div class="message-content">
           <div class="message-bubble">
@@ -305,6 +305,13 @@ const sendMessage = async () => {
   justify-content: center;
   font-weight: bold;
   font-size: 0.9rem;
+}
+
+.ai-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .message-content {
