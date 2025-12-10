@@ -122,13 +122,28 @@ const isActive = (path) => route.path === path
           <transition name="fade">
             <div v-if="showUserMenu" class="user-menu">
               <div class="menu-item" @click="navigateTo('/user-profile')">
-                <span class="menu-icon">👤</span> 个人信息
+                <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                个人信息
               </div>
               <div class="menu-item" @click="navigateTo('/my-appointments')">
-                <span class="menu-icon">📅</span> 我的预约
+                <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                我的预约
               </div>
               <div class="menu-item" @click="logout">
-                <span class="menu-icon">🚪</span> 退出登录
+                <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                退出登录
               </div>
             </div>
           </transition>
@@ -436,7 +451,9 @@ const isActive = (path) => route.path === path
 }
 
 .menu-icon {
-  font-size: 1.2rem;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
 }
 
 .fade-enter-active,

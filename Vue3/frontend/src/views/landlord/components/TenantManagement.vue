@@ -3,7 +3,7 @@ import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
 
 const props = defineProps(['userPhone'])
-const emit = defineEmits(['refresh'])
+const emit = defineEmits(['refresh', 'goToTenantMatching'])
 
 // API基础URL
 const API_BASE_URL = 'https://api.homesee.xyz/api'
@@ -182,6 +182,16 @@ const updateAppointmentStatus = async (appointmentId, newStatus) => {
 // 切换预约项的展开/折叠状态
 const toggleAppointment = (appointmentId) => {
   expandedAppointments.value[appointmentId] = !expandedAppointments.value[appointmentId]
+}
+
+// 跳转到租客匹配页面并自动选择
+const goToTenantMatching = (appointment) => {
+  emit('goToTenantMatching', {
+    roomId: appointment.roomId,
+    appointmentId: appointment.id,
+    contactName: appointment.contactName,
+    contactPhone: appointment.contactPhone
+  })
 }
 
 // 页面加载时获取数据
@@ -379,6 +389,19 @@ onMounted(() => {
                   <span class="value">{{ appointment.adminNotes }}</span>
                 </div>
               </div>
+            </div>
+
+            <!-- 快捷操作：跳转租客匹配（仅已确认状态显示） -->
+            <div v-if="appointment.status === 1" class="quick-actions">
+              <button class="quick-match-btn" @click="goToTenantMatching(appointment)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="8.5" cy="7" r="4"></circle>
+                  <line x1="20" y1="8" x2="20" y2="14"></line>
+                  <line x1="23" y1="11" x2="17" y2="11"></line>
+                </svg>
+                创建租约合同
+              </button>
             </div>
           </div>
         </div>
@@ -778,30 +801,30 @@ onMounted(() => {
 .appointment-content {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 0.75rem;
 }
 
 .info-section h4 {
-  margin: 0 0 1rem 0;
+  margin: 0 0 0.5rem 0;
   color: #2c3e50;
-  font-size: 1rem;
+  font-size: 0.85rem;
   font-weight: 600;
 }
 
 .info-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.5rem;
 }
 
 .info-item {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 0.75rem;
+  padding: 0.4rem 0.6rem;
   background: #f8f9fa;
-  border-radius: 6px;
-  font-size: 0.9rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
 }
 
 .info-item.full-width {
@@ -811,15 +834,45 @@ onMounted(() => {
 .info-item .label {
   font-weight: 500;
   color: #495057;
-  min-width: 100px;
-  margin-right: 1rem;
+  min-width: 70px;
+  margin-right: 0.5rem;
 }
 
 .info-item .value {
   color: #2c3e50;
-  text-align: right;
+  text-align: left;
   flex: 1;
   word-break: break-word;
+}
+
+/* 快捷操作按钮 */
+.quick-actions {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed #e9ecef;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.quick-match-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+}
+
+.quick-match-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4);
 }
 
 /* 弹窗样式 */

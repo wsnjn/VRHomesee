@@ -232,7 +232,9 @@ const formatDate = (dateString) => {
     </main>
 
     <!-- 智能匹配小恐龙 -->
-    <DinoOverlay />
+    <!-- 智能匹配小恐龙 -->
+    <!-- <DinoOverlay /> -->
+
   </div>
 </template>
 

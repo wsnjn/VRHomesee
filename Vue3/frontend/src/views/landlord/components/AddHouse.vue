@@ -351,24 +351,24 @@ defineExpose({ resetForm })
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
-  padding: 1.5rem;
+  margin-bottom: 1rem;
+  padding: 1rem 1.5rem;
   background: linear-gradient(135deg, rgb(179, 208, 253) 0%, rgb(164, 202, 248) 100%);
-  border-radius: 16px;
-  box-shadow: 0 8px 25px rgba(79, 156, 232, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(79, 156, 232, 0.2);
 }
 
 .page-header h2 {
   margin: 0;
   color: white;
-  font-size: 2rem;
-  font-weight: 700;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .header-actions {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
   align-items: center;
 }
 
@@ -376,45 +376,39 @@ defineExpose({ resetForm })
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
+  padding: 0.5rem 1rem;
   border: none;
-  border-radius: 12px;
+  border-radius: 8px;
   cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(79, 156, 232, 0.3);
-  position: relative;
-  overflow: hidden;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.2);
   background: linear-gradient(135deg, rgb(255, 107, 107) 0%, rgb(220, 53, 69) 100%);
   color: white;
 }
 
 .cancel-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
-  background: linear-gradient(135deg, rgb(245, 97, 97) 0%, rgb(200, 35, 51) 100%);
-}
-
-.cancel-btn:active {
-  transform: translateY(0);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
 }
 
 .form-container {
   background: white;
-  border-radius: 16px;
-  box-shadow: 0 8px 25px rgba(79, 156, 232, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(79, 156, 232, 0.15);
   overflow: hidden;
-  border: 1px solid rgba(179, 208, 253, 0.3);
+  border: 1px solid rgba(179, 208, 253, 0.2);
 }
 
 .house-form {
-  padding: 2rem;
+  padding: 1.25rem;
 }
 
 .form-section {
-  margin-bottom: 2.5rem;
-  padding-bottom: 2rem;
-  border-bottom: 1px solid rgba(179, 208, 253, 0.3);
+  margin-bottom: 1.25rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid rgba(179, 208, 253, 0.2);
 }
 
 .form-section:last-child {
@@ -423,18 +417,18 @@ defineExpose({ resetForm })
 }
 
 .form-section h3 {
-  margin: 0 0 1.5rem 0;
+  margin: 0 0 0.875rem 0;
   color: #2c3e50;
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 1.1rem;
+  font-weight: 600;
   padding-left: 0.5rem;
-  border-left: 4px solid rgb(179, 208, 253);
+  border-left: 3px solid rgb(179, 208, 253);
 }
 
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.875rem;
 }
 
 .form-group {
@@ -447,20 +441,20 @@ defineExpose({ resetForm })
 }
 
 .form-group label {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.375rem;
   color: #2c3e50;
-  font-weight: 600;
-  font-size: 0.95rem;
+  font-weight: 500;
+  font-size: 0.8rem;
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
-  padding: 0.75rem 1rem;
-  border: 2px solid #e9ecef;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: all 0.3s;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  transition: all 0.2s;
   background: white;
 }
 
@@ -469,18 +463,18 @@ defineExpose({ resetForm })
 .form-group textarea:focus {
   outline: none;
   border-color: rgb(179, 208, 253);
-  box-shadow: 0 0 0 3px rgba(179, 208, 253, 0.2);
+  box-shadow: 0 0 0 2px rgba(179, 208, 253, 0.15);
 }
 
 .form-group input::placeholder,
 .form-group textarea::placeholder {
-  color: #6c757d;
-  opacity: 0.7;
+  color: #9ca3af;
+  font-size: 0.8rem;
 }
 
 .form-group textarea {
   resize: vertical;
-  min-height: 100px;
+  min-height: 60px;
   font-family: inherit;
 }
 
@@ -494,10 +488,10 @@ defineExpose({ resetForm })
 .form-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 1rem;
-  margin-top: 2rem;
-  padding-top: 2rem;
-  border-top: 1px solid rgba(179, 208, 253, 0.3);
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(179, 208, 253, 0.2);
 }
 
 .cancel-btn,
@@ -505,18 +499,16 @@ defineExpose({ resetForm })
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem 2rem;
+  gap: 0.375rem;
+  padding: 0.5rem 1.25rem;
   border: none;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.875rem;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(79, 156, 232, 0.3);
-  position: relative;
-  overflow: hidden;
-  min-width: 120px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(79, 156, 232, 0.2);
+  min-width: 100px;
 }
 
 .cancel-btn {

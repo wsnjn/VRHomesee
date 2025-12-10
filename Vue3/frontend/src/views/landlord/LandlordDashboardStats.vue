@@ -1,0 +1,181 @@
+<template>
+  <div class="dashboard-stats-container">
+    <div class="stat-card income-card">
+      <div class="stat-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+        </svg>
+      </div>
+      <div class="stat-info">
+        <h3>本月总收入</h3>
+        <p class="stat-value">¥{{ formatCurrency(stats.monthlyIncome) }}</p>
+        <span class="stat-trend positive">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M7 14l5-5 5 5H7z"/>
+          </svg>
+          租金总额
+        </span>
+      </div>
+    </div>
+
+    <div class="stat-card occupancy-card">
+      <div class="stat-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8h5z"/>
+        </svg>
+      </div>
+      <div class="stat-info">
+        <h3>入住率</h3>
+        <p class="stat-value">{{ formatPercent(stats.occupationRate) }}</p>
+        <span class="stat-sub">{{ stats.rentedHouses }}/{{ stats.totalHouses }} 套已租</span>
+      </div>
+    </div>
+
+    <div class="stat-card maintenance-card">
+      <div class="stat-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/>
+        </svg>
+      </div>
+      <div class="stat-info">
+        <h3>待处理报修</h3>
+        <p class="stat-value">{{ stats.pendingMaintenance }}</p>
+        <span class="stat-status" :class="{ 'urgent': stats.pendingMaintenance > 0 }">
+          {{ stats.pendingMaintenance > 0 ? '需要立即处理' : '暂无待办' }}
+        </span>
+      </div>
+    </div>
+
+    <div class="stat-card lease-card">
+      <div class="stat-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+        </svg>
+      </div>
+      <div class="stat-info">
+        <h3>即将到期</h3>
+        <p class="stat-value">{{ stats.expiringLeases }}</p>
+        <span class="stat-sub">未来 30 天内</span>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { defineProps } from 'vue';
+
+const props = defineProps({
+  stats: {
+    type: Object,
+    required: true,
+    default: () => ({
+      monthlyIncome: 0,
+      occupationRate: 0,
+      rentedHouses: 0,
+      totalHouses: 0,
+      pendingMaintenance: 0,
+      expiringLeases: 0
+    })
+  }
+});
+
+const formatCurrency = (value) => {
+  return value ? value.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00';
+};
+
+const formatPercent = (value) => {
+  return value ? (value * 100).toFixed(1) + '%' : '0.0%';
+};
+</script>
+
+<style scoped>
+.dashboard-stats-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin-right: 20px;
+  flex-shrink: 0;
+}
+
+/* Specific Card Styles */
+.income-card .stat-icon {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10B981;
+}
+
+.occupancy-card .stat-icon {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3B82F6;
+}
+
+.maintenance-card .stat-icon {
+  background: rgba(245, 158, 11, 0.1);
+  color: #F59E0B;
+}
+
+.lease-card .stat-icon {
+  background: rgba(99, 102, 241, 0.1);
+  color: #6366F1;
+}
+
+.stat-info h3 {
+  margin: 0;
+  font-size: 14px;
+  color: #64748B;
+  font-weight: 500;
+}
+
+.stat-value {
+  margin: 5px 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #1E293B;
+  letter-spacing: -0.5px;
+}
+
+.stat-sub, .stat-trend, .stat-status {
+  font-size: 12px;
+  color: #94A3B8;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-trend.positive {
+  color: #10B981;
+  font-weight: 600;
+}
+
+.stat-status.urgent {
+  color: #EF4444;
+  font-weight: 600;
+}
+</style>

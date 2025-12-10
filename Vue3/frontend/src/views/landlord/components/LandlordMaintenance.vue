@@ -31,9 +31,24 @@
             <span class="req-id">#{{ req.id }}</span>
             <span class="req-title">{{ req.requestTitle }}</span>
           </div>
-          <span class="status-badge" :class="getStatusClass(req.requestStatus)">
-            {{ getStatusText(req.requestStatus) }}
-          </span>
+          <!-- 状态进度条 -->
+          <div class="status-progress" v-if="req.requestStatus !== 3">
+            <div class="progress-step" :class="{ active: req.requestStatus >= 0, current: req.requestStatus === 0 }">
+              <div class="step-dot"></div>
+              <span class="step-label">已提交</span>
+            </div>
+            <div class="progress-line" :class="{ active: req.requestStatus >= 1 }"></div>
+            <div class="progress-step" :class="{ active: req.requestStatus >= 1, current: req.requestStatus === 1 }">
+              <div class="step-dot"></div>
+              <span class="step-label">处理中</span>
+            </div>
+            <div class="progress-line" :class="{ active: req.requestStatus >= 2 }"></div>
+            <div class="progress-step" :class="{ active: req.requestStatus >= 2, current: req.requestStatus === 2 }">
+              <div class="step-dot"></div>
+              <span class="step-label">已完成</span>
+            </div>
+          </div>
+          <span v-else class="status-badge status-closed">已关闭</span>
         </div>
 
         <div class="card-body">
@@ -382,6 +397,69 @@ onMounted(() => {
 .status-processing { background: #eff6ff; color: #1d4ed8; }
 .status-completed { background: #f0fdf4; color: #15803d; }
 .status-closed { background: #f3f4f6; color: #4b5563; }
+
+/* 进度条样式 */
+.status-progress {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.step-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  border: 2px solid #e5e7eb;
+  transition: all 0.3s ease;
+}
+
+.progress-step.active .step-dot {
+  background: #10b981;
+  border-color: #10b981;
+}
+
+.progress-step.current .step-dot {
+  background: white;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.step-label {
+  font-size: 11px;
+  color: #9ca3af;
+  white-space: nowrap;
+}
+
+.progress-step.active .step-label {
+  color: #374151;
+  font-weight: 500;
+}
+
+.progress-step.current .step-label {
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+.progress-line {
+  width: 40px;
+  height: 2px;
+  background: #e5e7eb;
+  margin: 0 4px;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+}
+
+.progress-line.active {
+  background: #10b981;
+}
 
 .card-body {
   padding: 20px;

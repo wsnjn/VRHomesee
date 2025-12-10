@@ -15,126 +15,7 @@
     </div>
 
     <div class="content-grid">
-      <!-- Left Column: House Info -->
-      <div class="left-column">
-        <div class="section-title">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-          <h3>当前房屋信息</h3>
-        </div>
-        
-        <div class="lease-card" v-if="activeLease">
-          <div class="lease-header">
-            <h4 class="lease-title">当前租约信息</h4>
-            <span class="lease-status" :class="getLeaseStatusClass(activeLease.contractStatus)">{{ getLeaseStatusText(activeLease.contractStatus) }}</span>
-          </div>
-          
-          <div class="lease-info-grid">
-            <div class="info-item">
-              <span class="label">合同编号</span>
-              <span class="value">{{ activeLease.contractNumber }}</span>
-            </div>
 
-            <div class="info-item">
-              <span class="label">租期</span>
-              <span class="value">{{ formatDate(activeLease.contractStartDate) }} 至 {{ formatDate(activeLease.contractEndDate) }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">月租金</span>
-              <span class="value">¥{{ activeLease.monthlyRent }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">押金</span>
-              <span class="value">¥{{ activeLease.depositAmount ?? 0 }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">付款方式</span>
-              <span class="value">{{ getPaymentMethodText(activeLease.paymentCycle) }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">押金状态</span>
-              <span class="value">{{ getDepositStatusText(activeLease.depositStatus) }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">合同状态</span>
-              <span class="value">{{ getLeaseStatusText(activeLease.contractStatus) }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">签约日期</span>
-              <span class="value">{{ formatDate(activeLease.contractSignedTime) }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">合同备注</span>
-              <span class="value">{{ activeLease.contractNotes || '无备注' }}</span>
-            </div>
-          </div>
-          
-          <!-- 水电费用信息 -->
-          <div class="house-details-section">
-            <h5 class="section-subtitle">水电费用信息</h5>
-            <div class="house-details-grid">
-              <div class="detail-item">
-                <span class="label">水费单价</span>
-                <span class="value">{{ houseDetails?.waterPrice ? '¥' + houseDetails.waterPrice + '/吨' : '未设置' }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="label">电费单价</span>
-                <span class="value">{{ houseDetails?.electricPrice ? '¥' + houseDetails.electricPrice + '/度' : '未设置' }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="label">上期水表读数</span>
-                <span class="value">{{ activeLease.lastWaterReading ?? 0 }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="label">上期电表读数</span>
-                <span class="value">{{ activeLease.lastElectricReading ?? 0 }}</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- 房屋详细信息 -->
-          <div class="house-details-section" v-if="houseDetails">
-            <h5 class="section-subtitle">房屋详细信息</h5>
-            <div class="house-details-grid">
-              <div class="detail-item">
-                <span class="label">小区名称</span>
-                <span class="value">{{ houseDetails.communityName || '未知' }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="label">详细地址</span>
-                <span class="value">{{ getFullAddress(houseDetails) }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="label">房屋面积</span>
-                <span class="value">{{ houseDetails.roomArea || '未知' }}㎡</span>
-              </div>
-              <div class="detail-item">
-                <span class="label">楼层信息</span>
-                <span class="value">{{ houseDetails.floorInfo || '未知' }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="label">装修程度</span>
-                <span class="value">{{ getDecorationText(houseDetails.decoration) }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="label">朝向</span>
-                <span class="value">{{ getOrientationText(houseDetails.orientation) }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="label">租赁类型</span>
-                <span class="value">{{ getRentalTypeText(houseDetails.rentalType) }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="label">房东电话</span>
-                <span class="value">{{ houseDetails.landlordPhone ? formatPhoneNumber(houseDetails.landlordPhone) : '未提供' }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div v-else class="no-data-card">
-          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="15"></line><line x1="15" y1="9" x2="9" y2="15"></line></svg>
-          <p>暂无有效租约</p>
-        </div>
-      </div>
 
       <!-- Right Column: Maintenance Requests -->
       <div class="right-column">
@@ -403,7 +284,7 @@ onMounted(() => {
 
 .content-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 30px;
   align-items: start;
 }

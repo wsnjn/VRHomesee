@@ -1,10 +1,5 @@
 <template>
   <div class="my-tenants">
-    <!-- 页面标题 -->
-    <div class="page-header">
-      <h2>我的租户</h2>
-      <p class="page-description">管理您名下已出租房屋的租户信息</p>
-    </div>
 
     <!-- 统计信息 -->
     <div class="stats-grid" v-if="statistics">

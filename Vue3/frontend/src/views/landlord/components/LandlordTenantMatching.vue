@@ -139,6 +139,30 @@
                   <span class="label">租房意向:</span>
                   <span class="value">{{ appointment.rentalIntention }}</span>
                 </div>
+                
+                <!-- 推荐理由标签 -->
+                <div class="recommendation-tags">
+                  <span class="rec-tag match" v-if="appointment.status === 1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    已确认预约
+                  </span>
+                  <span class="rec-tag intent" v-if="appointment.rentalIntention">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8h5z"/></svg>
+                    有明确意向
+                  </span>
+                  <span class="rec-tag contact" v-if="appointment.wechatId">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+                    可微信沟通
+                  </span>
+                </div>
+                
+                <!-- 快捷操作 -->
+                <div class="quick-contact-actions">
+                  <a :href="'tel:' + appointment.contactPhone" class="contact-btn phone" @click.stop>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                    立即联系
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -231,10 +255,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import axios from 'axios'
 
-const props = defineProps(['userPhone'])
+const props = defineProps(['userPhone', 'preSelectedData'])
 
 // API基础URL
 const API_BASE_URL = 'https://api.homesee.xyz/api'
@@ -406,7 +430,7 @@ const selectAppointment = (appointment) => {
   if (appointment) {
     newContract.value.tenantId = appointment.userId
     // 使用预约编号作为合同编号
-    newContract.value.contractNumber = `APPT-${appointment.id}`
+    newContract.value.contractNumber = appointment.appointmentNumber || `APPT-${appointment.id}`
   }
 }
 
@@ -549,6 +573,28 @@ onMounted(() => {
   loadHouses()
   loadAppointments()
 })
+
+// 监听预选数据，自动选择对应房屋和预约
+watch(() => props.preSelectedData, async (newData) => {
+  if (newData && newData.roomId) {
+    // 等待数据加载完成
+    await Promise.all([loadHouses(), loadAppointments()])
+    
+    // 自动选择房屋
+    const house = houses.value.find(h => h.id === newData.roomId)
+    if (house) {
+      selectHouse(house)
+    }
+    
+    // 自动选择预约
+    if (newData.appointmentId) {
+      const appointment = appointments.value.find(a => a.id === newData.appointmentId)
+      if (appointment) {
+        selectAppointment(appointment)
+      }
+    }
+  }
+}, { immediate: true })
 </script>
 
 <style scoped>
@@ -692,6 +738,68 @@ onMounted(() => {
   margin: 0.25rem 0;
   font-size: 0.9rem;
   color: #6c757d;
+}
+
+/* 推荐理由标签 */
+.recommendation-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed #e9ecef;
+}
+
+.rec-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.rec-tag.match {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.rec-tag.intent {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.rec-tag.contact {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+/* 快捷联系按钮 */
+.quick-contact-actions {
+  margin-top: 12px;
+}
+
+.contact-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.contact-btn.phone {
+  background: #10b981;
+  color: white;
+}
+
+.contact-btn.phone:hover {
+  background: #059669;
+  transform: translateY(-1px);
 }
 
 .action-panel {

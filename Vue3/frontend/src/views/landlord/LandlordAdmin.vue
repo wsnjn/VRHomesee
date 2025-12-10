@@ -27,7 +27,7 @@
                   <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8h5z"/>
                 </svg>
               </span>
-              我的房屋
+              工作台
             </li>
             <li 
               :class="{ active: activeTab === 'house-status' }"
@@ -113,28 +113,32 @@
 
         <!-- 我的房屋 -->
         <div v-if="activeTab === 'my-houses'">
-          <my-houses 
-            :myHouses="myHouses"
-            :loadingHouses="loadingHouses"
-            :addingHouse="addingHouse"
-            @refresh="loadMyHouses"
-            @editHouse="editHouse"
-            @toggleHouseStatus="toggleHouseStatus"
-            @viewHouseDetail="viewHouseDetail"
-            @submitAddHouse="submitAddHouse"
+          <!-- 仪表盘统计卡片 -->
+          <landlord-dashboard-stats :stats="dashboardStats" />
+          
+          <!-- 快捷操作 -->
+          <landlord-quick-actions 
+            :pendingCount="pendingMaintenanceCount"
+            @navigate="handleQuickAction"
           />
+          
+          <!-- 信息提示卡片 -->
+          <my-houses />
         </div>
 
         <!-- 房屋状态 -->
         <div v-if="activeTab === 'house-status'">
           <house-status 
-            :statistics="statistics"
             :myHouses="myHouses"
-            @refreshStatistics="loadStatistics"
-            @refreshHouses="loadMyHouses"
+            :loadingHouses="loadingHouses"
+            :addingHouse="addingHouse"
+            :tenantContracts="tenantContracts"
+            :pendingAppointments="pendingAppointments"
+            @refresh="loadMyHouses"
+            @editHouse="editHouse"
             @toggleHouseStatus="toggleHouseStatus"
             @viewHouseDetail="viewHouseDetail"
-            @editHouse="editHouse"
+            @submitAddHouse="submitAddHouse"
           />
         </div>
 
@@ -148,12 +152,15 @@
 
         <!-- 租约管理 -->
         <div v-if="activeTab === 'tenant-management'">
-          <tenant-management :userPhone="userPhone" />
+          <tenant-management :userPhone="userPhone" @goToTenantMatching="handleGoToTenantMatching" />
         </div>
 
         <!-- 租客匹配 -->
         <div v-if="activeTab === 'tenant-matching'">
-          <landlord-tenant-matching :userPhone="userPhone" />
+          <landlord-tenant-matching 
+            :userPhone="userPhone" 
+            :preSelectedData="preSelectedMatchData"
+          />
         </div>
 
         <!-- 我的租户 -->
@@ -171,7 +178,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 
@@ -184,6 +191,8 @@ import LandlordTenantMatching from './components/LandlordTenantMatching.vue'
 import MyTenants from './components/MyTenants.vue'
 
 import LandlordMaintenance from './components/LandlordMaintenance.vue'
+import LandlordDashboardStats from './LandlordDashboardStats.vue'
+import LandlordQuickActions from './LandlordQuickActions.vue'
 
 // 占位页面组件
 const PlaceholderPage = {
@@ -208,6 +217,120 @@ const userPhone = ref('')
 const userId = ref(null)
 const statistics = ref({})
 const expiringContracts = ref([])
+
+// 待处理维修数量
+const pendingMaintenanceCount = ref(0)
+
+// 预选匹配数据（从租约列表跳转时使用）
+const preSelectedMatchData = ref(null)
+
+// 处理跳转到租客匹配
+const handleGoToTenantMatching = (data) => {
+  preSelectedMatchData.value = data
+  activeTab.value = 'tenant-matching'
+}
+
+// 租户合同数据
+const tenantContracts = ref([])
+
+// 加载租户合同数据
+const loadTenantContracts = async () => {
+  if (!userPhone.value) return
+  try {
+    const res = await axios.get(`${API_BASE_URL}/landlord/matching/contracts?landlordPhone=${userPhone.value}`)
+    if (res.data.success) {
+      tenantContracts.value = res.data.contracts || []
+    }
+  } catch (e) {
+    console.error('加载租户合同失败:', e)
+  }
+}
+
+// 计算即将到期租约（30天内）
+const expiringLeasesCount = computed(() => {
+  const today = new Date()
+  const thirtyDaysLater = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000)
+  
+  return tenantContracts.value.filter(contract => {
+    if (!contract.contractEndDate) return false
+    const endDate = new Date(contract.contractEndDate)
+    // 合同状态为履行中(2)或已签约(1)且未来30天内到期
+    return (contract.contractStatus === 1 || contract.contractStatus === 2) &&
+           endDate >= today && endDate <= thirtyDaysLater
+  }).length
+})
+
+// 计算月租金总额（作为本月收入）
+const totalMonthlyRent = computed(() => {
+  return tenantContracts.value
+    .filter(c => c.contractStatus === 1 || c.contractStatus === 2) // 只计算有效合同
+    .reduce((sum, c) => sum + (parseFloat(c.monthlyRent) || 0), 0)
+})
+
+// 计算已出租房屋数（从租户合同）
+const rentedHousesCount = computed(() => {
+  // 获取状态为履行中或已签约的合同的房屋ID（去重）
+  const rentedRoomIds = new Set(
+    tenantContracts.value
+      .filter(c => c.contractStatus === 1 || c.contractStatus === 2)
+      .map(c => c.roomId)
+  )
+  return rentedRoomIds.size
+})
+
+// 仪表盘统计数据
+const dashboardStats = computed(() => ({
+  monthlyIncome: totalMonthlyRent.value,
+  occupationRate: statistics.value.totalHouses > 0 
+    ? rentedHousesCount.value / statistics.value.totalHouses 
+    : 0,
+  rentedHouses: rentedHousesCount.value,
+  totalHouses: statistics.value.totalHouses || 0,
+  pendingMaintenance: pendingMaintenanceCount.value,
+  expiringLeases: expiringLeasesCount.value
+}))
+
+// 加载待处理维修数量
+const loadPendingMaintenance = async () => {
+  if (!userId.value) return
+  try {
+    const res = await axios.get(`${API_BASE_URL}/maintenance/landlord/${userId.value}`)
+    if (res.data.success) {
+      pendingMaintenanceCount.value = (res.data.data || []).filter(r => r.requestStatus === 0).length
+    }
+  } catch (e) {
+    console.error('加载维修数据失败:', e)
+  }
+}
+
+// 待确认预约列表（用于预租计数）
+const pendingAppointments = ref([])
+
+// 加载待确认预约
+const loadPendingAppointments = async () => {
+  if (!userPhone.value) return
+  try {
+    const res = await axios.get(`${API_BASE_URL}/viewing-appointment/landlord/${userPhone.value}/status/0`)
+    if (res.data.success) {
+      pendingAppointments.value = res.data.appointments || []
+    }
+  } catch (e) {
+    console.error('加载待确认预约失败:', e)
+  }
+}
+
+// 快捷操作处理
+const handleQuickAction = (route) => {
+  if (route === '/landlord/add') {
+    switchTab('add-house')
+  } else if (route === '/landlord/maintenance') {
+    switchTab('maintenance')
+  } else if (route === '/landlord/matching') {
+    switchTab('tenant-matching')
+  } else if (route === '/landlord/tenants') {
+    switchTab('my-tenants')
+  }
+}
 
 // 房屋管理相关数据
 const myHouses = ref([])
@@ -650,6 +773,9 @@ onMounted(async () => {
   await loadStatistics()
   await loadExpiringContracts()
   await loadMyHouses()
+  await loadPendingMaintenance()
+  await loadTenantContracts()
+  await loadPendingAppointments()
 })
 </script>
 
@@ -667,13 +793,11 @@ onMounted(async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
-  background-color: #494949;
+  padding: 0.875rem 2rem;
+  background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
   color: #ffffff;
   z-index: 100;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-  border-bottom: 1px solid #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
 .nav-brand {
@@ -685,12 +809,14 @@ onMounted(async () => {
 .nav-brand h2 {
   margin: 0;
   color: white;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
 .nav-links {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
   align-items: center;
 }
 
@@ -698,33 +824,42 @@ onMounted(async () => {
   color: white;
   text-decoration: none;
   padding: 0.5rem 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
-  transition: all 0.3s;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  transition: all 0.2s ease;
   font-weight: 500;
+  font-size: 0.875rem;
 }
 
 .client-link:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-1px);
 }
 
 .user-info {
-  font-weight: 600;
+  font-weight: 500;
+  font-size: 0.875rem;
+  opacity: 0.9;
 }
 
 .logout-btn {
-  background: rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: none;
   padding: 0.5rem 1rem;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  font-size: 0.875rem;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
 }
 
 .logout-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
 }
 
 .admin-container {
