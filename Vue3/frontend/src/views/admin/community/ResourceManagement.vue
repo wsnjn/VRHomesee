@@ -323,110 +323,111 @@ onMounted(() => {
 
 <style scoped>
 .resource-management {
-  padding: 16px;
+  padding: 0;
   max-width: 1200px;
   margin: 0 auto;
-  background: #f8fafc;
+  background: #fff;
   min-height: 100vh;
 }
 
 /* 分类导航 */
 .category-nav {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .nav-tabs {
   display: flex;
-  gap: 6px;
-  background: white;
-  padding: 6px;
-  border-radius: 10px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  gap: 0;
+  background: #fff;
+  border: 1px solid #ddd;
 }
 
 .nav-tab {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 10px 14px;
+  gap: 4px;
+  padding: 8px 12px;
   border: none;
   background: transparent;
-  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 13px;
-  color: #64748b;
+  font-size: 12px;
+  color: #888;
   white-space: nowrap;
+  border-right: 1px solid #ddd;
+}
+
+.nav-tab:last-child {
+  border-right: none;
 }
 
 .nav-tab:hover {
-  background: #f1f5f9;
-  color: #334155;
+  background: #f5f5f5;
+  color: #333;
 }
 
 .nav-tab.active {
-  background: #3b82f6;
-  color: white;
+  background: #1e3a5f;
+  color: #fff;
 }
 
 .tab-count {
-  background: rgba(255, 255, 255, 0.2);
-  padding: 2px 6px;
-  border-radius: 8px;
-  font-size: 11px;
+  background: rgba(255, 255, 255, 0.3);
+  padding: 1px 6px;
+  font-size: 10px;
   font-weight: 500;
 }
 
 /* 文件内容区域 */
 .file-content {
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 16px;
 }
 
 .content-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #ddd;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 8px;
 }
 
 .content-header h2 {
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: #1e293b;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  margin: 0;
 }
 
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .pagination-info {
-  font-size: 0.875rem;
-  color: #64748b;
+  font-size: 11px;
+  color: #888;
 }
 
 .refresh-btn {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  background: #f1f5f9;
-  border: none;
-  border-radius: 6px;
-  color: #64748b;
+  gap: 4px;
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid #ddd;
+  color: #888;
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 0.875rem;
+  font-size: 12px;
 }
 
 .refresh-btn:hover {
-  background: #e2e8f0;
+  background: #f5f5f5;
+  color: #333;
 }
 
 /* 加载状态 */
@@ -436,17 +437,17 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
-  color: #64748b;
+  color: #888;
 }
 
 .spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid #e2e8f0;
-  border-top: 3px solid #3b82f6;
+  width: 24px;
+  height: 24px;
+  border: 2px solid #ddd;
+  border-top: 2px solid #3A6EA5;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 @keyframes spin {
@@ -460,82 +461,79 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 20px;
-  color: #64748b;
+  padding: 40px 20px;
+  color: #888;
 }
 
 .empty-icon {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   opacity: 0.5;
 }
 
 .empty-state h3 {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-bottom: 6px;
-  color: #475569;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: #333;
 }
 
 /* 文件网格 */
 .file-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0;
 }
 
 .file-card {
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 16px;
-  transition: all 0.3s ease;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-bottom: none;
+  padding: 12px;
   position: relative;
   overflow: hidden;
 }
 
+.file-card:last-child {
+  border-bottom: 1px solid #ddd;
+}
+
 .file-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  border-color: #3b82f6;
+  background: #f9f9f9;
 }
 
 .file-preview {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .file-icon {
-  font-size: 2.5rem;
+  font-size: 2rem;
   line-height: 1;
 }
 
 .file-icon svg {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
+  color: #888;
 }
 
 .preview-container {
   width: 100%;
-  height: 140px;
+  height: 100px;
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  border-radius: 6px;
-  background-color: #f1f5f9;
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
 }
 
 .preview-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.file-card:hover .preview-image {
-  transform: scale(1.05);
 }
 
 .preview-video {
@@ -545,83 +543,85 @@ onMounted(() => {
 }
 
 .file-info {
-  text-align: center;
-  margin-bottom: 12px;
+  text-align: left;
+  margin-bottom: 8px;
 }
 
 .file-name {
-  font-weight: 600;
-  color: #1e293b;
-  margin-bottom: 4px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 2px;
   word-break: break-all;
-  font-size: 0.9rem;
+  font-size: 12px;
 }
 
 .file-type {
-  font-size: 0.75rem;
-  color: #64748b;
+  font-size: 10px;
+  color: #888;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
 }
 
 .file-actions {
   display: flex;
-  justify-content: center;
-  gap: 6px;
+  justify-content: flex-start;
+  gap: 4px;
 }
 
 .action-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border: none;
-  border-radius: 6px;
+  width: 24px;
+  height: 24px;
+  border: 1px solid #ddd;
   cursor: pointer;
-  transition: all 0.3s ease;
-  color: #64748b;
-  background: #f8fafc;
+  color: #888;
+  background: transparent;
 }
 
 .action-btn:hover {
-  transform: scale(1.1);
+  background: #f5f5f5;
+  color: #333;
 }
 
 .action-btn.download:hover {
-  background: #10b981;
-  color: white;
+  background: #2d8a4e;
+  color: #fff;
+  border-color: #2d8a4e;
 }
 
 .action-btn.copy:hover {
-  background: #3b82f6;
-  color: white;
+  background: #3A6EA5;
+  color: #fff;
+  border-color: #3A6EA5;
 }
 
 .action-btn.delete:hover {
-  background: #ef4444;
-  color: white;
+  background: #c00;
+  color: #fff;
+  border-color: #c00;
 }
 
-/* 文件类型颜色 */
+/* 文件类型颜色 - 底部边框 */
 .file-type-image {
-  border-left: 4px solid #10b981;
+  border-bottom: 3px solid #2d8a4e;
 }
 
 .file-type-document {
-  border-left: 4px solid #3b82f6;
+  border-bottom: 3px solid #3A6EA5;
 }
 
 .file-type-video {
-  border-left: 4px solid #f59e0b;
+  border-bottom: 3px solid #c07700;
 }
 
 .file-type-audio {
-  border-left: 4px solid #8b5cf6;
+  border-bottom: 3px solid #6b5b95;
 }
 
 .file-type-other {
-  border-left: 4px solid #64748b;
+  border-bottom: 3px solid #888;
 }
 
 /* 分页控件 */
@@ -629,26 +629,25 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 16px;
-  margin-top: 24px;
-  padding-top: 20px;
-  border-top: 1px solid #e2e8f0;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #ddd;
 }
 
 .pagination-btn {
-  padding: 8px 16px;
-  border: 1px solid #e2e8f0;
-  background: white;
-  border-radius: 6px;
+  padding: 4px 12px;
+  border: 1px solid #ddd;
+  background: transparent;
   cursor: pointer;
-  transition: all 0.3s ease;
-  color: #64748b;
+  color: #888;
+  font-size: 12px;
 }
 
 .pagination-btn:hover:not(:disabled) {
-  background: #3b82f6;
-  color: white;
-  border-color: #3b82f6;
+  background: #1e3a5f;
+  color: #fff;
+  border-color: #1e3a5f;
 }
 
 .pagination-btn:disabled {
@@ -657,36 +656,31 @@ onMounted(() => {
 }
 
 .pagination-info {
-  font-size: 0.875rem;
-  color: #64748b;
+  font-size: 11px;
+  color: #888;
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .resource-management {
-    padding: 12px;
-  }
-  
   .nav-tabs {
     flex-wrap: wrap;
   }
   
   .nav-tab {
-    padding: 8px 12px;
-    font-size: 12px;
+    padding: 6px 10px;
+    font-size: 11px;
   }
   
   .file-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
   }
   
   .file-card {
-    padding: 12px;
+    padding: 10px;
   }
   
   .preview-container {
-    height: 100px;
+    height: 80px;
   }
   
   .content-header {
@@ -707,7 +701,7 @@ onMounted(() => {
   
   .pagination {
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
   }
 }
 </style>

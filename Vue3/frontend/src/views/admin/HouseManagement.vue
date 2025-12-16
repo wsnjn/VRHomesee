@@ -1,174 +1,132 @@
 <template>
   <div class="house-management">
-    <!-- 页面标题和操作按钮 -->
-    <div class="page-header">
-      <h2>房屋管理</h2>
-      <div class="header-actions">
-        <button @click="showAddDialog = true" class="add-btn">
-          <span>+</span> 添加房屋
-        </button>
-        <button @click="refreshData" class="refresh-btn">
-          🔄 刷新
-        </button>
+    <!-- 工具栏 -->
+    <div class="toolbar">
+      <!-- 左侧：租赁类型选择器 -->
+      <div class="rental-type-filter">
+        <select v-model="filterRentalType" @change="loadHouses">
+          <option value="">全部类型</option>
+          <option value="0">整租</option>
+          <option value="1">合租</option>
+          <option value="2">单间</option>
+        </select>
       </div>
-    </div>
-
-    <!-- 统计信息 -->
-    <div class="stats-cards">
-      <div class="stat-card">
-        <div class="stat-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+      <!-- 右侧：状态标签 + 搜索框 + 按钮 -->
+      <div class="toolbar-right">
+        <div class="status-tabs">
+          <button 
+            class="filter-tab" 
+            :class="{ active: filterStatus === '' }"
+            @click="filterStatus = ''; loadHouses()"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+            </svg>
+            <span>全部</span>
+            <span class="count">{{ statistics.total || 0 }}</span>
+          </button>
+          <button 
+            class="filter-tab" 
+            :class="{ active: filterStatus === '0' }"
+            @click="filterStatus = '0'; loadHouses()"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+            </svg>
+            <span>可租</span>
+            <span class="count">{{ statistics.available || 0 }}</span>
+          </button>
+          <button 
+            class="filter-tab" 
+            :class="{ active: filterStatus === '1' }"
+            @click="filterStatus = '1'; loadHouses()"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span>已租</span>
+            <span class="count">{{ statistics.rented || 0 }}</span>
+          </button>
+          <button 
+            class="filter-tab" 
+            :class="{ active: filterStatus === '2' }"
+            @click="filterStatus = '2'; loadHouses()"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+            </svg>
+            <span>下架</span>
+            <span class="count">{{ statistics.maintenance || 0 }}</span>
+          </button>
+          <button 
+            class="filter-tab" 
+            :class="{ active: filterStatus === '3' }"
+            @click="filterStatus = '3'; loadHouses()"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+            </svg>
+            <span>预租</span>
+            <span class="count">{{ statistics.reserved || 0 }}</span>
+          </button>
         </div>
-        <div class="stat-content">
-          <h3>{{ statistics.total || 0 }}</h3>
-          <p>总房屋数</p>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-        </div>
-        <div class="stat-content">
-          <h3>{{ statistics.available || 0 }}</h3>
-          <p>可租房屋</p>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-        </div>
-        <div class="stat-content">
-          <h3>{{ statistics.rented || 0 }}</h3>
-          <p>已租房屋</p>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
-        </div>
-        <div class="stat-content">
-          <h3>{{ statistics.maintenance || 0 }}</h3>
-          <p>维护中</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- 筛选条件 -->
-    <div class="filter-section">
-      <div class="filter-row">
-        <div class="filter-item">
-          <label>状态筛选：</label>
-          <select v-model="filterStatus" @change="loadHouses">
-            <option value="">全部状态</option>
-            <option value="0">可租</option>
-            <option value="1">已租</option>
-            <option value="2">下架</option>
-            <option value="3">预租</option>
-          </select>
-        </div>
-        <div class="filter-item">
-          <label>租赁类型：</label>
-          <select v-model="filterRentalType" @change="loadHouses">
-            <option value="">全部类型</option>
-            <option value="0">整租</option>
-            <option value="1">合租</option>
-            <option value="2">单间</option>
-          </select>
-        </div>
-        <div class="filter-item">
-          <label>搜索：</label>
+        <div class="search-box">
+          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="M21 21l-4.35-4.35"></path>
+          </svg>
           <input 
             type="text" 
             v-model="searchKeyword" 
-            placeholder="输入小区名、地址等关键词"
+            placeholder="搜索房屋..."
             @input="onSearchInput"
           />
         </div>
+        <button @click="refreshData" class="toolbar-refresh-btn">刷新</button>
+        <button @click="showAddDialog = true" class="toolbar-add-btn">添加房屋</button>
       </div>
     </div>
 
     <!-- 房屋列表 -->
     <div class="house-list">
-      <div class="table-container">
-        <table class="house-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>地址信息</th>
-              <th>房屋信息</th>
-              <th>价格信息</th>
-              <th>租赁信息</th>
-              <th>状态</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="house in houses" :key="house.id">
-              <td>{{ house.id }}</td>
-              <td>
-                <div class="address-info">
-                  <strong>{{ house.communityName }}</strong>
-                  <div class="address-detail">
-                    {{ house.province }}{{ house.city }}{{ house.district }}{{ house.street }}
-                  </div>
-                  <div class="room-detail">
-                    {{ house.buildingUnit || '' }}{{ house.doorNumber }}{{ house.roomNumber ? house.roomNumber + '室' : '' }}
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="house-details">
-                  <div v-if="house.roomArea">面积: {{ house.roomArea }}㎡</div>
-                  <div v-if="house.floorInfo">楼层: {{ house.floorInfo }}</div>
-                  <div v-if="house.orientation">朝向: {{ house.orientation }}</div>
-                  <div v-if="house.decoration">装修: {{ getDecorationText(house.decoration) }}</div>
-                  <div>电梯: {{ house.hasElevator ? '有' : '无' }}</div>
-                </div>
-              </td>
-              <td>
-                <div class="price-info">
-                  <div class="rent-price">{{ house.rentPrice }}元/月</div>
-                  <div v-if="house.waterPrice" class="utility-price">水费: {{ house.waterPrice }}元/吨</div>
-                  <div v-if="house.electricPrice" class="utility-price">电费: {{ house.electricPrice }}元/度</div>
-                </div>
-              </td>
-              <td>
-                <div class="rental-info">
-                  <div>类型: {{ getRentalTypeText(house.rentalType) }}</div>
-                  <div>房东: {{ house.landlordPhone }}</div>
-                </div>
-              </td>
-              <td>
-                <span class="status-badge" :class="getStatusClass(house.status)">
-                  {{ getStatusText(house.status) }}
-                </span>
-              </td>
-              <td>
-                <div class="action-buttons">
-                  <button @click="editHouse(house)" class="edit-btn">编辑</button>
-                  <button @click="updateHouseStatus(house.id, house.status === 0 ? 1 : 0)" 
-                          class="status-btn"
-                          :class="house.status === 0 ? 'rent-btn' : 'available-btn'">
-                    {{ house.status === 0 ? '标记已租' : '标记可租' }}
-                  </button>
-                  <button @click="showVrDialog(house)" class="vr-btn">设置VR</button>
-                  <button @click="deleteHouse(house.id)" class="delete-btn">删除</button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        
-        <!-- 加载状态 -->
-        <div v-if="loading" class="loading">
-          <p>加载中...</p>
+      <div class="house-row" v-for="house in houses" :key="house.id">
+        <!-- 左侧：地址盒子 -->
+        <div class="row-address">
+          <div class="addr-main">{{ house.province }} {{ house.city }} {{ house.district }} {{ house.street }} {{ house.communityName }} {{ house.doorNumber }}</div>
+          <div class="addr-sub">{{ house.communityName }} · 公寓 · {{ house.roomNumber || '' }}</div>
         </div>
-        
-        <!-- 空状态 -->
-        <div v-if="!loading && houses.length === 0" class="empty-state">
-          <p>暂无房屋数据</p>
+        <!-- 中间：房屋信息 -->
+        <div class="row-info">
+          <span class="info-label">面积:</span><span class="info-val">{{ house.roomArea || '-' }}㎡</span>
+          <span class="info-label">楼层:</span><span class="info-val">{{ house.floorInfo || '-' }}</span>
+          <span class="info-label">朝向:</span><span class="info-val">{{ house.orientation || '-' }}</span>
+          <span class="info-label">装修:</span><span class="info-val">{{ getDecorationText(house.decoration) }}</span>
+          <span class="info-label">电梯:</span><span class="info-val">{{ house.hasElevator ? '有' : '无' }}</span>
+        </div>
+        <!-- 价格 -->
+        <div class="row-price">
+          <div class="price-main">{{ house.rentPrice }}元/月</div>
+          <div class="price-sub">水费:{{ house.waterPrice || '-' }}元/吨</div>
+          <div class="price-sub">电费:{{ house.electricPrice || '-' }}元/度</div>
+        </div>
+        <!-- 状态 -->
+        <div class="row-status">
+          <span class="status-tag" :class="getStatusClass(house.status)">{{ getStatusText(house.status) }}</span>
+        </div>
+        <!-- 操作按钮 -->
+        <div class="row-actions">
+          <button @click="editHouse(house)">编辑</button>
+          <button @click="updateHouseStatus(house.id, house.status === 0 ? 1 : 0)">设为可租</button>
+          <button @click="viewHouseDetail(house)">详情</button>
+          <button @click="showVrDialog(house)">VR</button>
         </div>
       </div>
+      
+      <!-- 加载状态 -->
+      <div v-if="loading" class="loading">加载中...</div>
+      
+      <!-- 空状态 -->
+      <div v-if="!loading && houses.length === 0" class="empty-state">暂无房屋数据</div>
     </div>
 
     <!-- 添加/编辑房屋对话框 -->
@@ -390,13 +348,44 @@ const loadHouses = async () => {
   loading.value = true
   try {
     const response = await axios.get(`${API_BASE_URL}/rooms/all`)
+    // 同时获取租约和预约数据用于筛选
+    const contractsRes = await axios.get(`${API_BASE_URL}/admin/tenant/all`)
+    const appointmentsRes = await axios.get(`${API_BASE_URL}/viewing-appointment/all`)
+    
     if (response.data.success) {
       let filteredHouses = response.data.rooms || []
+      const allContracts = contractsRes.data?.contracts || []
+      const allAppointments = appointmentsRes.data?.appointments || []
+      
+      // 已租房屋ID集合（有活跃租约）
+      const rentedRoomIds = new Set(
+        allContracts
+          .filter(c => c.contractStatus === 1 || c.contractStatus === 2)
+          .map(c => c.roomId)
+      )
+      
+      // 预租房屋ID集合（有待确认或已确认预约）
+      const preRentedRoomIds = new Set(
+        allAppointments
+          .filter(a => a.status === 0 || a.status === 1)
+          .map(a => a.roomId)
+      )
       
       // 应用状态筛选
-      if (filterStatus.value !== '') {
-        filteredHouses = filteredHouses.filter(house => house.status === parseInt(filterStatus.value))
+      if (filterStatus.value === '0') {
+        // 可租：房屋状态为0
+        filteredHouses = filteredHouses.filter(house => house.status === 0)
+      } else if (filterStatus.value === '1') {
+        // 已租：根据租约数据筛选
+        filteredHouses = filteredHouses.filter(house => rentedRoomIds.has(house.id))
+      } else if (filterStatus.value === '2') {
+        // 下架：房屋状态为2
+        filteredHouses = filteredHouses.filter(house => house.status === 2)
+      } else if (filterStatus.value === '3') {
+        // 预租：根据预约数据筛选
+        filteredHouses = filteredHouses.filter(house => preRentedRoomIds.has(house.id))
       }
+      // filterStatus === '' 表示全部，不筛选
       
       // 应用租赁类型筛选
       if (filterRentalType.value !== '') {
@@ -428,9 +417,42 @@ const loadHouses = async () => {
 // 加载统计信息
 const loadStatistics = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/rooms/count`)
-    if (response.data.success) {
-      statistics.value = response.data
+    // 获取所有房屋
+    const allHousesRes = await axios.get(`${API_BASE_URL}/rooms/all`)
+    // 获取所有租约数据来计算"已租"
+    const contractsRes = await axios.get(`${API_BASE_URL}/admin/tenant/all`)
+    // 获取所有预约数据来计算"预租"
+    const appointmentsRes = await axios.get(`${API_BASE_URL}/viewing-appointment/all`)
+    
+    if (allHousesRes.data.success) {
+      const allHouses = allHousesRes.data.rooms || []
+      const allContracts = contractsRes.data?.contracts || []
+      const allAppointments = appointmentsRes.data?.appointments || []
+      
+      // 已租：有活跃租约的房屋ID（合同状态为已签约=1或履行中=2）
+      const rentedRoomIds = new Set(
+        allContracts
+          .filter(c => c.contractStatus === 1 || c.contractStatus === 2)
+          .map(c => c.roomId)
+      )
+      
+      // 预租：有待确认=0或已确认=1预约的房屋ID
+      const preRentedRoomIds = new Set(
+        allAppointments
+          .filter(a => a.status === 0 || a.status === 1)
+          .map(a => a.roomId)
+      )
+      
+      // 统计（类别可以重叠，不必加起来等于全部）
+      statistics.value.total = allHouses.length
+      // 可租：状态为0的房屋
+      statistics.value.available = allHouses.filter(h => h.status === 0).length
+      // 已租：根据活跃租约数据统计
+      statistics.value.rented = rentedRoomIds.size
+      // 下架：状态为2的房屋
+      statistics.value.maintenance = allHouses.filter(h => h.status === 2).length
+      // 预租：有待确认或已确认预约的房屋数量
+      statistics.value.reserved = preRentedRoomIds.size
     }
   } catch (error) {
     console.error('加载统计信息失败:', error)
@@ -729,36 +751,151 @@ onMounted(() => {
   gap: 12px;
 }
 
-.add-btn, .refresh-btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s;
+
+/* 工具栏样式 */
+.toolbar {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #1e3a5f;
+  border-radius: 4px;
+  margin-bottom: 20px;
 }
 
-.add-btn {
-  background: linear-gradient(135deg, #007bff, #0056b3);
+.rental-type-filter select {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  background: #fff;
+  color: #333;
+  cursor: pointer;
+}
+
+.rental-type-filter select:focus {
+  outline: none;
+}
+
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.status-tabs {
+  display: flex;
+  gap: 0;
+  background: #fff;
+  border-radius: 4px;
+  padding: 2px;
+}
+
+.filter-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.filter-tab:hover {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.filter-tab.active {
+  background-color: #1e3a5f;
+  color: #fff;
+}
+
+.filter-tab svg {
+  display: block;
+  flex-shrink: 0;
+}
+
+.filter-tab span {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.filter-tab .count {
+  font-weight: 600;
+  color: inherit;
+}
+
+.search-box {
+  position: relative;
+  width: 270px;
+  flex-shrink: 0;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 8px 12px 8px 36px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  background: #fff;
+  color: #333;
+  box-sizing: border-box;
+}
+
+.search-box input::placeholder {
+  color: #999;
+}
+
+.search-box input:focus {
+  outline: none;
+}
+
+.search-box .search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+  pointer-events: none;
+}
+
+.toolbar .refresh-btn {
+  padding: 8px 16px;
+  background: #4a7ab0;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.toolbar .refresh-btn:hover {
+  background: #3a6a9f;
+}
+
+.toolbar .add-btn {
+  padding: 8px 16px;
+  background: #28a745;
   color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+  white-space: nowrap;
 }
 
-.add-btn:hover {
-  background: linear-gradient(135deg, #0056b3, #004085);
-  transform: translateY(-2px);
-}
-
-.refresh-btn {
-  background: #6c757d;
-  color: white;
-}
-
-.refresh-btn:hover {
-  background: #5a6268;
-  transform: translateY(-2px);
+.toolbar .add-btn:hover {
+  background: #218838;
 }
 
 .stats-cards {
@@ -771,12 +908,13 @@ onMounted(() => {
 .stat-card {
   background: white;
   padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;
   gap: 15px;
-  transition: transform 0.3s;
+  transition: transform 0.2s;
+  border: 1px solid #e9ecef;
 }
 
 .stat-card:hover {
@@ -801,96 +939,205 @@ onMounted(() => {
 }
 
 .filter-section {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: #1e3a5f;
+  padding: 15px 20px;
+  border-radius: 4px;
   margin-bottom: 20px;
 }
 
 .filter-row {
   display: flex;
-  gap: 20px;
-  align-items: end;
+  gap: 15px;
+  align-items: center;
 }
 
 .filter-item {
   display: flex;
-  flex-direction: column;
-  flex: 1;
+  align-items: center;
+  gap: 8px;
 }
 
 .filter-item label {
-  margin-bottom: 8px;
-  font-weight: 600;
-  color: #2c3e50;
+  font-weight: 500;
+  color: #fff;
+  white-space: nowrap;
 }
 
-.filter-item select,
-.filter-item input {
-  padding: 10px 12px;
-  border: 1px solid #e9ecef;
-  border-radius: 6px;
+.filter-item select {
+  padding: 8px 12px;
+  border: 1px solid #3a5a7f;
+  border-radius: 4px;
   font-size: 14px;
+  background: #2a4a6f;
+  color: #fff;
 }
 
-.filter-item select:focus,
-.filter-item input:focus {
+.filter-item select:focus {
   outline: none;
-  border-color: #007bff;
+  border-color: #4a9eff;
+}
+
+.search-item {
+  flex: 1;
+  position: relative;
+}
+
+.search-item input {
+  width: 100%;
+  padding: 8px 12px 8px 36px;
+  border: 1px solid #3a5a7f;
+  border-radius: 4px;
+  font-size: 14px;
+  background: #2a4a6f;
+  color: #fff;
+}
+
+.search-item input::placeholder {
+  color: #8a9aaf;
+}
+
+.search-item input:focus {
+  outline: none;
+  border-color: #4a9eff;
+}
+
+.search-item .search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #8a9aaf;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+  margin-left: auto;
+}
+
+/* 工具栏按钮样式 - 按个人风格指南 */
+.toolbar-refresh-btn,
+.toolbar-add-btn {
+  padding: 4px 12px;
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.4);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.toolbar-refresh-btn:hover,
+.toolbar-add-btn:hover {
+  background: rgba(255,255,255,0.1);
 }
 
 .house-list {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+  background: #fff;
+  border: 1px solid #ddd;
 }
 
-.table-container {
-  overflow-x: auto;
+.house-row {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  border-bottom: 1px solid #e5e5e5;
+  font-size: 13px;
 }
 
-.house-table {
-  width: 100%;
-  border-collapse: collapse;
+.house-row:hover {
+  background: #f9f9f9;
 }
 
-.house-table th,
-.house-table td {
-  padding: 12px 16px;
-  text-align: left;
-  border-bottom: 1px solid #e9ecef;
+.row-address {
+  flex: 0 0 280px;
+  padding-right: 16px;
+  border-right: 1px solid #e5e5e5;
 }
 
-.house-table th {
-  background-color: #f8f9fa;
-  font-weight: 600;
-  color: #2c3e50;
+.addr-main {
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 2px;
 }
 
-.house-table tbody tr:hover {
-  background-color: #f8f9fa;
-}
-
-.address-info strong {
-  display: block;
-  margin-bottom: 4px;
-  color: #2c3e50;
-}
-
-.vr-btn {
-  background-color: #6f42c1;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 4px;
-  cursor: pointer;
+.addr-sub {
   font-size: 12px;
-  transition: background 0.3s;
+  color: #888;
 }
-.vr-btn:hover {
-  background-color: #59359a;
+
+.row-info {
+  flex: 1;
+  padding: 0 16px;
+  color: #666;
+}
+
+.info-label {
+  color: #888;
+  margin-right: 2px;
+}
+
+.info-val {
+  color: #333;
+  margin-right: 16px;
+}
+
+.row-price {
+  flex: 0 0 120px;
+  padding: 0 16px;
+  text-align: right;
+}
+
+.price-main {
+  font-weight: 600;
+  color: #c00;
+  font-size: 14px;
+}
+
+.price-sub {
+  font-size: 11px;
+  color: #888;
+}
+
+.row-status {
+  flex: 0 0 60px;
+  padding: 0 16px;
+  text-align: center;
+}
+
+.status-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 12px;
+  background: #1e3a5f;
+  color: #fff;
+}
+
+.row-actions {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 4px;
+}
+
+.row-actions button {
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  background: #fff;
+  color: #333;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.row-actions button:hover {
+  background: #f5f5f5;
+  border-color: #ccc;
+}
+
+.loading,
+.empty-state {
+  padding: 24px;
+  text-align: center;
+  color: #888;
 }
 .vr-dialog {
   width: 600px;
@@ -988,7 +1235,7 @@ onMounted(() => {
 
 .status-badge {
   padding: 4px 12px;
-  border-radius: 12px;
+  border-radius: 2px;
   font-size: 0.8rem;
   font-weight: 600;
 }
@@ -1101,48 +1348,57 @@ onMounted(() => {
 }
 
 .dialog {
-  background: white;
-  border-radius: 12px;
+  background: #fff;
   width: 90%;
   max-width: 800px;
   max-height: 90vh;
   overflow-y: auto;
+  border: 1px solid #ddd;
 }
 
 .dialog-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
-  border-bottom: 1px solid #e9ecef;
+  padding: 16px;
+  border-bottom: 1px solid #ddd;
+  background: #f9f9f9;
 }
 
 .dialog-header h3 {
   margin: 0;
-  color: #2c3e50;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .close-btn {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
+  background: transparent;
+  border: 1px solid #ddd;
+  width: 24px;
+  height: 24px;
+  font-size: 14px;
   cursor: pointer;
-  color: #6c757d;
+  color: #888;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .close-btn:hover {
-  color: #dc3545;
+  background: #f5f5f5;
+  color: #333;
 }
 
 .dialog-content {
-  padding: 20px;
+  padding: 16px;
 }
 
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 16px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .form-group {
@@ -1155,61 +1411,60 @@ onMounted(() => {
 }
 
 .form-group label {
-  margin-bottom: 6px;
-  font-weight: 600;
-  color: #2c3e50;
+  margin-bottom: 4px;
+  font-weight: 500;
+  color: #333;
+  font-size: 12px;
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
-  padding: 10px 12px;
-  border: 1px solid #e9ecef;
-  border-radius: 6px;
-  font-size: 14px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  font-size: 13px;
+  background: #fff;
 }
 
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #007bff;
+  border-color: #3A6EA5;
 }
 
 .form-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-  padding-top: 20px;
-  border-top: 1px solid #e9ecef;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid #ddd;
 }
 
 .cancel-btn,
 .submit-btn {
-  padding: 10px 24px;
-  border: none;
-  border-radius: 6px;
+  padding: 4px 16px;
+  border: 1px solid #ddd;
   cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s;
-}
-
-.cancel-btn {
-  background: #6c757d;
-  color: white;
+  font-weight: 400;
+  font-size: 12px;
+  background: transparent;
+  color: #333;
 }
 
 .cancel-btn:hover {
-  background: #5a6268;
+  background: #f5f5f5;
 }
 
 .submit-btn {
-  background: #007bff;
-  color: white;
+  background: #1e3a5f;
+  color: #fff;
+  border-color: #1e3a5f;
 }
 
 .submit-btn:hover {
-  background: #0056b3;
+  background: #2d5a87;
+  border-color: #2d5a87;
 }
 
 .price-form {

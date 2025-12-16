@@ -98,84 +98,81 @@ const formatPercent = (value) => {
 
 .stat-card {
   background: white;
-  border-radius: 16px;
-  padding: 24px;
+  border-radius: 8px;
+  padding: 20px;
   display: flex;
   align-items: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  position: relative;
-  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e9ecef;
+  transition: box-shadow 0.2s ease;
 }
 
 .stat-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
 .stat-icon {
-  width: 60px;
-  height: 60px;
-  border-radius: 12px;
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
-  margin-right: 20px;
+  font-size: 24px;
+  margin-right: 16px;
   flex-shrink: 0;
 }
 
-/* Specific Card Styles */
+/* Specific Card Styles - 极简配色 */
 .income-card .stat-icon {
-  background: rgba(16, 185, 129, 0.1);
-  color: #10B981;
+  background-color: #e8f4fd;
+  color: #1e3a5f;
 }
 
 .occupancy-card .stat-icon {
-  background: rgba(59, 130, 246, 0.1);
-  color: #3B82F6;
+  background-color: #e8f5e9;
+  color: #2e7d32;
 }
 
 .maintenance-card .stat-icon {
-  background: rgba(245, 158, 11, 0.1);
-  color: #F59E0B;
+  background-color: #fff3e0;
+  color: #e65100;
 }
 
 .lease-card .stat-icon {
-  background: rgba(99, 102, 241, 0.1);
-  color: #6366F1;
+  background-color: #fce4ec;
+  color: #c2185b;
 }
 
 .stat-info h3 {
   margin: 0;
-  font-size: 14px;
-  color: #64748B;
+  font-size: 13px;
+  color: #7f8c8d;
   font-weight: 500;
 }
 
 .stat-value {
-  margin: 5px 0;
-  font-size: 28px;
-  font-weight: 700;
-  color: #1E293B;
-  letter-spacing: -0.5px;
+  margin: 4px 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #2c3e50;
 }
 
 .stat-sub, .stat-trend, .stat-status {
   font-size: 12px;
-  color: #94A3B8;
+  color: #95a5a6;
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
 .stat-trend.positive {
-  color: #10B981;
-  font-weight: 600;
+  color: #1e3a5f;
+  font-weight: 500;
 }
 
 .stat-status.urgent {
-  color: #EF4444;
-  font-weight: 600;
+  color: #e74c3c;
+  font-weight: 500;
 }
 </style>

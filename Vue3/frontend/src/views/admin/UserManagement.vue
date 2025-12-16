@@ -669,7 +669,7 @@ onMounted(() => {
 
 <style scoped>
 .user-management {
-  padding: 20px;
+  padding: 16px;
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -678,104 +678,97 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #e9ecef;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #ddd;
 }
 
 .page-header h2 {
   margin: 0;
-  color: #2c3e50;
-  font-size: 1.8rem;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .header-actions {
   display: flex;
-  gap: 12px;
-}
-
-.add-btn, .refresh-btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s;
-  display: flex;
-  align-items: center;
   gap: 8px;
 }
 
-.add-btn {
-  background: linear-gradient(135deg, #007bff, #0056b3);
-  color: white;
+.add-btn, .refresh-btn {
+  padding: 4px 12px;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  font-weight: 400;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  color: #333;
 }
 
-.add-btn:hover {
-  background: linear-gradient(135deg, #0056b3, #004085);
-  transform: translateY(-2px);
+.add-btn:hover, .refresh-btn:hover {
+  background: #f5f5f5;
 }
 
-.refresh-btn {
-  background: #6c757d;
-  color: white;
-}
-
-.refresh-btn:hover {
-  background: #5a6268;
-  transform: translateY(-2px);
+.add-btn svg, .refresh-btn svg {
+  width: 12px;
+  height: 12px;
 }
 
 .stats-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  margin-bottom: 30px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
 .stat-card {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  background: #fff;
+  padding: 16px;
   display: flex;
   align-items: center;
-  gap: 15px;
-  transition: transform 0.3s;
+  gap: 16px;
+  border: 1px solid #ddd;
 }
 
 .stat-card:hover {
-  transform: translateY(-2px);
+  background: #f9f9f9;
 }
 
 .stat-icon {
-  font-size: 2.5rem;
-  opacity: 0.8;
+  color: #1e3a5f;
+}
+
+.stat-icon svg {
+  width: 20px;
+  height: 20px;
 }
 
 .stat-content h3 {
   margin: 0;
-  font-size: 1.8rem;
-  color: #2c3e50;
+  font-size: 16px;
+  color: #333;
+  font-weight: 500;
 }
 
 .stat-content p {
-  margin: 5px 0 0 0;
-  color: #6c757d;
-  font-size: 0.9rem;
+  margin: 4px 0 0 0;
+  color: #888;
+  font-size: 12px;
 }
 
 .filter-section {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
+  background: #fff;
+  padding: 16px;
+  margin-bottom: 16px;
+  border: 1px solid #ddd;
 }
 
 .filter-row {
   display: flex;
-  gap: 20px;
+  gap: 16px;
   align-items: end;
 }
 
@@ -786,30 +779,29 @@ onMounted(() => {
 }
 
 .filter-item label {
-  margin-bottom: 8px;
-  font-weight: 600;
-  color: #2c3e50;
+  margin-bottom: 4px;
+  font-weight: 500;
+  color: #333;
+  font-size: 12px;
 }
 
 .filter-item select,
 .filter-item input {
-  padding: 10px 12px;
-  border: 1px solid #e9ecef;
-  border-radius: 6px;
-  font-size: 14px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  font-size: 13px;
 }
 
 .filter-item select:focus,
 .filter-item input:focus {
   outline: none;
-  border-color: #007bff;
+  border-color: #3A6EA5;
 }
 
 .user-list {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: #fff;
   overflow: hidden;
+  border: 1px solid #ddd;
 }
 
 .table-container {
@@ -823,31 +815,31 @@ onMounted(() => {
 
 .user-table th,
 .user-table td {
-  padding: 12px 16px;
+  padding: 8px 12px;
   text-align: left;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid #ddd;
+  font-size: 12px;
 }
 
 .user-table th {
-  background-color: #f8f9fa;
-  font-weight: 600;
-  color: #2c3e50;
+  background-color: #f9f9f9;
+  font-weight: 500;
+  color: #333;
 }
 
 .user-table tbody tr:hover {
-  background-color: #f8f9fa;
+  background-color: #f9f9f9;
 }
 
 .user-info {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .user-avatar {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
+  width: 32px;
+  height: 32px;
   overflow: hidden;
 }
 
@@ -859,196 +851,202 @@ onMounted(() => {
 
 .user-details strong {
   display: block;
-  margin-bottom: 4px;
-  color: #2c3e50;
+  margin-bottom: 2px;
+  color: #333;
+  font-size: 12px;
 }
 
 .user-real-name {
-  font-size: 0.9rem;
-  color: #6c757d;
+  font-size: 11px;
+  color: #888;
 }
 
 .user-type {
-  font-size: 0.8rem;
-  color: #007bff;
-  background: #e3f2fd;
-  padding: 2px 8px;
-  border-radius: 12px;
+  font-size: 10px;
+  color: #fff;
+  background: #1e3a5f;
+  padding: 2px 6px;
   display: inline-block;
 }
 
 .contact-info div {
-  margin-bottom: 4px;
-  font-size: 0.9rem;
+  margin-bottom: 2px;
+  font-size: 11px;
 }
 
 .phone {
-  font-weight: 600;
-  color: #2c3e50;
+  font-weight: 500;
+  color: #333;
 }
 
 .email, .wechat, .qq {
-  color: #6c757d;
-  font-size: 0.85rem;
+  color: #888;
+  font-size: 11px;
 }
 
 .basic-info div,
 .rental-info div {
-  margin-bottom: 4px;
-  font-size: 0.9rem;
+  margin-bottom: 2px;
+  font-size: 11px;
 }
 
 .preferred-districts,
 .requirements {
-  font-size: 0.85rem;
-  color: #6c757d;
+  font-size: 11px;
+  color: #888;
 }
 
 .account-status {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .status-badge {
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 500;
   align-self: flex-start;
 }
 
 .status-active {
-  background: #d4edda;
-  color: #155724;
+  background: #1e3a5f;
+  color: #fff;
 }
 
 .status-disabled {
-  background: #f8d7da;
-  color: #721c24;
+  background: #c00;
+  color: #fff;
 }
 
 .status-inactive {
-  background: #fff3cd;
-  color: #856404;
+  background: #888;
+  color: #fff;
 }
 
 .status-unknown {
-  background: #e2e3e5;
-  color: #383d41;
+  background: #888;
+  color: #fff;
 }
 
 .credit-score {
-  font-size: 0.85rem;
+  font-size: 11px;
 }
 
 .credit-excellent {
-  color: #28a745;
-  font-weight: 600;
+  color: #1e3a5f;
+  font-weight: 500;
 }
 
 .credit-good {
-  color: #17a2b8;
-  font-weight: 600;
+  color: #3A6EA5;
+  font-weight: 500;
 }
 
 .credit-fair {
-  color: #ffc107;
-  font-weight: 600;
+  color: #888;
+  font-weight: 500;
 }
 
 .credit-poor {
-  color: #dc3545;
-  font-weight: 600;
+  color: #c00;
+  font-weight: 500;
 }
 
 .certification-status span {
-  font-size: 0.8rem;
+  font-size: 10px;
   padding: 2px 6px;
-  border-radius: 8px;
 }
 
 .certified {
-  background: #d4edda;
-  color: #155724;
+  background: #1e3a5f;
+  color: #fff;
 }
 
 .not-certified {
-  background: #fff3cd;
-  color: #856404;
+  background: #888;
+  color: #fff;
 }
 
 .register-time {
-  font-size: 0.75rem;
-  color: #6c757d;
+  font-size: 10px;
+  color: #888;
 }
 
 .action-buttons {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  flex-direction: row;
+  gap: 4px;
+  flex-wrap: wrap;
 }
 
 .action-buttons button {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
+  padding: 2px 8px;
+  border: 1px solid #ddd;
   cursor: pointer;
-  font-size: 0.8rem;
-  transition: all 0.3s;
+  font-size: 10px;
+  background: transparent;
+  color: #333;
+}
+
+.action-buttons button:hover {
+  background: #f5f5f5;
 }
 
 .edit-btn {
-  background: #17a2b8;
-  color: white;
+  border-color: #3A6EA5;
+  color: #3A6EA5;
 }
 
 .edit-btn:hover {
-  background: #138496;
+  background: #f0f5fa;
 }
 
 .status-btn {
-  color: white;
+  color: #333;
 }
 
 .disable-btn {
-  background: #dc3545;
+  border-color: #c00;
+  color: #c00;
 }
 
 .disable-btn:hover {
-  background: #c82333;
+  background: #fff0f0;
 }
 
 .enable-btn {
-  background: #28a745;
+  border-color: #1e3a5f;
+  color: #1e3a5f;
 }
 
 .enable-btn:hover {
-  background: #218838;
+  background: #f0f5fa;
 }
 
 .password-btn {
-  background: #ffc107;
-  color: #212529;
+  border-color: #888;
+  color: #888;
 }
 
 .password-btn:hover {
-  background: #e0a800;
+  background: #f5f5f5;
 }
 
 .delete-btn {
-  background: #6c757d;
-  color: white;
+  border-color: #c00;
+  color: #c00;
 }
 
 .delete-btn:hover {
-  background: #5a6268;
+  background: #fff0f0;
 }
 
 .loading, .empty-state {
   text-align: center;
-  padding: 40px;
-  color: #6c757d;
+  padding: 24px;
+  color: #888;
+  font-size: 12px;
 }
 
 /* 对话框样式 */
@@ -1066,48 +1064,57 @@ onMounted(() => {
 }
 
 .dialog {
-  background: white;
-  border-radius: 12px;
+  background: #fff;
   width: 90%;
   max-width: 800px;
   max-height: 90vh;
   overflow-y: auto;
+  border: 1px solid #ddd;
 }
 
 .dialog-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
-  border-bottom: 1px solid #e9ecef;
+  padding: 16px;
+  border-bottom: 1px solid #ddd;
+  background: #f9f9f9;
 }
 
 .dialog-header h3 {
   margin: 0;
-  color: #2c3e50;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .close-btn {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
+  background: transparent;
+  border: 1px solid #ddd;
+  width: 24px;
+  height: 24px;
+  font-size: 14px;
   cursor: pointer;
-  color: #6c757d;
+  color: #888;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .close-btn:hover {
-  color: #dc3545;
+  background: #f5f5f5;
+  color: #333;
 }
 
 .dialog-content {
-  padding: 20px;
+  padding: 16px;
 }
 
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 16px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .form-group {
@@ -1121,72 +1128,75 @@ onMounted(() => {
 }
 
 .form-group label {
-  margin-bottom: 6px;
-  font-weight: 600;
-  color: #2c3e50;
+  margin-bottom: 4px;
+  font-weight: 500;
+  color: #333;
+  font-size: 12px;
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
-  padding: 10px 12px;
-  border: 1px solid #e9ecef;
-  border-radius: 6px;
-  font-size: 14px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  font-size: 13px;
 }
 
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #007bff;
+  border-color: #3A6EA5;
 }
 
 .password-toggle {
   position: absolute;
-  right: 10px;
-  top: 35px;
-  background: none;
-  border: none;
-  color: #6c757d;
+  right: 8px;
+  top: 28px;
+  background: transparent;
+  border: 1px solid #ddd;
+  color: #888;
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: 10px;
+  padding: 2px 6px;
+}
+
+.password-toggle:hover {
+  background: #f5f5f5;
 }
 
 .form-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-  padding-top: 20px;
-  border-top: 1px solid #e9ecef;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid #ddd;
 }
 
 .cancel-btn,
 .submit-btn {
-  padding: 10px 24px;
-  border: none;
-  border-radius: 6px;
+  padding: 4px 16px;
+  border: 1px solid #ddd;
   cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s;
-}
-
-.cancel-btn {
-  background: #6c757d;
-  color: white;
+  font-weight: 400;
+  font-size: 12px;
+  background: transparent;
+  color: #333;
 }
 
 .cancel-btn:hover {
-  background: #5a6268;
+  background: #f5f5f5;
 }
 
 .submit-btn {
-  background: #007bff;
-  color: white;
+  background: #1e3a5f;
+  color: #fff;
+  border-color: #1e3a5f;
 }
 
 .submit-btn:hover {
-  background: #0056b3;
+  background: #2d5a87;
+  border-color: #2d5a87;
 }
 
 .password-form {

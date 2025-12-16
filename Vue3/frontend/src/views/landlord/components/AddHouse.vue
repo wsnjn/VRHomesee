@@ -353,9 +353,8 @@ defineExpose({ resetForm })
   align-items: center;
   margin-bottom: 1rem;
   padding: 1rem 1.5rem;
-  background: linear-gradient(135deg, rgb(179, 208, 253) 0%, rgb(164, 202, 248) 100%);
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(79, 156, 232, 0.2);
+  background-color: #1e3a5f;
+  border-radius: 8px;
 }
 
 .page-header h2 {
@@ -363,7 +362,6 @@ defineExpose({ resetForm })
   color: white;
   font-size: 1.5rem;
   font-weight: 600;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .header-actions {
@@ -378,19 +376,17 @@ defineExpose({ resetForm })
   gap: 0.5rem;
   padding: 0.5rem 1rem;
   border: none;
-  border-radius: 8px;
+  border-radius: 4px;
   cursor: pointer;
   font-weight: 500;
-  font-size: 0.875rem;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.2);
-  background: linear-gradient(135deg, rgb(255, 107, 107) 0%, rgb(220, 53, 69) 100%);
+  font-size: 13px;
+  transition: background-color 0.2s ease;
+  background-color: #e74c3c;
   color: white;
 }
 
 .cancel-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+  background-color: #c0392b;
 }
 
 .form-container {
@@ -502,41 +498,35 @@ defineExpose({ resetForm })
   gap: 0.375rem;
   padding: 0.5rem 1.25rem;
   border: none;
-  border-radius: 8px;
+  border-radius: 4px;
   font-weight: 500;
-  font-size: 0.875rem;
+  font-size: 13px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(79, 156, 232, 0.2);
+  transition: background-color 0.2s ease;
   min-width: 100px;
 }
 
 .cancel-btn {
-  background: linear-gradient(135deg, rgb(255, 107, 107) 0%, rgb(220, 53, 69) 100%);
+  background-color: #e74c3c;
   color: white;
 }
 
 .cancel-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
-  background: linear-gradient(135deg, rgb(245, 97, 97) 0%, rgb(200, 35, 51) 100%);
+  background-color: #c0392b;
 }
 
 .submit-btn {
-  background: linear-gradient(135deg, rgb(102, 187, 106) 0%, rgb(76, 175, 80) 100%);
+  background-color: #27ae60;
   color: white;
 }
 
 .submit-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
-  background: linear-gradient(135deg, rgb(92, 177, 96) 0%, rgb(66, 165, 70) 100%);
+  background-color: #219a52;
 }
 
 .submit-btn:disabled {
-  background: linear-gradient(135deg, rgb(149, 185, 240) 0%, rgb(119, 162, 224) 100%);
+  background-color: #bdc3c7;
   cursor: not-allowed;
-  transform: none;
   opacity: 0.7;
 }
 

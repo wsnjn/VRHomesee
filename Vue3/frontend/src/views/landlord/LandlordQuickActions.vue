@@ -77,8 +77,8 @@ defineEmits(['navigate']);
 
 .action-btn {
   background: white;
-  border: 1px solid #E2E8F0;
-  border-radius: 12px;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
   padding: 20px;
   cursor: pointer;
   display: flex;
@@ -92,19 +92,18 @@ defineEmits(['navigate']);
 }
 
 .action-btn:hover {
-  background: #F8FAFC;
-  border-color: #CBD5E1;
-  transform: translateY(-2px);
+  background-color: #f5f7fa;
+  border-color: #1e3a5f;
 }
 
 .action-btn.primary {
-  background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
+  background-color: #1e3a5f;
   border: none;
   color: white;
 }
 
 .action-btn.primary .icon-wrapper {
-  background: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.2);
   color: white;
 }
 
@@ -113,43 +112,42 @@ defineEmits(['navigate']);
 }
 
 .action-btn.primary:hover {
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+  background-color: #2d5a87;
 }
 
 .icon-wrapper {
-  width: 48px;
-  height: 48px;
-  background: #F1F5F9;
-  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  background-color: #e8f4fd;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 20px;
-  color: #64748B;
+  color: #1e3a5f;
   transition: all 0.2s ease;
 }
 
 .action-btn span {
   font-size: 14px;
   font-weight: 500;
-  color: #475569;
+  color: #2c3e50;
 }
 
 .badge {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  background: #EF4444;
+  top: 10px;
+  right: 10px;
+  background-color: #e74c3c;
   color: white;
-  font-size: 12px;
-  font-weight: 700;
-  min-width: 20px;
-  height: 20px;
-  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 6px;
-  border: 2px solid white;
+  padding: 0 5px;
 }
 </style>

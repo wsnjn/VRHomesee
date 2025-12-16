@@ -318,15 +318,16 @@ onMounted(() => {
   gap: 10px;
   background: white;
   padding: 4px;
-  border-radius: 8px;
+  border-radius: 4px;
   box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  border: 1px solid #e9ecef;
 }
 
 .filter-btn {
   padding: 6px 16px;
   border: none;
   background: none;
-  border-radius: 6px;
+  border-radius: 2px;
   font-size: 14px;
   color: #6b7280;
   cursor: pointer;
@@ -347,9 +348,9 @@ onMounted(() => {
 
 .request-card {
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  border: 1px solid #f3f4f6;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  border: 1px solid #e9ecef;
   overflow: hidden;
   transition: transform 0.2s;
 }
@@ -389,7 +390,7 @@ onMounted(() => {
 .status-badge {
   font-size: 12px;
   padding: 4px 12px;
-  border-radius: 20px;
+  border-radius: 2px;
   font-weight: 500;
 }
 
@@ -477,7 +478,7 @@ onMounted(() => {
   gap: 16px;
   background: #f9fafb;
   padding: 16px;
-  border-radius: 8px;
+  border-radius: 4px;
 }
 
 .info-item {
@@ -512,7 +513,7 @@ onMounted(() => {
 
 .action-btn {
   padding: 8px 16px;
-  border-radius: 6px;
+  border-radius: 2px;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -586,10 +587,10 @@ onMounted(() => {
 .modal-content {
   background: white;
   padding: 30px;
-  border-radius: 12px;
+  border-radius: 4px;
   width: 90%;
   max-width: 400px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
 .modal-content h3 {
@@ -614,7 +615,7 @@ onMounted(() => {
   width: 100%;
   padding: 10px;
   border: 1px solid #d1d5db;
-  border-radius: 6px;
+  border-radius: 2px;
   font-size: 14px;
 }
 
@@ -629,7 +630,7 @@ onMounted(() => {
   padding: 8px 16px;
   border: 1px solid #d1d5db;
   background: white;
-  border-radius: 6px;
+  border-radius: 2px;
   cursor: pointer;
   color: #374151;
 }
@@ -637,13 +638,13 @@ onMounted(() => {
 .btn-confirm {
   padding: 8px 16px;
   border: none;
-  background: #10b981;
+  background: #1e3a5f;
   color: white;
-  border-radius: 6px;
+  border-radius: 2px;
   cursor: pointer;
 }
 
 .btn-confirm:hover {
-  background: #059669;
+  background: #2d5a87;
 }
 </style>

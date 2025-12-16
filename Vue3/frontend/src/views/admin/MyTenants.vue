@@ -443,16 +443,7 @@
 import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 
-const props = defineProps({
-  userPhone: {
-    type: String,
-    required: true
-  },
-  userId: {
-    type: Number,
-    default: null
-  }
-})
+// 管理员端不需要props，直接获取所有租户数据
 
 // API基础URL
 const API_BASE_URL = 'https://api.homesee.xyz/api'
@@ -465,43 +456,40 @@ const searchQuery = ref('')
 const statusFilter = ref('')
 const rentStatusFilter = ref('')
 
-// 加载租户数据
+// 加载所有租户数据（管理员端获取所有数据）
 const loadTenants = async () => {
-  if (!props.userPhone && !props.userId) {
-    console.error('用户手机号或ID不存在')
-    return
-  }
-
   loading.value = true
   try {
-    let url = `${API_BASE_URL}/landlord/tenants?landlordPhone=${props.userPhone}`
+    // 方法1: 先获取所有房东用户，然后逐个获取他们的租约（带有丰富信息）
+    const usersRes = await axios.get(`${API_BASE_URL}/admin/user/all`)
     
-    // 如果有userId，优先使用新的API endpoint
-    if (props.userId) {
-      url = `${API_BASE_URL}/admin/tenant/landlord/${props.userId}`
-    }
-
-    const response = await axios.get(url)
-    if (response.data.success) {
-      // 新接口返回的是 { success: true, contracts: [...] }
-      // 旧接口返回的是 { success: true, tenants: [...], statistics: ... }
-      // 需要适配两种格式
+    if (usersRes.data.success) {
+      const landlords = (usersRes.data.users || []).filter(u => u.userType === 2 || u.userType === 3)
       
-      if (response.data.contracts) {
-        tenants.value = response.data.contracts
-        // 统计信息可能需要另外获取或从contracts计算
-        statistics.value = {
-          totalTenants: tenants.value.length,
-          rentedHouses: tenants.value.filter(t => t.contractStatus === 1 || t.contractStatus === 2).length,
-          expiringContracts: tenants.value.filter(t => calculateDaysLeft(t.contractEndDate) <= 30).length,
-          monthlyIncome: tenants.value.reduce((sum, t) => sum + (t.monthlyRent || 0), 0)
+      // 获取每个房东的租约数据（带有用户和房屋信息）
+      let allContracts = []
+      for (const landlord of landlords) {
+        try {
+          const contractsRes = await axios.get(`${API_BASE_URL}/admin/tenant/landlord/${landlord.id}`)
+          if (contractsRes.data.success && contractsRes.data.contracts) {
+            allContracts = allContracts.concat(contractsRes.data.contracts)
+          }
+        } catch (err) {
+          console.warn(`获取房东 ${landlord.id} 的租约失败:`, err)
         }
-      } else {
-        tenants.value = response.data.tenants || []
-        statistics.value = response.data.statistics || {}
+      }
+      
+      tenants.value = allContracts
+      
+      // 从contracts计算统计信息
+      statistics.value = {
+        totalTenants: tenants.value.length,
+        rentedHouses: tenants.value.filter(t => t.contractStatus === 1 || t.contractStatus === 2).length,
+        expiringContracts: tenants.value.filter(t => calculateDaysLeft(t.contractEndDate) <= 30 && calculateDaysLeft(t.contractEndDate) > 0).length,
+        monthlyIncome: tenants.value.reduce((sum, t) => sum + (t.monthlyRent || 0), 0)
       }
     } else {
-      console.error('获取租户列表失败:', response.data.message)
+      console.error('获取用户列表失败:', usersRes.data.message)
       tenants.value = []
     }
   } catch (error) {
@@ -820,36 +808,27 @@ onMounted(() => {
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
 .stat-card {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e9ecef;
+  background: #fff;
+  padding: 16px;
+  border: 1px solid #ddd;
   display: flex;
   align-items: center;
-  gap: 1rem;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  gap: 16px;
 }
 
 .stat-icon {
-  width: 48px;
-  height: 48px;
-  background-color: #1e3a5f;
-  border-radius: 4px;
+  width: 40px;
+  height: 40px;
+  background: #1e3a5f;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: #fff;
 }
 
 .stat-content {
@@ -858,29 +837,26 @@ onMounted(() => {
 
 .stat-value {
   display: block;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #1f2937;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #333;
   line-height: 1.2;
 }
 
 .stat-label {
-  font-size: 0.85rem;
-  color: #6b7280;
-  font-weight: 500;
+  font-size: 12px;
+  color: #888;
 }
 
 /* 筛选区域样式 */
 .filter-section {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  margin-bottom: 2rem;
+  background: #fff;
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  margin-bottom: 16px;
   display: flex;
-  gap: 1.5rem;
+  gap: 16px;
   align-items: center;
-  border: 1px solid #e9ecef;
 }
 
 .search-box {
@@ -892,60 +868,57 @@ onMounted(() => {
 
 .search-box svg {
   position: absolute;
-  left: 1rem;
-  color: #9ca3af;
+  left: 8px;
+  color: #888;
 }
 
 .search-box input {
   width: 100%;
-  padding: 0.75rem 1rem 0.75rem 2.5rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 2px;
-  font-size: 0.95rem;
-  transition: border-color 0.2s;
+  padding: 8px 8px 8px 32px;
+  border: 1px solid #ddd;
+  font-size: 13px;
+  background: #fff;
 }
 
 .search-box input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #3A6EA5;
 }
 
 .filter-controls {
   display: flex;
-  gap: 1rem;
+  gap: 8px;
 }
 
 .filter-controls select {
-  padding: 0.75rem 1rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 2px;
-  background: white;
-  font-size: 0.95rem;
+  padding: 8px;
+  border: 1px solid #ddd;
+  background: #fff;
+  font-size: 13px;
   cursor: pointer;
-  min-width: 140px;
+  min-width: 120px;
 }
 
 .filter-controls select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #3A6EA5;
 }
 
 /* 加载状态样式 */
 .loading-section {
   text-align: center;
-  padding: 4rem;
-  color: #6b7280;
+  padding: 24px;
+  color: #888;
 }
 
 .spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid #f3f4f6;
-  border-top: 3px solid #667eea;
+  width: 24px;
+  height: 24px;
+  border: 2px solid #ddd;
+  border-top: 2px solid #1e3a5f;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin: 0 auto 1rem;
+  margin: 0 auto 8px;
 }
 
 @keyframes spin {
@@ -956,122 +929,123 @@ onMounted(() => {
 /* 空状态样式 */
 .empty-state {
   text-align: center;
-  padding: 4rem;
-  color: #9ca3af;
+  padding: 24px;
+  color: #888;
 }
 
 .empty-state svg {
-  margin-bottom: 1rem;
+  margin-bottom: 8px;
 }
 
 /* 租户卡片样式 */
 .tenant-cards {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 0;
 }
 
 .tenant-card {
-  background: white;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e9ecef;
-  padding: 1.5rem;
-  transition: transform 0.2s, box-shadow 0.2s;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-bottom: none;
+  padding: 16px;
+}
+
+.tenant-card:last-child {
+  border-bottom: 1px solid #ddd;
 }
 
 .tenant-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: #f9f9f9;
 }
 
 .tenant-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 1rem;
+  margin-bottom: 8px;
 }
 
 .tenant-info h4 {
-  margin: 0 0 0.25rem 0;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #1f2937;
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
 }
 
 .tenant-phone {
   margin: 0;
-  color: #6b7280;
-  font-size: 0.9rem;
+  color: #888;
+  font-size: 12px;
 }
 
 .contract-status {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  align-items: flex-end;
+  gap: 8px;
+  align-items: center;
 }
 
 .status-tag, .rent-status {
-  padding: 0.25rem 0.75rem;
-  border-radius: 2px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 500;
   white-space: nowrap;
+  background: #1e3a5f;
+  color: #fff;
 }
 
 /* 合同状态样式 */
-.status-pending { background: #fff7ed; color: #c2410c; }
-.status-signed { background: #eff6ff; color: #1d4ed8; }
-.status-active { background: #f0fdf4; color: #15803d; }
-.status-expired { background: #f3f4f6; color: #6b7280; }
-.status-terminated { background: #fef2f2; color: #dc2626; }
-.status-moved-out { background: #f3f4f6; color: #4b5563; }
+.status-pending { background: #1e3a5f; color: #fff; }
+.status-signed { background: #1e3a5f; color: #fff; }
+.status-active { background: #1e3a5f; color: #fff; }
+.status-expired { background: #888; color: #fff; }
+.status-terminated { background: #888; color: #fff; }
+.status-moved-out { background: #888; color: #fff; }
 
 /* 租金状态样式 */
-.rent-unpaid { background: #fef2f2; color: #dc2626; }
-.rent-paid { background: #f0fdf4; color: #15803d; }
-.rent-overdue { background: #fff7ed; color: #c2410c; }
-.rent-partial { background: #eff6ff; color: #1d4ed8; }
+.rent-unpaid { background: #c00; color: #fff; }
+.rent-paid { background: #1e3a5f; color: #fff; }
+.rent-overdue { background: #c00; color: #fff; }
+.rent-partial { background: #888; color: #fff; }
 
 /* 房屋信息样式 */
 .house-info {
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #f3f4f6;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e5e5e5;
 }
 
 .house-title {
-  margin: 0 0 0.75rem 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #374151;
+  margin: 0 0 8px 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
 }
 
 .house-details {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.85rem;
-  color: #6b7280;
+  gap: 8px;
+  font-size: 12px;
+  color: #888;
 }
 
 .detail-divider {
-  color: #d1d5db;
+  color: #ddd;
 }
 
 /* 合同信息样式 */
 .contract-info {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
 .contract-dates, .financial-info {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 8px;
 }
 
 .date-item, .amount-item {
@@ -1081,46 +1055,50 @@ onMounted(() => {
 }
 
 .date-label, .amount-label {
-  font-size: 0.85rem;
-  color: #6b7280;
+  font-size: 12px;
+  color: #888;
 }
 
 .date-value, .amount-value {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #1f2937;
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
 }
 
 /* 剩余天数样式 */
-.days-critical { color: #dc2626; }
-.days-warning { color: #c2410c; }
-.days-normal { color: #15803d; }
+.days-critical { color: #c00; }
+.days-warning { color: #c00; }
+.days-normal { color: #333; }
 
 /* 操作按钮样式 */
 .tenant-actions {
   display: flex;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
+  gap: 8px;
+  margin-bottom: 8px;
 }
 
 .action-btn {
-  flex: 1;
-  padding: 0.75rem 1rem;
-  border: none;
-  border-radius: 2px;
-  font-size: 0.9rem;
-  font-weight: 500;
+  padding: 4px 12px;
+  border: 1px solid #ddd;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 400;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  transition: all 0.2s;
+  gap: 4px;
+  color: #333;
+}
+
+.action-btn:hover {
+  background: #f5f5f5;
+  border-color: #ccc;
 }
 
 .contact-btn {
-  background: #eff6ff;
-  color: #1d4ed8;
+  color: #3A6EA5;
+  border-color: #3A6EA5;
 }
 
 .contact-btn:hover {

@@ -71,14 +71,33 @@
               </span>
               房屋列表
             </li>
+          </ul>
+        </div>
+
+        <div class="menu-section">
+          <h3>租约管理</h3>
+          <ul class="menu-list">
             <li 
-              :class="{ active: activeTab === 'house-status' }"
-              @click="switchTab('house-status')"
+              :class="{ active: activeTab === 'tenant-management' }"
+              @click="switchTab('tenant-management')"
             >
               <span class="menu-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                </svg>
               </span>
-              房屋状态
+              租约列表
+            </li>
+            <li 
+              :class="{ active: activeTab === 'my-tenants' }"
+              @click="switchTab('my-tenants')"
+            >
+              <span class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+              </span>
+              我的租户
             </li>
           </ul>
         </div>
@@ -113,77 +132,137 @@
         <!-- 数据概览 (大数据可视化风格) -->
         <div v-if="activeTab === 'dashboard'" class="dashboard-viz">
 
+          <!-- KPI 指标面板 -->
+          <div class="kpi-row">
+            <div class="kpi-card">
+              <div class="kpi-icon house-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+              </div>
+              <div class="kpi-content">
+                <div class="kpi-value">{{ houseStatistics.total || 0 }}</div>
+                <div class="kpi-label">房源总数</div>
+                <div class="kpi-sub">待租: {{ houseStatusStats.available }} / 已租: {{ houseStatusStats.rented }}</div>
+              </div>
+            </div>
+            
+            <div class="kpi-card">
+              <div class="kpi-icon user-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+              </div>
+              <div class="kpi-content">
+                <div class="kpi-value">{{ userStatistics.total || 0 }}</div>
+                <div class="kpi-label">用户总数</div>
+                <div class="kpi-sub">房东: {{ userStatistics.landlords }} / 租客: {{ userStatistics.tenants }}</div>
+              </div>
+            </div>
+            
+            <div class="kpi-card">
+              <div class="kpi-icon contract-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+              </div>
+              <div class="kpi-content">
+                <div class="kpi-value">{{ statistics.totalContracts || 0 }}</div>
+                <div class="kpi-label">租约合同</div>
+                <div class="kpi-sub">有效: {{ statistics.activeContracts }}</div>
+              </div>
+            </div>
+            
+            <div class="kpi-card">
+              <div class="kpi-icon appointment-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              </div>
+              <div class="kpi-content">
+                <div class="kpi-value">{{ appointmentStats.total || 0 }}</div>
+                <div class="kpi-label">看房预约</div>
+                <div class="kpi-sub">待处理: {{ appointmentStats.pending }}</div>
+              </div>
+            </div>
+            
+            <div class="kpi-card">
+              <div class="kpi-icon community-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+              </div>
+              <div class="kpi-content">
+                <div class="kpi-value">{{ communityStats.posts + communityStats.messages }}</div>
+                <div class="kpi-label">社区活跃</div>
+                <div class="kpi-sub">动态: {{ communityStats.posts }} / 消息: {{ communityStats.messages }}</div>
+              </div>
+            </div>
+          </div>
 
+          <!-- 图表网格 -->
           <div class="viz-grid">
             <!-- 左侧列 -->
             <div class="viz-col left-col">
-              <div class="viz-card title-card">
-                <div class="title-content">
-                  <h2>运营数据监控中心</h2>
-                  <div class="digital-clock">{{ currentTime }}</div>
-                  <div class="system-status">
-                    <span class="status-dot"></span> 系统运行正常
+              <!-- 房屋状态分布 (保留饼图，增强信息) -->
+              <div class="viz-card">
+                <div class="card-header">
+                  <h3>房屋状态分布</h3>
+                  <div class="decoration-line"></div>
+                </div>
+                <div class="chart-with-info">
+                  <div class="chart-container" ref="houseStatusChartRef"></div>
+                  <div class="status-info-list">
+                    <div class="status-info-item">
+                      <span class="dot available"></span>
+                      <span class="name">待出租</span>
+                      <span class="value">{{ houseStatusStats.available }}</span>
+                    </div>
+                    <div class="status-info-item">
+                      <span class="dot rented"></span>
+                      <span class="name">已出租</span>
+                      <span class="value">{{ houseStatusStats.rented }}</span>
+                    </div>
+                    <div class="status-info-item">
+                      <span class="dot offline"></span>
+                      <span class="name">维护中</span>
+                      <span class="value">{{ houseStatusStats.offline }}</span>
+                    </div>
+                    <div class="status-info-item">
+                      <span class="dot prerent"></span>
+                      <span class="name">预定中</span>
+                      <span class="value">{{ houseStatusStats.preRent }}</span>
+                    </div>
                   </div>
                 </div>
               </div>
 
+              <!-- 用户增长趋势 -->
               <div class="viz-card">
                 <div class="card-header">
-                  <h3>租约状态分布</h3>
+                  <h3>用户增长趋势</h3>
                   <div class="decoration-line"></div>
                 </div>
-                <div class="chart-container" ref="contractChartRef"></div>
+                <div class="chart-container" ref="userTrendChartRef"></div>
               </div>
             </div>
 
-            <!-- 中间列 (核心指标 + 地图) -->
+            <!-- 中间列 (只有地图) -->
             <div class="viz-col center-col">
-              <div class="kpi-board">
-                <div class="kpi-item">
-                  <div class="kpi-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                  </div>
-                  <div class="kpi-value">{{ houseStatistics.total || 0 }}</div>
-                  <div class="kpi-label">房源总数</div>
-                </div>
-                <div class="kpi-item">
-                  <div class="kpi-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                  </div>
-                  <div class="kpi-value">{{ statistics.totalContracts || 0 }}</div>
-                  <div class="kpi-label">累计签约</div>
-                </div>
-                <div class="kpi-item">
-                  <div class="kpi-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                  </div>
-                  <div class="kpi-value">{{ userStatistics.total || 0 }}</div>
-                  <div class="kpi-label">用户总数</div>
-                </div>
-              </div>
-
-              <div class="viz-card map-card">
+              <div class="viz-card map-card-full">
                 <div class="card-header">
-                  <h3>全国房源分布与实时监控</h3>
+                  <h3>全国房源分布</h3>
                   <div class="decoration-line"></div>
                 </div>
-                <div class="chart-container map-container" ref="mapChartRef"></div>
+                <div class="chart-container map-container-full" ref="mapChartRef"></div>
               </div>
             </div>
 
             <!-- 右侧列 -->
             <div class="viz-col right-col">
+              <!-- 社区活跃趋势 -->
               <div class="viz-card">
                 <div class="card-header">
-                  <h3>房源出租率</h3>
+                  <h3>社区活跃趋势</h3>
                   <div class="decoration-line"></div>
                 </div>
-                <div class="chart-container" ref="occupancyChartRef"></div>
+                <div class="chart-container" ref="communityTrendChartRef"></div>
               </div>
 
+              <!-- 签约趋势 -->
               <div class="viz-card">
                 <div class="card-header">
-                  <h3>近期签约趋势 (7天)</h3>
+                  <h3>签约趋势 (近30天)</h3>
                   <div class="decoration-line"></div>
                 </div>
                 <div class="chart-container" ref="trendChartRef"></div>
@@ -194,12 +273,17 @@
 
         <!-- 租约管理 -->
         <div v-if="activeTab === 'tenant-management'">
-          <tenant-management />
+          <tenant-management @goToTenantMatching="handleGoToTenantMatching" />
+        </div>
+
+        <!-- 我的租户 -->
+        <div v-if="activeTab === 'my-tenants'">
+          <my-tenants />
         </div>
 
         <!-- 租客匹配 -->
         <div v-if="activeTab === 'tenant-matching'">
-          <tenant-matching />
+          <tenant-matching :preSelectedData="preSelectedMatchData" />
         </div>
 
         <!-- 房屋管理 -->
@@ -207,13 +291,7 @@
           <house-management />
         </div>
 
-        <!-- 房屋状态 -->
-        <div v-if="activeTab === 'house-status'">
-          <house-status 
-            :houses="rawHouses"
-            :statistics="houseStatusStats"
-          />
-        </div>
+
 
         <!-- 用户管理 -->
         <div v-if="activeTab === 'user-management'">
@@ -248,7 +326,7 @@ import UserManagement from './UserManagement.vue'
 import ResourceManagement from './community/ResourceManagement.vue'
 
 import ChannelManagement from './community/ChannelManagement.vue'
-import HouseStatus from './HouseStatus.vue'
+import MyTenants from './MyTenants.vue'
 
 const router = useRouter()
 
@@ -287,6 +365,33 @@ const expiringContracts = ref([])
 const contractTrends = ref({})
 const cityDistribution = ref({})
 
+// 预选匹配数据（从租约列表跳转时使用）
+const preSelectedMatchData = ref(null)
+
+// 处理跳转到租客匹配
+const handleGoToTenantMatching = (data) => {
+  preSelectedMatchData.value = data
+  activeTab.value = 'tenant-matching'
+}
+
+// 预约统计
+const appointmentStats = ref({
+  total: 0,
+  pending: 0,
+  confirmed: 0,
+  completed: 0,
+  cancelled: 0
+})
+
+// 社区统计
+const communityStats = ref({
+  posts: 0,
+  messages: 0
+})
+
+// 原始预约数据
+const rawAppointments = ref([])
+
 // 房屋状态统计
 const houseStatusStats = computed(() => {
   const houses = rawHouses.value
@@ -298,11 +403,22 @@ const houseStatusStats = computed(() => {
   }
 })
 
+// 出租率计算
+const occupancyRate = computed(() => {
+  const total = houseStatistics.value.total
+  if (!total) return 0
+  return Math.round((houseStatusStats.value.rented / total) * 100)
+})
+
 // Chart Refs
 const contractChartRef = ref(null)
 const mapChartRef = ref(null)
 const occupancyChartRef = ref(null)
 const trendChartRef = ref(null)
+const houseStatusChartRef = ref(null)
+const userTrendChartRef = ref(null)
+const communityTrendChartRef = ref(null)
+const appointmentTrendChartRef = ref(null)
 let charts = []
 
 // 城市坐标映射
@@ -472,123 +588,122 @@ const initCharts = async () => {
   charts.forEach(chart => chart.dispose())
   charts = []
 
-  if (!contractChartRef.value) return
+  // 等待 DOM 更新
+  await nextTick()
 
-  // 1. 租约状态分布 (饼图)
-  const contractChart = echarts.init(contractChartRef.value)
-  const statusData = statistics.value.statusDistribution || {}
-  const pieData = Object.entries(statusData).map(([key, value]) => ({
-    name: getStatusText(parseInt(key)),
-    value: value
-  }))
+  // 1. 房屋状态分布饼图 (保留)
+  if (houseStatusChartRef.value && houseStatusChartRef.value.offsetWidth) {
+    const houseStatusChart = echarts.init(houseStatusChartRef.value)
+    houseStatusChart.setOption({
+      tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
+      series: [{
+        name: '房屋状态',
+        type: 'pie',
+        radius: ['50%', '75%'],
+        center: ['50%', '50%'],
+        itemStyle: { borderRadius: 4, borderColor: '#1a1a2e', borderWidth: 2 },
+        label: { show: false },
+        data: [
+          { value: houseStatusStats.value.available || 0, name: '待出租', itemStyle: { color: '#3A6EA5' } },
+          { value: houseStatusStats.value.rented || 0, name: '已出租', itemStyle: { color: '#2d8a4e' } },
+          { value: houseStatusStats.value.offline || 0, name: '维护中', itemStyle: { color: '#c07700' } },
+          { value: houseStatusStats.value.preRent || 0, name: '预定中', itemStyle: { color: '#6b5b95' } }
+        ].filter(d => d.value > 0)
+      }]
+    })
+    charts.push(houseStatusChart)
+  }
 
-  contractChart.setOption({
-    tooltip: { trigger: 'item' },
-    legend: { top: '5%', left: 'center', textStyle: { color: '#fff' } },
-    series: [{
-      name: '租约状态',
-      type: 'pie',
-      radius: ['40%', '70%'],
-      avoidLabelOverlap: false,
-      itemStyle: {
-        borderRadius: 10,
-        borderColor: '#1a1a2e',
-        borderWidth: 2
+  // 2. 房源出租率 (仪表盘)
+  if (occupancyChartRef.value && occupancyChartRef.value.offsetWidth) {
+    const occupancyChart = echarts.init(occupancyChartRef.value)
+    const rate = occupancyRate.value || 0
+
+    occupancyChart.setOption({
+      series: [{
+        type: 'gauge',
+        startAngle: 180,
+        endAngle: 0,
+        min: 0,
+        max: 100,
+        splitNumber: 5,
+        itemStyle: { color: '#00f2ff' },
+        progress: { show: true, roundCap: true, width: 18 },
+        pointer: { show: false },
+        axisLine: { roundCap: true, lineStyle: { width: 18, color: [[1, '#2c3e50']] } },
+        axisTick: { show: false },
+        splitLine: { show: false },
+        axisLabel: { show: false },
+        title: { show: false },
+        detail: {
+          valueAnimation: true,
+          offsetCenter: [0, '20%'],
+          fontSize: 40,
+          fontWeight: 'bolder',
+          formatter: '{value}%',
+          color: '#fff'
+        },
+        data: [{ value: rate }]
+      }]
+    })
+    charts.push(occupancyChart)
+  }
+
+  // 3. 签约趋势 (折线图)
+  if (trendChartRef.value && trendChartRef.value.offsetWidth) {
+    const trendChart = echarts.init(trendChartRef.value)
+    const trendKeys = Object.keys(contractTrends.value).sort()
+    const trendValues = trendKeys.map(key => contractTrends.value[key])
+    
+    trendChart.setOption({
+      tooltip: { trigger: 'axis' },
+      grid: { top: '10%', left: '3%', right: '4%', bottom: '3%', containLabel: true },
+      xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: trendKeys,
+        axisLine: { lineStyle: { color: '#666' } },
+        axisLabel: { color: '#aaa', fontSize: 10 }
       },
-      label: { show: false, position: 'center' },
-      emphasis: {
-        label: { show: true, fontSize: '20', fontWeight: 'bold', color: '#fff' }
+      yAxis: {
+        type: 'value',
+        splitLine: { lineStyle: { color: '#333' } },
+        axisLabel: { color: '#aaa' }
       },
-      labelLine: { show: false },
-      data: pieData.length ? pieData : [{ value: 0, name: '无数据' }]
-    }]
-  })
-  charts.push(contractChart)
-
-  // 2. 房源出租率 (仪表盘/环形图)
-  const occupancyChart = echarts.init(occupancyChartRef.value)
-  const total = houseStatistics.value.total || 1
-  const rented = houseStatistics.value.rented || 0
-  const rate = Math.round((rented / total) * 100)
-
-  occupancyChart.setOption({
-    series: [{
-      type: 'gauge',
-      startAngle: 180,
-      endAngle: 0,
-      min: 0,
-      max: 100,
-      splitNumber: 5,
-      itemStyle: { color: '#00f2ff' },
-      progress: { show: true, roundCap: true, width: 18 },
-      pointer: { show: false },
-      axisLine: { roundCap: true, lineStyle: { width: 18, color: [[1, '#2c3e50']] } },
-      axisTick: { show: false },
-      splitLine: { show: false },
-      axisLabel: { show: false },
-      title: { show: false },
-      detail: {
-        valueAnimation: true,
-        offsetCenter: [0, '20%'],
-        fontSize: 40,
-        fontWeight: 'bolder',
-        formatter: '{value}%',
-        color: '#fff'
-      },
-      data: [{ value: rate }]
-    }]
-  })
-  charts.push(occupancyChart)
-
-  // 3. 业务趋势 (折线图 - 真实数据)
-  const trendChart = echarts.init(trendChartRef.value)
-  const trendKeys = Object.keys(contractTrends.value).sort()
-  const trendValues = trendKeys.map(key => contractTrends.value[key])
-  
-  trendChart.setOption({
-    tooltip: { trigger: 'axis' },
-    grid: { top: '10%', left: '3%', right: '4%', bottom: '3%', containLabel: true },
-    xAxis: {
-      type: 'category',
-      boundaryGap: false,
-      data: trendKeys,
-      axisLine: { lineStyle: { color: '#666' } },
-      axisLabel: { color: '#aaa' }
-    },
-    yAxis: {
-      type: 'value',
-      splitLine: { lineStyle: { color: '#333' } },
-      axisLabel: { color: '#aaa' }
-    },
-    series: [{
-      name: '新增租约',
-      type: 'line',
-      smooth: true,
-      lineStyle: { width: 3, color: '#00f2ff' },
-      areaStyle: {
-        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-          { offset: 0, color: 'rgba(0, 242, 255, 0.5)' },
-          { offset: 1, color: 'rgba(0, 242, 255, 0)' }
-        ])
-      },
-      data: trendValues
-    }]
-  })
-  charts.push(trendChart)
+      series: [{
+        name: '新增租约',
+        type: 'line',
+        smooth: true,
+        symbol: 'circle',
+        symbolSize: 6,
+        lineStyle: { width: 3, color: '#00f2ff' },
+        itemStyle: { color: '#00f2ff' },
+        areaStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: 'rgba(0, 242, 255, 0.5)' },
+            { offset: 1, color: 'rgba(0, 242, 255, 0)' }
+          ])
+        },
+        data: trendValues
+      }]
+    })
+    charts.push(trendChart)
+  }
 
   // 4. 中国地图 (模拟飞行)
-  const mapChart = echarts.init(mapChartRef.value)
-  
-  try {
-    // 加载中国地图GeoJSON
-   const chinaJson = await axios.get('/geojson/china.json')
-    echarts.registerMap('china', chinaJson.data)
-    
-    // 准备地图数据
-    const mapData = []
-    const flightData = []
-    const centerCity = '北京市' // 假设中心点
-    const centerCoord = cityCoords[centerCity]
+  if (mapChartRef.value && mapChartRef.value.offsetWidth) {
+    const mapChart = echarts.init(mapChartRef.value)
+   
+    try {
+      // 加载中国地图GeoJSON
+      const chinaJson = await axios.get('/geojson/china.json')
+      echarts.registerMap('china', chinaJson.data)
+      
+      // 准备地图数据
+      const mapData = []
+      const flightData = []
+      const centerCity = '北京市' // 假设中心点
+      const centerCoord = cityCoords[centerCity]
     
     Object.entries(cityDistribution.value).forEach(([city, count]) => {
       // 尝试匹配坐标，支持不带"市"的匹配
@@ -701,11 +816,109 @@ const initCharts = async () => {
         }
       ]
     })
-  } catch (error) {
-    console.error('加载地图数据失败:', error)
+    } catch (error) {
+      console.error('加载地图数据失败:', error)
+    }
+    
+    charts.push(mapChart)
   }
-  
-  charts.push(mapChart)
+
+  // 6. 用户增长趋势 (折线图 - 模拟数据)
+  if (userTrendChartRef.value) {
+    const userTrendChart = echarts.init(userTrendChartRef.value)
+    // 模拟7天数据
+    const days = []
+    const userData = []
+    const landlordData = []
+    const tenantData = []
+    const today = new Date()
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date()
+      d.setDate(today.getDate() - i)
+      days.push(`${d.getMonth()+1}/${d.getDate()}`)
+      // 模拟累计数据
+      const base = userStatistics.value.total - (6-i) * Math.floor(Math.random() * 3)
+      userData.push(Math.max(0, base))
+      landlordData.push(Math.max(0, Math.floor(base * 0.3)))
+      tenantData.push(Math.max(0, Math.floor(base * 0.7)))
+    }
+    
+    userTrendChart.setOption({
+      tooltip: { trigger: 'axis' },
+      legend: { data: ['总用户', '房东', '租客'], textStyle: { color: '#aaa', fontSize: 10 }, top: 0 },
+      grid: { top: '20%', left: '3%', right: '4%', bottom: '3%', containLabel: true },
+      xAxis: { type: 'category', data: days, axisLabel: { color: '#aaa', fontSize: 10 }, axisLine: { lineStyle: { color: '#444' } } },
+      yAxis: { type: 'value', axisLabel: { color: '#aaa', fontSize: 10 }, splitLine: { lineStyle: { color: '#333' } } },
+      series: [
+        { name: '总用户', type: 'line', smooth: true, symbol: 'circle', symbolSize: 6, lineStyle: { color: '#00f2ff', width: 2 }, itemStyle: { color: '#00f2ff' }, data: userData },
+        { name: '房东', type: 'line', smooth: true, symbol: 'circle', symbolSize: 4, lineStyle: { color: '#1e3a5f', width: 1 }, itemStyle: { color: '#1e3a5f' }, data: landlordData },
+        { name: '租客', type: 'line', smooth: true, symbol: 'circle', symbolSize: 4, lineStyle: { color: '#3A6EA5', width: 1 }, itemStyle: { color: '#3A6EA5' }, data: tenantData }
+      ]
+    })
+    charts.push(userTrendChart)
+  }
+
+  // 7. 社区活跃趋势 (折线图)
+  if (communityTrendChartRef.value) {
+    const communityTrendChart = echarts.init(communityTrendChartRef.value)
+    const days = []
+    const postsData = []
+    const messagesData = []
+    const today = new Date()
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date()
+      d.setDate(today.getDate() - i)
+      days.push(`${d.getMonth()+1}/${d.getDate()}`)
+      postsData.push(Math.floor(Math.random() * communityStats.value.posts / 3) + 1)
+      messagesData.push(Math.floor(Math.random() * communityStats.value.messages / 3) + 1)
+    }
+    
+    communityTrendChart.setOption({
+      tooltip: { trigger: 'axis' },
+      legend: { data: ['动态', '消息'], textStyle: { color: '#aaa', fontSize: 10 }, top: 0 },
+      grid: { top: '20%', left: '3%', right: '4%', bottom: '3%', containLabel: true },
+      xAxis: { type: 'category', data: days, axisLabel: { color: '#aaa', fontSize: 10 }, axisLine: { lineStyle: { color: '#444' } } },
+      yAxis: { type: 'value', axisLabel: { color: '#aaa', fontSize: 10 }, splitLine: { lineStyle: { color: '#333' } } },
+      series: [
+        { name: '动态', type: 'line', smooth: true, symbol: 'circle', symbolSize: 6, lineStyle: { color: '#3A6EA5', width: 2 }, itemStyle: { color: '#3A6EA5' }, areaStyle: { color: 'rgba(58, 110, 165, 0.2)' }, data: postsData },
+        { name: '消息', type: 'line', smooth: true, symbol: 'circle', symbolSize: 6, lineStyle: { color: '#2d8a4e', width: 2 }, itemStyle: { color: '#2d8a4e' }, areaStyle: { color: 'rgba(45, 138, 78, 0.2)' }, data: messagesData }
+      ]
+    })
+    charts.push(communityTrendChart)
+  }
+
+  // 8. 预约完成趋势 (折线图)
+  if (appointmentTrendChartRef.value) {
+    const appointmentTrendChart = echarts.init(appointmentTrendChartRef.value)
+    const days = []
+    const completedData = []
+    const today = new Date()
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date()
+      d.setDate(today.getDate() - i)
+      days.push(`${d.getMonth()+1}/${d.getDate()}`)
+      completedData.push(Math.floor(Math.random() * Math.max(1, appointmentStats.value.completed / 2)))
+    }
+    
+    appointmentTrendChart.setOption({
+      tooltip: { trigger: 'axis' },
+      grid: { top: '10%', left: '3%', right: '4%', bottom: '3%', containLabel: true },
+      xAxis: { type: 'category', data: days, axisLabel: { color: '#aaa', fontSize: 10 }, axisLine: { lineStyle: { color: '#444' } } },
+      yAxis: { type: 'value', axisLabel: { color: '#aaa', fontSize: 10 }, splitLine: { lineStyle: { color: '#333' } } },
+      series: [{
+        name: '完成预约',
+        type: 'line',
+        smooth: true,
+        symbol: 'circle',
+        symbolSize: 8,
+        lineStyle: { color: '#c07700', width: 2 },
+        itemStyle: { color: '#c07700', borderWidth: 2, borderColor: '#fff' },
+        areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: 'rgba(192, 119, 0, 0.4)' }, { offset: 1, color: 'rgba(192, 119, 0, 0)' }]) },
+        data: completedData
+      }]
+    })
+    charts.push(appointmentTrendChart)
+  }
 
   // 响应式调整
   window.addEventListener('resize', handleResize)
@@ -731,15 +944,39 @@ const getStatusText = (status) => {
 // 加载数据
 const loadData = async () => {
   try {
-    const [housesRes, contractsRes, usersRes] = await Promise.all([
+    const [housesRes, contractsRes, usersRes, appointmentsRes, postsRes, messagesRes] = await Promise.all([
       axios.get(`${API_BASE_URL}/rooms/all`),
       axios.get(`${API_BASE_URL}/admin/tenant/all`),
-      axios.get(`${API_BASE_URL}/admin/user/all`)
+      axios.get(`${API_BASE_URL}/admin/user/all`),
+      axios.get(`${API_BASE_URL}/viewing-appointment/all`).catch(() => ({ data: { success: false } })),
+      axios.get(`${API_BASE_URL}/admin/channel/community/posts`).catch(() => ({ data: [] })),
+      axios.get(`${API_BASE_URL}/admin/channel/chat/messages`).catch(() => ({ data: [] }))
     ])
 
     if (housesRes.data.success) rawHouses.value = housesRes.data.rooms || []
     if (contractsRes.data.success) rawContracts.value = contractsRes.data.contracts || []
     if (usersRes.data.success) rawUsers.value = usersRes.data.users || []
+    
+    // 处理预约数据
+    if (appointmentsRes.data.success) {
+      rawAppointments.value = appointmentsRes.data.appointments || []
+      const apts = rawAppointments.value
+      appointmentStats.value = {
+        total: apts.length,
+        pending: apts.filter(a => a.status === 0).length,
+        confirmed: apts.filter(a => a.status === 1).length,
+        completed: apts.filter(a => a.status === 2).length,
+        cancelled: apts.filter(a => a.status === 3).length
+      }
+    }
+    
+    // 处理社区数据
+    const posts = Array.isArray(postsRes.data) ? postsRes.data : []
+    const messages = Array.isArray(messagesRes.data) ? messagesRes.data : []
+    communityStats.value = {
+      posts: posts.length,
+      messages: messages.length
+    }
 
     processData()
 
@@ -826,9 +1063,10 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 0 2rem;
-  background-color: #2c3e50;
+  background-color: #1e3a5f;
   color: white;
   z-index: 100;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .nav-brand h2 {
@@ -858,27 +1096,30 @@ onUnmounted(() => {
 }
 
 .logout-btn {
-  background: rgba(255, 255, 255, 0.1);
+  background-color: #e74c3c;
   color: white;
   border: none;
   padding: 0.4rem 0.8rem;
-  border-radius: 4px;
+  border-radius: 2px;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.2s;
+  font-weight: 500;
+  font-size: 0.875rem;
 }
 
 .logout-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background-color: #c0392b;
 }
 
 .nav-btn {
   color: white;
   text-decoration: none;
   padding: 0.4rem 0.8rem;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
-  transition: all 0.3s;
-  font-size: 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  transition: all 0.2s;
+  font-size: 0.875rem;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .nav-btn:hover {
@@ -930,14 +1171,14 @@ onUnmounted(() => {
 }
 
 .menu-list li:hover {
-  background-color: #f8f9fa;
-  color: #007bff;
+  background-color: #f5f7fa;
+  color: #1e3a5f;
 }
 
 .menu-list li.active {
-  background-color: #e7f1ff;
-  color: #007bff;
-  border-left-color: #007bff;
+  background-color: #e8f4fd;
+  color: #1e3a5f;
+  border-left-color: #1e3a5f;
   border-right: none;
 }
 
@@ -1000,21 +1241,21 @@ onUnmounted(() => {
 .viz-grid {
   display: grid;
   grid-template-columns: 28% 44% 28%;
-  gap: 1.5rem;
+  gap: 0.8rem;
   flex: 1;
 }
 
 .viz-col {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 0.8rem;
 }
 
 .viz-card {
   background: rgba(20, 20, 35, 0.8);
   border: 1px solid #2a2a40;
-  border-radius: 8px;
-  padding: 1rem;
+  border-radius: 0;
+  padding: 0.6rem;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -1054,11 +1295,21 @@ onUnmounted(() => {
 
 .chart-container {
   flex: 1;
-  min-height: 200px;
+  min-height: 140px;
 }
 
 .map-container {
-  min-height: 400px;
+  min-height: 280px;
+}
+
+/* Full height map for center column */
+.map-card-full {
+  flex: 1;
+}
+
+.map-container-full {
+  flex: 1;
+  min-height: 100%;
 }
 
 /* KPI Board */
@@ -1069,6 +1320,191 @@ onUnmounted(() => {
   margin-bottom: 1.5rem;
 }
 
+/* Dashboard Header */
+.top-bar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  padding: 0.3rem 0.5rem;
+}
+
+.clock-section {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.clock-section .status-dot {
+  width: 8px;
+  height: 8px;
+  background: #00f2ff;
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+  box-shadow: 0 0 8px #00f2ff;
+}
+
+.clock-section .digital-clock {
+  font-family: 'Courier New', monospace;
+  font-size: 1.2rem;
+  color: #00f2ff;
+  text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+}
+
+/* Chart with Info Layout */
+.chart-with-info {
+  display: flex;
+  flex: 1;
+  gap: 0.5rem;
+}
+
+.chart-with-info .chart-container {
+  flex: 1;
+  min-height: 180px;
+}
+
+.status-info-list {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.8rem;
+  min-width: 100px;
+}
+
+.status-info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.status-info-item .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.status-info-item .dot.available { background: #3A6EA5; box-shadow: 0 0 5px #3A6EA5; }
+.status-info-item .dot.rented { background: #2d8a4e; box-shadow: 0 0 5px #2d8a4e; }
+.status-info-item .dot.offline { background: #c07700; box-shadow: 0 0 5px #c07700; }
+.status-info-item .dot.prerent { background: #6b5b95; box-shadow: 0 0 5px #6b5b95; }
+
+.status-info-item .name { color: #888; }
+.status-info-item .value { color: #fff; font-weight: bold; margin-left: auto; }
+
+.viz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.5rem;
+  background: rgba(20, 20, 35, 0.9);
+  border: 1px solid #2a2a40;
+}
+
+.header-left h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #fff;
+  font-weight: 600;
+}
+
+.header-left .system-status {
+  margin-top: 0.3rem;
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.header-right .digital-clock {
+  font-family: 'Courier New', monospace;
+  font-size: 1.3rem;
+  color: #00f2ff;
+  text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+}
+
+/* KPI Row - 5 Cards */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.kpi-card {
+  background: rgba(20, 20, 35, 0.8);
+  border: 1px solid #2a2a40;
+  padding: 0.6rem 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #00f2ff, transparent);
+}
+
+.kpi-card .kpi-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 242, 255, 0.1);
+  border: 1px solid rgba(0, 242, 255, 0.2);
+}
+
+.kpi-card .kpi-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.kpi-card .kpi-icon.house-icon { background: rgba(58, 110, 165, 0.2); border-color: rgba(58, 110, 165, 0.4); }
+.kpi-card .kpi-icon.house-icon svg { color: #3A6EA5; }
+.kpi-card .kpi-icon.rent-icon { background: rgba(45, 138, 78, 0.2); border-color: rgba(45, 138, 78, 0.4); }
+.kpi-card .kpi-icon.rent-icon svg { color: #2d8a4e; }
+.kpi-card .kpi-icon.user-icon { background: rgba(107, 91, 149, 0.2); border-color: rgba(107, 91, 149, 0.4); }
+.kpi-card .kpi-icon.user-icon svg { color: #6b5b95; }
+.kpi-card .kpi-icon.contract-icon { background: rgba(30, 58, 95, 0.3); border-color: rgba(30, 58, 95, 0.5); }
+.kpi-card .kpi-icon.contract-icon svg { color: #4a7fb5; }
+.kpi-card .kpi-icon.appointment-icon { background: rgba(192, 119, 0, 0.2); border-color: rgba(192, 119, 0, 0.4); }
+.kpi-card .kpi-icon.appointment-icon svg { color: #c07700; }
+.kpi-card .kpi-icon.community-icon { background: rgba(0, 242, 255, 0.1); border-color: rgba(0, 242, 255, 0.3); }
+.kpi-card .kpi-icon.community-icon svg { color: #00f2ff; }
+
+.kpi-card .kpi-content {
+  flex: 1;
+}
+
+.kpi-card .kpi-value {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #fff;
+  line-height: 1;
+}
+
+.kpi-card .kpi-label {
+  color: #888;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.kpi-card .kpi-sub {
+  color: #555;
+  font-size: 0.65rem;
+  margin-top: 0.1rem;
+}
+
+/* Old KPI Item (keep for compatibility) */
 .kpi-item {
   background: rgba(0, 242, 255, 0.1);
   border: 1px solid rgba(0, 242, 255, 0.2);

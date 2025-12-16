@@ -120,7 +120,24 @@
                 <p><strong>用户名:</strong> {{ user.username }}</p>
                 <p><strong>手机:</strong> {{ user.phone }}</p>
                 <p><strong>邮箱:</strong> {{ user.email || '未设置' }}</p>
-                <p><strong>身份证:</strong> {{ user.idCard || '未设置' }}</p>
+                <p v-if="user.rentalBudgetMin && user.rentalBudgetMax">
+                  <strong>预算:</strong> ¥{{ user.rentalBudgetMin }}-{{ user.rentalBudgetMax }}/月
+                </p>
+              </div>
+              <div class="item-actions">
+                <button 
+                  class="intention-btn" 
+                  :class="{ 'has-intention': hasIntention(user) }"
+                  @click.stop="viewUserIntention(user)"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                  {{ hasIntention(user) ? '有明确意向' : '暂无意向' }}
+                  <span v-if="getUserIntentions(user).length > 0" class="intention-count">({{ getUserIntentions(user).length }})</span>
+                </button>
+                <button class="contact-btn" @click.stop="contactUser(user)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                  立即联系
+                </button>
               </div>
             </div>
           </div>
@@ -208,12 +225,65 @@
         </div>
       </div>
     </div>
+
+    <!-- 意向详情弹窗 -->
+    <div v-if="showIntentionModal" class="modal-overlay">
+      <div class="modal intention-modal">
+        <div class="modal-header">
+          <h3>{{ selectedIntentionUser?.realName || selectedIntentionUser?.username }} 的预约意向</h3>
+          <button @click="showIntentionModal = false" class="close-btn">×</button>
+        </div>
+        
+        <div class="modal-body">
+          <div v-if="selectedUserIntentions.length === 0" class="empty-intentions">
+            <p>该用户暂无预约记录</p>
+          </div>
+          
+          <div v-else class="intentions-list">
+            <div 
+              v-for="(apt, index) in selectedUserIntentions" 
+              :key="apt.id || index"
+              class="intention-item"
+            >
+              <div class="intention-header">
+                <span class="intention-date">{{ formatDate(apt.preferredDate) }}</span>
+                <span class="intention-status" :class="getAppointmentStatusClass(apt.status)">
+                  {{ getAppointmentStatusText(apt.status) }}
+                </span>
+              </div>
+              <div class="intention-content">
+                <p><strong>预约房屋:</strong> {{ getHouseAddress(apt) }}</p>
+                <p><strong>预约类型:</strong> {{ apt.appointmentType === 1 ? '现场看房' : '视频看房' }}</p>
+                <p><strong>预约时段:</strong> {{ apt.preferredTimeSlot || '未设置' }}</p>
+                <p v-if="apt.expectedMoveInDate"><strong>期望入住:</strong> {{ formatDate(apt.expectedMoveInDate) }}</p>
+                <p v-if="apt.rentalIntention" class="intention-text">
+                  <strong>租房意向:</strong> {{ apt.rentalIntention }}
+                </p>
+                <p v-else class="no-intention">暂未填写租房意向</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button @click="showIntentionModal = false" class="cancel-btn">关闭</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import axios from 'axios'
+
+// Props
+const props = defineProps({
+  preSelectedData: {
+    type: Object,
+    default: null
+  }
+})
 
 // API基础URL
 const API_BASE_URL = 'https://api.homesee.xyz/api'
@@ -223,9 +293,13 @@ const housesLoading = ref(false)
 const usersLoading = ref(false)
 const houses = ref([])
 const users = ref([])
+const appointments = ref([]) // 预约数据
 const selectedHouse = ref(null)
 const selectedUser = ref(null)
 const showCreateContractModal = ref(false)
+const showIntentionModal = ref(false) // 意向详情弹窗
+const selectedUserIntentions = ref([]) // 选中用户的意向列表
+const selectedIntentionUser = ref(null) // 选中查看意向的用户
 
 // 筛选条件
 const houseFilters = ref({
@@ -327,6 +401,43 @@ const loadUsers = async () => {
   }
 }
 
+// 加载预约数据
+const loadAppointments = async () => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/viewing-appointment/all`)
+    if (response.data.success) {
+      appointments.value = response.data.appointments || []
+      // 调试：查看数据结构
+      if (appointments.value.length > 0) {
+        console.log('预约数据示例:', appointments.value[0])
+      }
+    }
+  } catch (error) {
+    console.error('加载预约数据失败:', error)
+    appointments.value = []
+  }
+}
+
+// 获取用户的意向记录（根据手机号匹配）
+const getUserIntentions = (user) => {
+  return appointments.value
+    .filter(apt => apt.contactPhone === user.phone)
+    .sort((a, b) => new Date(b.appointmentDate) - new Date(a.appointmentDate)) // 按时间倒序
+}
+
+// 检查用户是否有意向
+const hasIntention = (user) => {
+  const intentions = getUserIntentions(user)
+  return intentions.some(apt => apt.rentalIntention && apt.rentalIntention.trim() !== '')
+}
+
+// 查看用户意向详情
+const viewUserIntention = (user) => {
+  selectedIntentionUser.value = user
+  selectedUserIntentions.value = getUserIntentions(user)
+  showIntentionModal.value = true
+}
+
 // 选择房屋
 const selectHouse = (house) => {
   selectedHouse.value = house
@@ -368,6 +479,57 @@ const getHouseStatusText = (status) => {
   return texts[status] || '未知状态'
 }
 
+// 预约状态相关方法
+const getAppointmentStatusClass = (status) => {
+  const classes = {
+    0: 'apt-status-pending',
+    1: 'apt-status-confirmed',
+    2: 'apt-status-completed',
+    3: 'apt-status-cancelled',
+    4: 'apt-status-expired',
+    5: 'apt-status-missed'
+  }
+  return classes[status] || 'apt-status-unknown'
+}
+
+const getAppointmentStatusText = (status) => {
+  const texts = {
+    0: '待确认',
+    1: '已确认',
+    2: '已完成',
+    3: '已取消',
+    4: '已过期',
+    5: '用户爽约'
+  }
+  return texts[status] || '未知状态'
+}
+
+// 日期格式化
+const formatDate = (dateString) => {
+  if (!dateString) return '未设置'
+  const date = new Date(dateString)
+  return date.toLocaleDateString('zh-CN')
+}
+
+// 获取房屋地址（多种来源尝试）
+const getHouseAddress = (apt) => {
+  // 优先使用 roomInfo 中的地址
+  if (apt.roomInfo?.address) {
+    return apt.roomInfo.address
+  }
+  
+  // 尝试通过 roomId 从房屋列表中查找
+  if (apt.roomId) {
+    const house = houses.value.find(h => h.id === apt.roomId)
+    if (house?.address) {
+      return house.address
+    }
+  }
+  
+  // 返回未知
+  return '未知'
+}
+
 // 用户类型相关方法
 const getUserTypeClass = (userType) => {
   const classes = {
@@ -383,6 +545,15 @@ const getUserTypeText = (userType) => {
     2: '房东'
   }
   return texts[userType] || '未知类型'
+}
+
+// 联系用户
+const contactUser = (user) => {
+  if (user.phone) {
+    window.open(`tel:${user.phone}`)
+  } else {
+    alert('该用户未提供联系电话')
+  }
 }
 
 // 创建合同
@@ -447,10 +618,49 @@ const resetNewContract = () => {
 }
 
 // 页面加载时初始化数据
-onMounted(() => {
-  loadHouses()
-  loadUsers()
+onMounted(async () => {
+  await loadHouses()
+  await loadUsers()
+  await loadAppointments()
+  
+  // 如果有预选数据，自动选择
+  if (props.preSelectedData) {
+    applyPreSelectedData(props.preSelectedData)
+  }
 })
+
+// 应用预选数据
+const applyPreSelectedData = (data) => {
+  if (!data) return
+  
+  // 自动选择房屋
+  if (data.roomId) {
+    const house = houses.value.find(h => h.id === data.roomId)
+    if (house) {
+      selectHouse(house)
+    }
+  }
+  
+  // 自动选择用户（通过手机号匹配）
+  if (data.contactPhone) {
+    const user = users.value.find(u => u.phone === data.contactPhone)
+    if (user) {
+      selectUser(user)
+    }
+  }
+  
+  // 自动填充合同编号（使用预约编号）
+  if (data.appointmentNumber) {
+    newContract.value.contractNumber = data.appointmentNumber
+  }
+}
+
+// 监听预选数据变化
+watch(() => props.preSelectedData, (newData) => {
+  if (newData) {
+    applyPreSelectedData(newData)
+  }
+}, { immediate: false })
 </script>
 
 <style scoped>
@@ -462,122 +672,255 @@ onMounted(() => {
 .matching-container {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
-  gap: 2rem;
+  gap: 16px;
   height: 70vh;
-  align-items: start; /* 确保三个面板顶端对齐 */
+  align-items: start;
 }
 
 .panel {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: #fff;
+  border: 1px solid #ddd;
   display: flex;
   flex-direction: column;
 }
 
 .panel-header {
-  padding: 1.5rem;
-  border-bottom: 1px solid #e9ecef;
-  background: #f8f9fa;
+  padding: 16px;
+  border-bottom: 1px solid #ddd;
+  background: #f9f9f9;
 }
 
 .panel-header h3 {
-  margin: 0 0 1rem 0;
-  color: #2c3e50;
+  margin: 0 0 8px 0;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .filter-controls {
   display: flex;
-  gap: 1rem;
+  gap: 8px;
 }
 
 .search-input, .status-select, .type-select {
-  padding: 0.5rem;
-  border: 1px solid #dee2e6;
-  border-radius: 4px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  font-size: 12px;
   flex: 1;
+}
+
+.search-input:focus, .status-select:focus, .type-select:focus {
+  outline: none;
+  border-color: #3A6EA5;
 }
 
 .panel-body {
   flex: 1;
   overflow-y: auto;
-  padding: 1rem;
+  padding: 8px;
 }
 
 .loading, .empty {
   text-align: center;
-  padding: 3rem;
-  color: #6c757d;
+  padding: 24px;
+  color: #888;
+  font-size: 12px;
 }
 
 .items-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0;
 }
 
 .item-card {
-  border: 1px solid #e9ecef;
-  border-radius: 8px;
-  padding: 1rem;
+  border: 1px solid #ddd;
+  border-bottom: none;
+  padding: 8px 12px;
   cursor: pointer;
-  transition: all 0.3s;
+}
+
+.item-card:last-child {
+  border-bottom: 1px solid #ddd;
 }
 
 .item-card:hover {
-  border-color: #007bff;
-  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
+  background: #f9f9f9;
 }
 
 .item-card.selected {
-  border-color: #007bff;
-  background-color: #f8f9ff;
+  border-color: #3A6EA5;
+  background-color: #f0f5fa;
 }
 
 .item-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 0.75rem;
+  margin-bottom: 4px;
 }
 
 .item-header h4 {
   margin: 0;
-  color: #2c3e50;
+  color: #333;
+  font-size: 12px;
+  font-weight: 500;
   flex: 1;
 }
 
 .status-badge, .type-badge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 500;
   text-align: center;
 }
 
-.status-available { background: #d4edda; color: #155724; }
-.status-rented { background: #cce7ff; color: #004085; }
-.status-maintenance { background: #fff3cd; color: #856404; }
-.status-unknown { background: #e2e3e5; color: #383d41; }
+/* 房屋状态颜色 - 不同状态不同颜色 */
+.status-available { background: #3A6EA5; color: #fff; } /* 待出租 - 蓝色 */
+.status-rented { background: #2d8a4e; color: #fff; } /* 已出租 - 绿色 */
+.status-maintenance { background: #c07700; color: #fff; } /* 维护中 - 橙色 */
+.status-unknown { background: #888; color: #fff; }
 
-.type-landlord { background: #d1ecf1; color: #0c5460; }
-.type-tenant { background: #d4edda; color: #155724; }
-.type-unknown { background: #e2e3e5; color: #383d41; }
+/* 用户类型颜色 - 不同类型不同颜色 */
+.type-landlord { background: #1e3a5f; color: #fff; } /* 房东 - 深蓝 */
+.type-tenant { background: #3A6EA5; color: #fff; } /* 租客 - 蓝色 */
+.type-unknown { background: #888; color: #fff; }
 
 .item-details p {
-  margin: 0.25rem 0;
-  font-size: 0.9rem;
-  color: #6c757d;
+  margin: 2px 0;
+  font-size: 11px;
+  color: #888;
+}
+
+/* 用户卡片操作按钮 */
+.item-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #eee;
+}
+
+.intention-btn,
+.contact-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  font-size: 10px;
+  cursor: pointer;
+  border: 1px solid #ddd;
+  background: transparent;
+  color: #888;
+}
+
+.intention-btn svg,
+.contact-btn svg {
+  width: 12px;
+  height: 12px;
+}
+
+.intention-btn.has-intention {
+  border-color: #3A6EA5;
+  color: #3A6EA5;
+  background: #f0f5fa;
+}
+
+.intention-count {
+  font-size: 9px;
+  color: inherit;
+}
+
+.contact-btn {
+  border-color: #3A6EA5;
+  color: #3A6EA5;
+}
+
+.contact-btn:hover {
+  background: #3A6EA5;
+  color: #fff;
+}
+
+/* 预约状态颜色 */
+.apt-status-pending { background: #c07700; color: #fff; }
+.apt-status-confirmed { background: #3A6EA5; color: #fff; }
+.apt-status-completed { background: #2d8a4e; color: #fff; }
+.apt-status-cancelled { background: #888; color: #fff; }
+.apt-status-expired { background: #888; color: #fff; }
+.apt-status-missed { background: #c00; color: #fff; }
+.apt-status-unknown { background: #888; color: #fff; }
+
+/* 意向弹窗样式 */
+.intention-modal {
+  max-width: 600px;
+}
+
+.empty-intentions {
+  text-align: center;
+  padding: 24px;
+  color: #888;
+  font-size: 12px;
+}
+
+.intentions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.intention-item {
+  border: 1px solid #ddd;
+  border-bottom: none;
+  padding: 12px;
+}
+
+.intention-item:last-child {
+  border-bottom: 1px solid #ddd;
+}
+
+.intention-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.intention-date {
+  font-size: 12px;
+  color: #333;
+  font-weight: 500;
+}
+
+.intention-status {
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.intention-content p {
+  margin: 4px 0;
+  font-size: 11px;
+  color: #888;
+}
+
+.intention-text {
+  color: #333 !important;
+  font-weight: 500;
+}
+
+.no-intention {
+  color: #888;
+  font-style: italic;
 }
 
 .action-panel {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* 改为顶部对齐 */
+  justify-content: flex-start;
   align-items: center;
-  gap: 2rem;
-  min-width: 200px;
-  padding-top: 1rem; /* 添加顶部内边距 */
+  gap: 16px;
+  min-width: 180px;
+  padding-top: 8px;
 }
 
 .selected-info {
@@ -585,58 +928,58 @@ onMounted(() => {
 }
 
 .selected-item {
-  background: white;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 1rem;
+  background: #fff;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  margin-bottom: 8px;
 }
 
 .selected-item h4 {
-  margin: 0 0 0.5rem 0;
-  color: #2c3e50;
+  margin: 0 0 4px 0;
+  color: #333;
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .selected-item p {
-  margin: 0.25rem 0;
-  font-size: 0.9rem;
+  margin: 2px 0;
+  font-size: 11px;
+  color: #888;
 }
 
 .placeholder {
-  padding: 2rem;
-  color: #6c757d;
-  background: #f8f9fa;
-  border-radius: 8px;
-  border: 2px dashed #dee2e6;
+  padding: 16px;
+  color: #888;
+  background: #f9f9f9;
+  border: 1px dashed #ddd;
+  font-size: 12px;
 }
 
 .arrow {
-  font-size: 2rem;
-  color: #007bff;
-  margin: 1rem 0;
+  font-size: 16px;
+  color: #1e3a5f;
+  margin: 8px 0;
 }
 
 .create-contract-btn {
-  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-  color: white;
-  border: none;
-  padding: 1rem 2rem;
-  border-radius: 8px;
+  background: #1e3a5f;
+  color: #fff;
+  border: 1px solid #1e3a5f;
+  padding: 8px 16px;
   cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s;
+  font-weight: 400;
+  font-size: 12px;
 }
 
 .create-contract-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  background: #2d5a87;
+  border-color: #2d5a87;
 }
 
 .create-contract-btn:disabled {
-  background: #6c757d;
+  background: #888;
+  border-color: #888;
   cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
 }
 
 /* 模态框样式 */
@@ -654,143 +997,146 @@ onMounted(() => {
 }
 
 .modal {
-  background: white;
-  border-radius: 12px;
+  background: #fff;
   width: 90%;
   max-width: 800px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  border: 1px solid #ddd;
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem;
-  border-bottom: 1px solid #e9ecef;
+  padding: 16px;
+  border-bottom: 1px solid #ddd;
+  background: #f9f9f9;
 }
 
 .modal-header h3 {
   margin: 0;
-  color: #2c3e50;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .close-btn {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
+  background: transparent;
+  border: 1px solid #ddd;
+  width: 24px;
+  height: 24px;
+  font-size: 14px;
   cursor: pointer;
-  color: #6c757d;
-  padding: 0;
-  width: 30px;
-  height: 30px;
+  color: #888;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .close-btn:hover {
-  color: #dc3545;
+  background: #f5f5f5;
+  color: #333;
 }
 
 .modal-body {
-  padding: 1.5rem;
+  padding: 16px;
 }
 
 .contract-info {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  margin-bottom: 2rem;
-  padding: 1rem;
-  background: #f8f9fa;
-  border-radius: 8px;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 16px;
+  background: #f9f9f9;
+  border: 1px solid #ddd;
 }
 
 .info-section h4 {
-  margin: 0 0 1rem 0;
-  color: #2c3e50;
+  margin: 0 0 8px 0;
+  color: #333;
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .info-section p {
-  margin: 0.5rem 0;
-  font-size: 0.9rem;
+  margin: 4px 0;
+  font-size: 11px;
+  color: #888;
 }
 
 .form-section {
-  margin-top: 1.5rem;
+  margin-top: 16px;
 }
 
 .form-group {
-  margin-bottom: 1rem;
+  margin-bottom: 16px;
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-  color: #2c3e50;
+  margin-bottom: 4px;
+  font-weight: 500;
+  color: #333;
+  font-size: 12px;
 }
 
-.form-group input, .form-group textarea {
+.form-group input, .form-group textarea, .form-group select {
   width: 100%;
-  padding: 0.75rem;
-  border: 2px solid #e9ecef;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  transition: border-color 0.3s;
+  padding: 8px;
+  border: 1px solid #ddd;
+  font-size: 13px;
+  box-sizing: border-box;
 }
 
-.form-group input:focus, .form-group textarea:focus {
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus {
   outline: none;
-  border-color: #007bff;
+  border-color: #3A6EA5;
 }
 
 .form-group textarea {
-  min-height: 80px;
+  min-height: 60px;
   resize: vertical;
 }
 
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: 16px;
 }
 
 .modal-footer {
-  padding: 1.5rem;
-  border-top: 1px solid #e9ecef;
+  padding: 16px;
+  border-top: 1px solid #ddd;
   display: flex;
   justify-content: flex-end;
-  gap: 1rem;
+  gap: 8px;
 }
 
 .cancel-btn, .confirm-btn {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 6px;
+  padding: 4px 16px;
+  border: 1px solid #ddd;
   cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s;
-}
-
-.cancel-btn {
-  background: #6c757d;
-  color: white;
-}
-
-.confirm-btn {
-  background: #007bff;
-  color: white;
+  font-weight: 400;
+  font-size: 12px;
+  background: transparent;
+  color: #333;
 }
 
 .cancel-btn:hover {
-  background: #5a6268;
+  background: #f5f5f5;
+}
+
+.confirm-btn {
+  background: #1e3a5f;
+  color: #fff;
+  border-color: #1e3a5f;
 }
 
 .confirm-btn:hover {
-  background: #0056b3;
+  background: #2d5a87;
+  border-color: #2d5a87;
 }
 
 /* 响应式设计 */

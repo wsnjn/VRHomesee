@@ -606,9 +606,9 @@ watch(() => props.preSelectedData, async (newData) => {
 .page-header {
   margin-bottom: 2rem;
   padding: 1.5rem;
-  background: linear-gradient(135deg, rgb(179, 208, 253) 0%, rgb(164, 202, 248) 100%);
-  border-radius: 16px;
-  box-shadow: 0 8px 25px rgba(79, 156, 232, 0.3);
+  background-color: #1e3a5f;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .page-header h2 {
@@ -635,10 +635,11 @@ watch(() => props.preSelectedData, async (newData) => {
 
 .panel {
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
+  border: 1px solid #e9ecef;
 }
 
 .panel-header {
@@ -660,7 +661,7 @@ watch(() => props.preSelectedData, async (newData) => {
 .search-input, .status-select {
   padding: 0.5rem;
   border: 1px solid #dee2e6;
-  border-radius: 4px;
+  border-radius: 2px;
   flex: 1;
 }
 
@@ -684,10 +685,10 @@ watch(() => props.preSelectedData, async (newData) => {
 
 .item-card {
   border: 1px solid #e9ecef;
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 1rem;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.2s;
 }
 
 .item-card:hover {
@@ -715,7 +716,7 @@ watch(() => props.preSelectedData, async (newData) => {
 
 .status-badge {
   padding: 0.25rem 0.75rem;
-  border-radius: 12px;
+  border-radius: 2px;
   font-size: 0.8rem;
   font-weight: 600;
   text-align: center;
@@ -755,7 +756,7 @@ watch(() => props.preSelectedData, async (newData) => {
   align-items: center;
   gap: 4px;
   padding: 4px 8px;
-  border-radius: 12px;
+  border-radius: 2px;
   font-size: 11px;
   font-weight: 500;
 }
@@ -785,7 +786,7 @@ watch(() => props.preSelectedData, async (newData) => {
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
-  border-radius: 6px;
+  border-radius: 2px;
   font-size: 13px;
   font-weight: 500;
   text-decoration: none;
@@ -819,9 +820,10 @@ watch(() => props.preSelectedData, async (newData) => {
 .selected-item {
   background: white;
   padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   margin-bottom: 1rem;
+  border: 1px solid #e9ecef;
 }
 
 .selected-item h4 {
@@ -838,7 +840,7 @@ watch(() => props.preSelectedData, async (newData) => {
   padding: 2rem;
   color: #6c757d;
   background: #f8f9fa;
-  border-radius: 8px;
+  border-radius: 4px;
   border: 2px dashed #dee2e6;
 }
 
@@ -849,14 +851,14 @@ watch(() => props.preSelectedData, async (newData) => {
 }
 
 .create-contract-btn {
-  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  background-color: #1e3a5f;
   color: white;
   border: none;
   padding: 1rem 2rem;
-  border-radius: 8px;
+  border-radius: 4px;
   cursor: pointer;
   font-weight: 600;
-  transition: all 0.3s;
+  transition: all 0.2s;
 }
 
 .create-contract-btn:hover:not(:disabled) {
@@ -887,12 +889,12 @@ watch(() => props.preSelectedData, async (newData) => {
 
 .modal {
   background: white;
-  border-radius: 12px;
+  border-radius: 4px;
   width: 90%;
   max-width: 800px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
 .modal-header {
@@ -937,7 +939,7 @@ watch(() => props.preSelectedData, async (newData) => {
   margin-bottom: 2rem;
   padding: 1rem;
   background: #f8f9fa;
-  border-radius: 8px;
+  border-radius: 4px;
 }
 
 .info-section h4 {
@@ -968,10 +970,10 @@ watch(() => props.preSelectedData, async (newData) => {
 .form-group input, .form-group textarea, .form-group select {
   width: 100%;
   padding: 0.75rem;
-  border: 2px solid #e9ecef;
-  border-radius: 6px;
+  border: 1px solid #e9ecef;
+  border-radius: 2px;
   font-size: 0.9rem;
-  transition: border-color 0.3s;
+  transition: border-color 0.2s;
 }
 
 .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
@@ -1001,10 +1003,10 @@ watch(() => props.preSelectedData, async (newData) => {
 .cancel-btn, .confirm-btn {
   padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 6px;
+  border-radius: 2px;
   cursor: pointer;
   font-weight: 600;
-  transition: all 0.3s;
+  transition: all 0.2s;
 }
 
 .cancel-btn {

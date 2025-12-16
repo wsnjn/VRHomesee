@@ -794,10 +794,10 @@ onMounted(async () => {
   justify-content: space-between;
   align-items: center;
   padding: 0.875rem 2rem;
-  background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
+  background-color: #1e3a5f;
   color: #ffffff;
   z-index: 100;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .nav-brand {
@@ -845,21 +845,19 @@ onMounted(async () => {
 }
 
 .logout-btn {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  background-color: #e74c3c;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease;
   font-weight: 500;
   font-size: 0.875rem;
-  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
 }
 
 .logout-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+  background-color: #c0392b;
 }
 
 .admin-container {
@@ -881,11 +879,12 @@ onMounted(async () => {
 
 .menu-section h3 {
   padding: 0 1.5rem;
-  margin: 0 0 1rem 0;
-  font-size: 0.9rem;
-  color: #6c757d;
+  margin: 0 0 0.75rem 0;
+  font-size: 0.75rem;
+  color: #95a5a6;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
+  font-weight: 600;
 }
 
 .menu-list {
@@ -897,22 +896,23 @@ onMounted(async () => {
 .menu-list li {
   padding: 0.75rem 1.5rem;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   gap: 0.75rem;
   border-left: 3px solid transparent;
+  color: #5a6c7d;
 }
 
 .menu-list li:hover {
-  background-color: #f8f9fa;
-  color: #28a745;
+  background-color: #f5f7fa;
+  color: #1e3a5f;
 }
 
 .menu-list li.active {
-  background-color: #e8f5e8;
-  color: #28a745;
-  border-left-color: #28a745;
+  background-color: #e8f4fd;
+  color: #1e3a5f;
+  border-left-color: #1e3a5f;
   font-weight: 600;
 }
 

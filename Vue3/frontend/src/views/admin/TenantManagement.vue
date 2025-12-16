@@ -1,186 +1,455 @@
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import axios from 'axios'
+
+// 管理员端不需要props，直接获取所有预约数据
+const emit = defineEmits(['refresh', 'goToTenantMatching'])
+
+// API基础URL
+const API_BASE_URL = 'https://api.homesee.xyz/api'
+
+// 响应式数据
+const appointments = ref([])
+const loadingAppointments = ref(false)
+const selectedStatusFilter = ref('all') // all, 0, 1, 2, 3, 4, 5
+const expandedAppointments = ref({}) // 存储每个预约项的展开状态
+const searchQuery = ref('') // 搜索查询
+
+// 状态筛选选项
+const statusFilters = [
+  { value: 'all', label: '全部状态' },
+  { value: '0', label: '待确认' },
+  { value: '1', label: '已确认' },
+  { value: '2', label: '已完成' },
+  { value: '3', label: '已取消' },
+  { value: '4', label: '已过期' },
+  { value: '5', label: '用户爽约' }
+]
+
+// 加载所有预约列表（始终获取所有数据，前端筛选）
+const loadAppointments = async () => {
+  loadingAppointments.value = true
+  try {
+    const response = await axios.get(`${API_BASE_URL}/viewing-appointment/all`)
+    
+    if (response.data.success) {
+      appointments.value = response.data.appointments || []
+    }
+  } catch (error) {
+    console.error('加载预约列表失败:', error)
+  } finally {
+    loadingAppointments.value = false
+  }
+}
+
+// 获取状态数量统计
+const getStatusCount = (statusValue) => {
+  if (statusValue === 'all') {
+    return appointments.value.length
+  }
+  return appointments.value.filter(a => a.status === parseInt(statusValue)).length
+}
+
+// 预约状态映射
+const getAppointmentStatusText = (status) => {
+  const statusMap = {
+    0: '待确认',
+    1: '已确认',
+    2: '已完成',
+    3: '已取消',
+    4: '已过期',
+    5: '用户爽约'
+  }
+  return statusMap[status] || '未知状态'
+}
+
+// 预约类型映射
+const getAppointmentTypeText = (type) => {
+  return type === 1 ? '现场看房' : '视频看房'
+}
+
+// 状态样式类映射
+const getStatusClass = (status) => {
+  const statusClassMap = {
+    0: 'status-pending',
+    1: 'status-confirmed',
+    2: 'status-completed',
+    3: 'status-cancelled',
+    4: 'status-expired',
+    5: 'status-missed'
+  }
+  return statusClassMap[status] || 'status-unknown'
+}
+
+// 房屋状态样式类
+const getRoomStatusClass = (status) => {
+  const classes = {
+    0: 'room-available',
+    1: 'room-rented',
+    2: 'room-maintenance'
+  }
+  return classes[status] || 'room-unknown'
+}
+
+// 房屋状态文本
+const getRoomStatusText = (status) => {
+  const texts = {
+    0: '待出租',
+    1: '已出租',
+    2: '维护中'
+  }
+  return texts[status] || '未知状态'
+}
+
+// 日期格式化
+const formatDate = (dateString) => {
+  if (!dateString) return '未设置'
+  const date = new Date(dateString)
+  return date.toLocaleDateString('zh-CN')
+}
+
+// 时间格式化
+const formatDateTime = (dateTimeString) => {
+  if (!dateTimeString) return '未设置'
+  const date = new Date(dateTimeString)
+  return date.toLocaleString('zh-CN')
+}
+
+// 搜索后的租约列表
+const searchedAppointments = computed(() => {
+  let result = appointments.value
+  
+  // 按状态筛选
+  if (selectedStatusFilter.value !== 'all') {
+    result = result.filter(a => a.status === parseInt(selectedStatusFilter.value))
+  }
+  
+  // 按搜索关键词筛选
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase()
+    result = result.filter(appointment => {
+      const appointmentNumber = appointment.appointmentNumber ? appointment.appointmentNumber.toLowerCase() : ''
+      return appointmentNumber.includes(query)
+    })
+  }
+  
+  return result
+})
+
+// 筛选后的租约列表
+const filteredAppointments = computed(() => {
+  return searchedAppointments.value
+})
+
+// 状态筛选变化处理（不再需要重新请求API）
+const handleStatusFilterChange = () => {
+  // 前端筛选，不需要重新请求
+}
+
+// 状态修改相关数据
+const updatingStatus = ref(false)
+const showStatusModalFlag = ref(false)
+const selectedAppointment = ref(null)
+const selectedNewStatus = ref('')
+
+// 状态选项
+const statusOptions = [
+  { value: '0', label: '待确认' },
+  { value: '1', label: '已确认' },
+  { value: '2', label: '已完成' },
+  { value: '3', label: '已取消' },
+  { value: '4', label: '已过期' },
+  { value: '5', label: '用户爽约' }
+]
+
+// 显示状态修改模态框
+const showStatusModal = (appointment) => {
+  selectedAppointment.value = appointment
+  selectedNewStatus.value = appointment.status.toString()
+  showStatusModalFlag.value = true
+}
+
+// 关闭状态模态框
+const closeStatusModal = () => {
+  showStatusModalFlag.value = false
+  selectedAppointment.value = null
+  selectedNewStatus.value = ''
+}
+
+// 更新预约状态
+const updateAppointmentStatus = async (appointmentId, newStatus) => {
+  updatingStatus.value = true
+  try {
+    const response = await axios.put(`${API_BASE_URL}/viewing-appointment/${appointmentId}/status`, {
+      status: parseInt(newStatus)
+    })
+    
+    if (response.data.success) {
+      closeStatusModal()
+      // 重新加载租约列表
+      await loadAppointments()
+    } else {
+      alert(`状态更新失败: ${response.data.message}`)
+    }
+  } catch (error) {
+    console.error('更新预约状态失败:', error)
+    alert('状态更新失败，请稍后重试')
+  } finally {
+    updatingStatus.value = false
+  }
+}
+
+// 切换预约项的展开/折叠状态
+const toggleAppointment = (appointmentId) => {
+  expandedAppointments.value[appointmentId] = !expandedAppointments.value[appointmentId]
+}
+
+// 跳转到租客匹配页面并自动选择
+const goToTenantMatching = (appointment) => {
+  emit('goToTenantMatching', {
+    roomId: appointment.roomId,
+    appointmentId: appointment.id,
+    appointmentNumber: appointment.appointmentNumber, // 预约编号作为默认合同编号
+    contactName: appointment.contactName,
+    contactPhone: appointment.contactPhone
+  })
+}
+
+// 页面加载时获取数据
+onMounted(() => {
+  loadAppointments()
+})
+</script>
+
 <template>
   <div class="tenant-management">
     <div class="page-header">
-      <h2>租约管理</h2>
+      <h2>租约列表</h2>
       <div class="header-actions">
-        <button @click="showCreateModal = true" class="create-btn">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-          新建租约
+        <div class="search-wrapper">
+          <div class="container">
+            <div class="search-container">
+              <input class="input" type="text" placeholder="搜索预约编号..." v-model="searchQuery">
+              <svg viewBox="0 0 24 24" class="search__icon">
+                <g>
+                  <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z">
+                  </path>
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <button @click="loadAppointments" class="refresh-btn" :disabled="loadingAppointments">
+          {{ loadingAppointments ? '刷新中...' : '刷新' }}
         </button>
       </div>
     </div>
 
-    <!-- 筛选条件 -->
-    <div class="filter-section">
-      <div class="filter-row">
-        <div class="filter-item">
-          <label>合同状态：</label>
-          <select v-model="filters.contractStatus" @change="loadContracts">
-            <option value="">全部状态</option>
-            <option value="0">待签约</option>
-            <option value="1">已签约</option>
-            <option value="2">履行中</option>
-            <option value="3">已到期</option>
-            <option value="4">提前解约</option>
-            <option value="5">已退租</option>
-          </select>
-        </div>
-
-        <div class="filter-item">
-          <label>租金状态：</label>
-          <select v-model="filters.rentStatus" @change="loadContracts">
-            <option value="">全部状态</option>
-            <option value="0">未付款</option>
-            <option value="1">已付款</option>
-            <option value="2">逾期</option>
-            <option value="3">部分付款</option>
-          </select>
-        </div>
-
-        <div class="filter-item">
-          <label>押金状态：</label>
-          <select v-model="filters.depositStatus" @change="loadContracts">
-            <option value="">全部状态</option>
-            <option value="0">未付</option>
-            <option value="1">已付</option>
-            <option value="2">已退</option>
-            <option value="3">抵扣中</option>
-          </select>
-        </div>
-
-        <div class="filter-item">
-          <label>搜索：</label>
-          <input 
-            v-model="filters.search" 
-            placeholder="合同编号、租客姓名..." 
-            @input="onSearchInput"
-          />
-        </div>
+    <!-- 状态筛选器 -->
+    <div class="status-filter">
+      <div class="filter-title">预约状态：</div>
+      <div class="filter-buttons">
+        <button
+          v-for="filter in statusFilters"
+          :key="filter.value"
+          :class="['filter-btn', 'filter-status-' + filter.value, { active: selectedStatusFilter === filter.value }]"
+          @click="selectedStatusFilter = filter.value"
+        >
+          {{ filter.label }}
+          <span class="filter-count" v-if="getStatusCount(filter.value) > 0">({{ getStatusCount(filter.value) }})</span>
+        </button>
       </div>
     </div>
 
     <!-- 租约列表 -->
-    <div class="contracts-table">
-      <div class="table-header">
-        <div class="table-row">
-          <div class="table-cell">合同编号</div>
-          <div class="table-cell">房屋信息</div>
-          <div class="table-cell">租客信息</div>
-          <div class="table-cell">租期</div>
-          <div class="table-cell">租金/押金</div>
-          <div class="table-cell">合同状态</div>
-          <div class="table-cell">租金状态</div>
-          <div class="table-cell">押金状态</div>
-          <div class="table-cell">操作</div>
+    <div class="appointments-container">
+      <div v-if="loadingAppointments" class="loading">
+        加载中...
+      </div>
+
+      <div v-else-if="filteredAppointments.length === 0" class="no-appointments">
+        <div class="empty-state">
+          <span class="empty-icon">📋</span>
+          <h3>暂无租约信息</h3>
+          <p>当前没有用户预约您的房源</p>
         </div>
       </div>
 
-      <div class="table-body">
-        <div v-if="loading" class="loading-row">
-          <div class="loading-text">正在加载数据...</div>
-        </div>
-
-        <div v-else-if="contracts.length === 0" class="empty-row">
-          <div class="empty-text">暂无租约数据</div>
-        </div>
-
-        <div 
-          v-else
-          v-for="contract in contracts" 
-          :key="contract.id"
-          class="table-row"
-        >
-          <div class="table-cell">
-            <strong>{{ contract.contractNumber }}</strong>
-          </div>
-          <div class="table-cell">
-            <div class="house-info">
-              <div>房屋ID: {{ contract.roomId }}</div>
-              <div class="text-muted">需要关联房屋详情</div>
+        <div v-else class="appointments-list">
+        <div v-for="appointment in filteredAppointments" :key="appointment.id" class="appointment-item">
+          <div class="appointment-header" @click="toggleAppointment(appointment.id)">
+            <div class="appointment-number">
+              <strong>预约编号：</strong>{{ appointment.appointmentNumber }}
             </div>
-          </div>
-          <div class="table-cell">
-            <div class="tenant-info">
-              <div>租客ID: {{ contract.tenantId }}</div>
-              <div class="text-muted">需要关联用户详情</div>
-            </div>
-          </div>
-          <div class="table-cell">
-            <div class="date-info">
-              <div>开始: {{ formatDate(contract.contractStartDate) }}</div>
-              <div>结束: {{ formatDate(contract.contractEndDate) }}</div>
-              <div class="text-muted">
-                剩余: {{ calculateDaysLeft(contract.contractEndDate) }}天
+            <div class="header-right">
+              <div 
+                class="appointment-status clickable-status" 
+                :class="getStatusClass(appointment.status)"
+                @click.stop="showStatusModal(appointment)"
+              >
+                {{ getAppointmentStatusText(appointment.status) }}
+              </div>
+              <div class="expand-icon" :class="{ expanded: expandedAppointments[appointment.id] }">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M8 10.586L3.707 6.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414L8 10.586z"/>
+                </svg>
               </div>
             </div>
           </div>
-          <div class="table-cell">
-            <div class="amount-info">
-              <div>月租: ¥{{ contract.monthlyRent }}</div>
-              <div>押金: ¥{{ contract.depositAmount }}</div>
+
+          <div v-if="expandedAppointments[appointment.id]" class="appointment-content">
+
+            <!-- 用户信息 -->
+            <div class="info-section">
+              <h4>用户信息</h4>
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="label">联系人：</span>
+                  <span class="value">{{ appointment.contactName }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">联系电话：</span>
+                  <span class="value">{{ appointment.contactPhone }}</span>
+                </div>
+                <div v-if="appointment.wechatId" class="info-item">
+                  <span class="label">微信号：</span>
+                  <span class="value">{{ appointment.wechatId }}</span>
+                </div>
+                <div v-if="appointment.tenantCount" class="info-item">
+                  <span class="label">租客人数：</span>
+                  <span class="value">{{ appointment.tenantCount }}人</span>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="table-cell">
-            <select 
-              v-model.number="contract.contractStatus" 
-              @change="updateContractStatus(contract.id, contract.contractStatus)"
-              class="status-select"
-            >
-              <option value="0">待签约</option>
-              <option value="1">已签约</option>
-              <option value="2">履行中</option>
-              <option value="3">已到期</option>
-              <option value="4">提前解约</option>
-              <option value="5">已退租</option>
-            </select>
-          </div>
-          <div class="table-cell">
-            <select 
-              v-model.number="contract.rentStatus" 
-              @change="updateRentStatus(contract.id, contract.rentStatus)"
-              class="status-select"
-            >
-              <option value="0">未付款</option>
-              <option value="1">已付款</option>
-              <option value="2">逾期</option>
-              <option value="3">部分付款</option>
-            </select>
-          </div>
-          <div class="table-cell">
-            <select 
-              v-model.number="contract.depositStatus" 
-              @change="updateDepositStatus(contract.id, contract.depositStatus)"
-              class="status-select"
-            >
-              <option value="0">未付</option>
-              <option value="1">已付</option>
-              <option value="2">已退</option>
-              <option value="3">抵扣中</option>
-            </select>
-          </div>
-          <div class="table-cell">
-            <div class="action-buttons">
-              <button 
-                @click="viewContractDetail(contract.id)" 
-                class="action-btn view-btn"
-                title="查看详情"
-              >
-                查看
-              </button>
-              <button 
-                @click="editContract(contract)" 
-                class="action-btn edit-btn"
-                title="编辑"
-              >
-                编辑
-              </button>
-              <button 
-                @click="updateContractStatus(contract.id, 5)" 
-                class="action-btn complete-btn"
-                title="标记为已退租"
-                v-if="contract.contractStatus !== 5"
-              >
-                退租
+
+            <!-- 房屋信息 -->
+            <div v-if="appointment.roomInfo" class="info-section">
+              <h4>房屋信息</h4>
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="label">房屋名称：</span>
+                  <span class="value">{{ appointment.roomInfo.roomName || `房屋${appointment.roomId}` }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">房屋面积：</span>
+                  <span class="value">{{ appointment.roomInfo.area || '未设置' }} ㎡</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">月租金：</span>
+                  <span class="value">¥{{ appointment.roomInfo.monthlyRent || '未设置' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">房屋状态：</span>
+                  <span class="value house-status" :class="getRoomStatusClass(appointment.roomInfo.status)">
+                    {{ getRoomStatusText(appointment.roomInfo.status) }}
+                  </span>
+                </div>
+                <div class="info-item full-width">
+                  <span class="label">房屋地址：</span>
+                  <span class="value">{{ appointment.roomInfo.address || '未设置' }}</span>
+                </div>
+              </div>
+            </div>
+            <div v-else class="info-section">
+              <h4>房屋信息</h4>
+              <div class="info-grid">
+                <div class="info-item full-width">
+                  <span class="label">房屋ID：</span>
+                  <span class="value">{{ appointment.roomId }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 预约信息 -->
+            <div class="info-section">
+              <h4>预约信息</h4>
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="label">预约类型：</span>
+                  <span class="value">{{ getAppointmentTypeText(appointment.appointmentType) }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">期望日期：</span>
+                  <span class="value">{{ formatDate(appointment.preferredDate) }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">时间段：</span>
+                  <span class="value">{{ appointment.preferredTimeSlot }}</span>
+                </div>
+                <div v-if="appointment.actualDate" class="info-item">
+                  <span class="label">实际日期：</span>
+                  <span class="value">{{ formatDate(appointment.actualDate) }}</span>
+                </div>
+                <div v-if="appointment.actualTimeSlot" class="info-item">
+                  <span class="label">实际时间段：</span>
+                  <span class="value">{{ appointment.actualTimeSlot }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 租房意向 -->
+            <div v-if="appointment.expectedMoveInDate || appointment.rentalIntention" class="info-section">
+              <h4>租房意向</h4>
+              <div class="info-grid">
+                <div v-if="appointment.expectedMoveInDate" class="info-item">
+                  <span class="label">期望入住：</span>
+                  <span class="value">{{ formatDate(appointment.expectedMoveInDate) }}</span>
+                </div>
+                <div v-if="appointment.rentalIntention" class="info-item full-width">
+                  <span class="label">租房意向：</span>
+                  <span class="value">{{ appointment.rentalIntention }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 时间信息 -->
+            <div class="info-section">
+              <h4>时间信息</h4>
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="label">创建时间：</span>
+                  <span class="value">{{ formatDateTime(appointment.appointmentCreatedTime) }}</span>
+                </div>
+                <div v-if="appointment.confirmedTime" class="info-item">
+                  <span class="label">确认时间：</span>
+                  <span class="value">{{ formatDateTime(appointment.confirmedTime) }}</span>
+                </div>
+                <div v-if="appointment.completedTime" class="info-item">
+                  <span class="label">完成时间：</span>
+                  <span class="value">{{ formatDateTime(appointment.completedTime) }}</span>
+                </div>
+                <div v-if="appointment.cancelledTime" class="info-item">
+                  <span class="label">取消时间：</span>
+                  <span class="value">{{ formatDateTime(appointment.cancelledTime) }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 备注信息 -->
+            <div v-if="appointment.agentNotes || appointment.adminNotes" class="info-section">
+              <h4>备注信息</h4>
+              <div class="info-grid">
+                <div v-if="appointment.agentNotes" class="info-item full-width">
+                  <span class="label">业务员备注：</span>
+                  <span class="value">{{ appointment.agentNotes }}</span>
+                </div>
+                <div v-if="appointment.adminNotes" class="info-item full-width">
+                  <span class="label">管理员备注：</span>
+                  <span class="value">{{ appointment.adminNotes }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 快捷操作：跳转租客匹配（仅已确认状态显示） -->
+            <div v-if="appointment.status === 1" class="quick-actions">
+              <button class="quick-match-btn" @click="goToTenantMatching(appointment)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="8.5" cy="7" r="4"></circle>
+                  <line x1="20" y1="8" x2="20" y2="14"></line>
+                  <line x1="23" y1="11" x2="17" y2="11"></line>
+                </svg>
+                创建租约合同
               </button>
             </div>
           </div>
@@ -188,629 +457,489 @@
       </div>
     </div>
 
-    <!-- 分页 -->
-    <div class="pagination" v-if="contracts.length > 0">
-      <button 
-        @click="prevPage" 
-        :disabled="currentPage === 1"
-        class="page-btn"
-      >
-        上一页
-      </button>
-      <span class="page-info">
-        第 {{ currentPage }} 页，共 {{ totalPages }} 页
-      </span>
-      <button 
-        @click="nextPage" 
-        :disabled="currentPage === totalPages"
-        class="page-btn"
-      >
-        下一页
-      </button>
-    </div>
-
-    <!-- 创建租约模态框 -->
-    <div v-if="showCreateModal" class="modal-overlay">
-      <div class="modal">
-        <div class="modal-header">
-          <h3>新建租约</h3>
-          <button @click="showCreateModal = false" class="close-btn">×</button>
-        </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label>合同编号 *</label>
-            <input v-model="newContract.contractNumber" placeholder="请输入合同编号" />
+    <!-- 状态修改弹窗 -->
+    <div v-if="showStatusModalFlag" class="modal-overlay">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>修改预约状态</h3>
+            <button @click="closeStatusModal" class="close-btn">&times;</button>
           </div>
-          <div class="form-group">
-            <label>房屋ID *</label>
-            <input v-model="newContract.roomId" type="number" placeholder="请输入房屋ID" />
-          </div>
-          <div class="form-group">
-            <label>房东ID *</label>
-            <input v-model="newContract.landlordId" type="number" placeholder="请输入房东ID" />
-          </div>
-          <div class="form-group">
-            <label>租客ID *</label>
-            <input v-model="newContract.tenantId" type="number" placeholder="请输入租客ID" />
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>合同开始日期 *</label>
-              <input v-model="newContract.contractStartDate" type="date" />
-            </div>
-            <div class="form-group">
-              <label>合同结束日期 *</label>
-              <input v-model="newContract.contractEndDate" type="date" />
+          <div class="modal-body">
+            <p>预约编号：<strong>{{ selectedAppointment?.appointmentNumber }}</strong></p>
+            <p>当前状态：<span :class="getStatusClass(selectedAppointment?.status)">{{ getAppointmentStatusText(selectedAppointment?.status) }}</span></p>
+            
+            <div class="status-options">
+              <h4>选择新状态：</h4>
+              <div class="status-buttons">
+                <button 
+                  v-for="status in statusOptions" 
+                  :key="status.value"
+                  :class="['status-btn', getStatusClass(status.value), { active: selectedNewStatus === status.value }]"
+                  @click="selectedNewStatus = status.value"
+                >
+                  {{ status.label }}
+                </button>
+              </div>
             </div>
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>月租金 *</label>
-              <input v-model="newContract.monthlyRent" type="number" placeholder="0.00" />
-            </div>
-            <div class="form-group">
-              <label>押金金额 *</label>
-              <input v-model="newContract.depositAmount" type="number" placeholder="0.00" />
-            </div>
+          <div class="modal-footer">
+            <button @click="closeStatusModal" class="btn btn-secondary">取消</button>
+            <button 
+              @click="updateAppointmentStatus(selectedAppointment.id, selectedNewStatus)" 
+              class="btn btn-primary" 
+              :disabled="updatingStatus || !selectedNewStatus"
+            >
+              {{ updatingStatus ? '更新中...' : '确认修改' }}
+            </button>
           </div>
-        </div>
-        <div class="modal-footer">
-          <button @click="showCreateModal = false" class="cancel-btn">取消</button>
-          <button @click="createContract" class="confirm-btn">创建</button>
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted, computed } from 'vue'
-import axios from 'axios'
-
-// API基础URL
-const API_BASE_URL = 'https://api.homesee.xyz/api'
-
-// 响应式数据
-const loading = ref(false)
-const contracts = ref([])
-const showCreateModal = ref(false)
-const currentPage = ref(1)
-const pageSize = ref(10)
-const totalCount = ref(0)
-
-// 筛选条件
-const filters = ref({
-  contractStatus: '',
-  rentStatus: '',
-  depositStatus: '',
-  search: ''
-})
-
-// 新租约数据
-const newContract = ref({
-  contractNumber: '',
-  roomId: '',
-  landlordId: '',
-  tenantId: '',
-  contractStartDate: '',
-  contractEndDate: '',
-  monthlyRent: '',
-  depositAmount: ''
-})
-
-// 计算总页数
-const totalPages = computed(() => {
-  return Math.ceil(totalCount.value / pageSize.value)
-})
-
-// 加载租约列表
-const loadContracts = async () => {
-  loading.value = true
-  try {
-    const response = await axios.get(`${API_BASE_URL}/admin/tenant/all`)
-    if (response.data.success) {
-      contracts.value = response.data.contracts || []
-    }
-  } catch (error) {
-    console.error('加载租约列表失败:', error)
-    contracts.value = []
-  } finally {
-    loading.value = false
-  }
-}
-
-// 搜索输入处理
-const onSearchInput = () => {
-  // 防抖处理，可以添加延迟搜索
-  loadContracts()
-}
-
-// 格式化日期
-const formatDate = (dateString) => {
-  if (!dateString) return ''
-  const date = new Date(dateString)
-  return date.toLocaleDateString('zh-CN')
-}
-
-// 计算剩余天数
-const calculateDaysLeft = (endDate) => {
-  if (!endDate) return 0
-  const today = new Date()
-  const end = new Date(endDate)
-  const diffTime = end - today
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-  return diffDays > 0 ? diffDays : 0
-}
-
-// 状态相关方法
-const getStatusClass = (status) => {
-  const classes = {
-    0: 'status-pending',
-    1: 'status-active',
-    2: 'status-processing',
-    3: 'status-expired',
-    4: 'status-cancelled',
-    5: 'status-completed'
-  }
-  return classes[status] || 'status-unknown'
-}
-
-const getStatusText = (status) => {
-  const texts = {
-    0: '待签约',
-    1: '已签约',
-    2: '履行中',
-    3: '已到期',
-    4: '提前解约',
-    5: '已退租'
-  }
-  return texts[status] || '未知状态'
-}
-
-const getRentStatusClass = (status) => {
-  const classes = {
-    0: 'status-unpaid',
-    1: 'status-paid',
-    2: 'status-overdue',
-    3: 'status-partial'
-  }
-  return classes[status] || 'status-unknown'
-}
-
-const getRentStatusText = (status) => {
-  const texts = {
-    0: '未付款',
-    1: '已付款',
-    2: '逾期',
-    3: '部分付款'
-  }
-  return texts[status] || '未知状态'
-}
-
-const getDepositStatusClass = (status) => {
-  const classes = {
-    0: 'status-unpaid',
-    1: 'status-paid',
-    2: 'status-refunded',
-    3: 'status-deducting'
-  }
-  return classes[status] || 'status-unknown'
-}
-
-const getDepositStatusText = (status) => {
-  const texts = {
-    0: '未付',
-    1: '已付',
-    2: '已退',
-    3: '抵扣中'
-  }
-  return texts[status] || '未知状态'
-}
-
-// 操作按钮方法
-const viewContractDetail = (contractId) => {
-  // 这里可以跳转到详情页面或显示详情模态框
-  alert(`查看合同详情: ${contractId}`)
-}
-
-const editContract = (contract) => {
-  // 这里可以打开编辑模态框
-  alert(`编辑合同: ${contract.contractNumber}`)
-}
-
-const updateContractStatus = async (contractId, status) => {
-  try {
-    const response = await axios.put(`${API_BASE_URL}/admin/tenant/${contractId}/status`, {
-      status: status
-    })
-    if (response.data.success) {
-      alert('合同状态更新成功')
-      loadContracts()
-    } else {
-      alert('合同状态更新失败: ' + response.data.message)
-    }
-  } catch (error) {
-    console.error('更新合同状态失败:', error)
-    alert('更新合同状态失败')
-  }
-}
-
-const updateRentStatus = async (contractId, rentStatus) => {
-  try {
-    const response = await axios.put(`${API_BASE_URL}/admin/tenant/${contractId}/rent-status`, {
-      rentStatus: rentStatus
-    })
-    if (response.data.success) {
-      alert('租金状态更新成功')
-      loadContracts()
-    } else {
-      alert('租金状态更新失败: ' + response.data.message)
-    }
-  } catch (error) {
-    console.error('更新租金状态失败:', error)
-    alert('更新租金状态失败')
-  }
-}
-
-const updateDepositStatus = async (contractId, depositStatus) => {
-  try {
-    const response = await axios.put(`${API_BASE_URL}/admin/tenant/${contractId}/deposit-status`, {
-      depositStatus: depositStatus
-    })
-    if (response.data.success) {
-      alert('押金状态更新成功')
-      loadContracts()
-    } else {
-      alert('押金状态更新失败: ' + response.data.message)
-    }
-  } catch (error) {
-    console.error('更新押金状态失败:', error)
-    alert('更新押金状态失败')
-  }
-}
-
-// 创建租约
-const createContract = async () => {
-  try {
-    // 验证必填字段
-    if (!newContract.value.contractNumber || !newContract.value.roomId || 
-        !newContract.value.landlordId || !newContract.value.tenantId ||
-        !newContract.value.contractStartDate || !newContract.value.contractEndDate ||
-        !newContract.value.monthlyRent || !newContract.value.depositAmount) {
-      alert('请填写所有必填字段')
-      return
-    }
-
-    const response = await axios.post(`${API_BASE_URL}/admin/tenant/create`, newContract.value)
-    if (response.data.success) {
-      alert('租约创建成功')
-      showCreateModal.value = false
-      resetNewContract()
-      loadContracts()
-    } else {
-      alert('租约创建失败: ' + response.data.message)
-    }
-  } catch (error) {
-    console.error('创建租约失败:', error)
-    alert('创建租约失败')
-  }
-}
-
-// 重置新租约数据
-const resetNewContract = () => {
-  newContract.value = {
-    contractNumber: '',
-    roomId: '',
-    landlordId: '',
-    tenantId: '',
-    contractStartDate: '',
-    contractEndDate: '',
-    monthlyRent: '',
-    depositAmount: ''
-  }
-}
-
-// 分页方法
-const prevPage = () => {
-  if (currentPage.value > 1) {
-    currentPage.value--
-    loadContracts()
-  }
-}
-
-const nextPage = () => {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++
-    loadContracts()
-  }
-}
-
-// 页面加载时初始化数据
-onMounted(() => {
-  loadContracts()
-})
-</script>
-
 <style scoped>
 .tenant-management {
-  max-width: 1400px;
+  width: 100%;
 }
 
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
+  padding: 1.25rem 1.5rem;
+  background-color: #1e3a5f;
+  border-radius: 8px;
 }
 
 .page-header h2 {
   margin: 0;
-  color: #2c3e50;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 600;
 }
 
 .header-actions {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
+  align-items: center;
 }
 
-.create-btn {
-  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
+.search-wrapper {
+  margin-right: 0.75rem;
+}
+
+.container {
+  position: relative;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 6px;
+  padding: 0;
+  display: grid;
+  place-content: center;
+  z-index: 0;
+  max-width: 240px;
+  width: 240px;
+}
+
+.search-container {
+  position: relative;
+  width: 100%;
+  border-radius: 6px;
+  background-color: white;
+  padding: 0;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  transition: all 0.3s;
+  border: 1px solid #e9ecef;
 }
 
-.create-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+.search-container::after, .search-container::before {
+  display: none;
 }
 
-.filter-section {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 1.5rem;
-}
-
-.filter-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem;
-}
-
-.filter-item {
-  display: flex;
-  flex-direction: column;
-  min-width: 180px;
-  flex: 1;
-}
-
-.filter-item label {
-  margin-bottom: 0.5rem;
-  font-weight: 600;
+.input {
+  padding: 8px 12px;
+  width: calc(100% - 40px);
+  background: transparent;
+  border: none;
   color: #2c3e50;
-  font-size: 0.9rem;
-}
-
-.filter-item select,
-.filter-item input {
-  padding: 0.75rem;
-  border: 2px solid #e9ecef;
+  font-size: 13px;
   border-radius: 6px;
-  background: white;
-  font-size: 0.9rem;
-  transition: border-color 0.3s;
 }
 
-.filter-item select:focus,
-.filter-item input:focus {
+.input::placeholder {
+  color: #95a5a6;
+}
+
+.input:focus {
   outline: none;
-  border-color: #007bff;
 }
 
-.contracts-table {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.search__icon {
+  width: 16px;
+  aspect-ratio: 1;
+  border: none;
+  padding: 0;
+  margin-right: 10px;
+}
+
+.search__icon path {
+  fill: #7f8c8d;
+}
+
+.refresh-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 13px;
+  transition: background-color 0.2s ease;
+  background-color: #1e3a5f;
+  color: white;
+}
+
+.refresh-btn:hover:not(:disabled) {
+  background-color: #2d5a87;
+}
+
+.refresh-btn:disabled {
+  background-color: #7f8c8d;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* 状态筛选器样式 */
+.status-filter {
+  background: #fff;
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.filter-title {
+  font-weight: 500;
+  color: #333;
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 4px 12px;
+  border: 1px solid #ddd;
+  background: #fff;
+  color: #666;
+  cursor: pointer;
+  font-weight: 400;
+  font-size: 12px;
+}
+
+.filter-btn:hover {
+  border-color: #1e3a5f;
+  color: #1e3a5f;
+}
+
+.filter-btn.active {
+  border-color: #1e3a5f;
+  background: #1e3a5f;
+  color: #fff;
+}
+
+/* 状态筛选按钮 - 每个状态对应不同颜色 */
+.filter-status-0.active { background: #1e3a5f; border-color: #1e3a5f; } /* 待确认 */
+.filter-status-1.active { background: #1e3a5f; border-color: #1e3a5f; } /* 已确认 */
+.filter-status-2.active { background: #1e3a5f; border-color: #1e3a5f; } /* 已完成 */
+.filter-status-3.active { background: #888; border-color: #888; } /* 已取消 */
+.filter-status-4.active { background: #888; border-color: #888; } /* 已过期 */
+.filter-status-5.active { background: #c00; border-color: #c00; } /* 用户爽约 */
+
+/* 租约列表样式 */
+.appointments-container {
+  background: #fff;
+  border: 1px solid #ddd;
   overflow: hidden;
 }
 
-.table-header {
-  background: #f8f9fa;
-  border-bottom: 1px solid #e9ecef;
+.loading, .no-appointments {
+  text-align: center;
+  color: #888;
+  padding: 24px;
 }
 
-.table-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 0.8fr 0.8fr 0.8fr 1.2fr;
-  gap: 1rem;
-  padding: 1rem;
+.empty-state {
+  text-align: center;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.empty-icon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.empty-state h3 {
+  margin: 0 0 8px 0;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.empty-state p {
+  color: #888;
+  margin-bottom: 0;
+  font-size: 12px;
+}
+
+.appointments-list {
+  max-height: 800px;
+  overflow-y: auto;
+}
+
+.appointment-item {
+  border-bottom: 1px solid #e5e5e5;
+  padding: 16px;
+}
+
+.appointment-item:hover {
+  background: #f9f9f9;
+}
+
+.appointment-item:last-child {
+  border-bottom: none;
+}
+
+.appointment-header {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e5e5e5;
+  cursor: pointer;
 }
 
-.table-header .table-row {
-  font-weight: 600;
+.appointment-header:hover {
+  background: #f9f9f9;
+}
+
+.appointment-number {
+  font-weight: 500;
+  color: #333;
+  font-size: 13px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.expand-icon {
+  transition: transform 0.2s;
+  color: #888;
+}
+
+.expand-icon.expanded {
+  transform: rotate(180deg);
+}
+
+.clickable-status {
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  min-width: 60px;
+  cursor: pointer;
+}
+
+.clickable-status:hover {
+  opacity: 0.8;
+}
+
+.status-pending {
+  background: #1e3a5f;
+  color: #fff;
+  border: none;
+}
+
+.status-confirmed {
+  background: #1e3a5f;
+  color: #fff;
+  border: none;
+}
+
+.status-completed {
+  background: #1e3a5f;
+  color: #fff;
+  border: none;
+}
+
+.status-cancelled {
+  background: #888;
+  color: #fff;
+  border: none;
+}
+
+.status-expired {
+  background: #888;
+  color: #fff;
+  border: none;
+}
+
+.status-missed {
+  background: #c00;
+  color: #fff;
+  border: none;
+}
+
+.status-unknown {
+  background: #888;
+  color: #fff;
+  border: none;
+}
+
+.appointment-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.info-section h4 {
+  margin: 0 0 0.5rem 0;
   color: #2c3e50;
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 
-.table-body .table-row {
-  border-bottom: 1px solid #f8f9fa;
-  transition: background-color 0.3s;
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.5rem;
 }
 
-.table-body .table-row:hover {
-  background-color: #f8f9fa;
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.4rem 0.6rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+  font-size: 0.8rem;
 }
 
-.table-cell {
+.info-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.info-item .label {
+  font-weight: 500;
+  color: #495057;
+  min-width: 70px;
+  margin-right: 0.5rem;
+}
+
+.info-item .value {
+  color: #2c3e50;
+  text-align: left;
+  flex: 1;
   word-break: break-word;
 }
 
-.loading-row,
-.empty-row {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: 3rem;
-}
-
-.loading-text,
-.empty-text {
-  color: #6c757d;
-  font-size: 1.1rem;
-}
-
-.text-muted {
-  color: #6c757d;
-  font-size: 0.8rem;
-}
-
-.house-info,
-.tenant-info,
-.date-info,
-.amount-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.status-badge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-align: center;
-  display: inline-block;
-}
-
-.status-pending { background: #fff3cd; color: #856404; }
-.status-active { background: #d4edda; color: #155724; }
-.status-processing { background: #cce7ff; color: #004085; }
-.status-expired { background: #f8d7da; color: #721c24; }
-.status-cancelled { background: #e2e3e5; color: #383d41; }
-.status-completed { background: #d1ecf1; color: #0c5460; }
-.status-unpaid { background: #f8d7da; color: #721c24; }
-.status-paid { background: #d4edda; color: #155724; }
-.status-overdue { background: #f8d7da; color: #721c24; }
-.status-partial { background: #fff3cd; color: #856404; }
-.status-refunded { background: #d4edda; color: #155724; }
-.status-deducting { background: #fff3cd; color: #856404; }
-.status-unknown { background: #e2e3e5; color: #383d41; }
-
-.action-buttons {
+/* 快捷操作按钮 */
+.quick-actions {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed #e9ecef;
   display: flex;
   gap: 0.5rem;
-  flex-wrap: wrap;
 }
 
-.action-btn {
-  padding: 0.4rem 0.8rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.8rem;
-  font-weight: 600;
-  transition: all 0.3s;
-}
-
-.status-select {
-  width: 100%;
-  padding: 0.5rem;
-  border: 2px solid #e9ecef;
-  border-radius: 6px;
-  background: white;
-  font-size: 0.8rem;
-  transition: border-color 0.3s;
-}
-
-.status-select:focus {
-  outline: none;
-  border-color: #007bff;
-}
-
-.view-btn {
-  background: #17a2b8;
-  color: white;
-}
-
-.edit-btn {
-  background: #ffc107;
-  color: #212529;
-}
-
-.complete-btn {
-  background: #28a745;
-  color: white;
-}
-
-.action-btn:hover {
-  opacity: 0.8;
-  transform: translateY(-1px);
-}
-
-.pagination {
+.quick-match-btn {
   display: flex;
-  justify-content: center;
   align-items: center;
-  gap: 1rem;
-  margin-top: 2rem;
-  padding: 1rem;
-}
-
-.page-btn {
-  padding: 0.5rem 1rem;
-  border: 1px solid #dee2e6;
-  background: white;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.page-btn:hover:not(:disabled) {
-  background: #007bff;
+  gap: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  background-color: #27ae60;
   color: white;
-  border-color: #007bff;
+  border: none;
+  border-radius: 2px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
-.page-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.quick-match-btn:hover {
+  background-color: #219a52;
 }
 
-.page-info {
-  color: #6c757d;
-  font-weight: 600;
+/* 房屋状态样式 */
+.house-status {
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 500;
 }
 
-/* 模态框样式 */
+.room-available {
+  background: #3A6EA5;
+  color: #fff;
+}
+
+.room-rented {
+  background: #2d8a4e;
+  color: #fff;
+}
+
+.room-maintenance {
+  background: #c07700;
+  color: #fff;
+}
+
+.room-unknown {
+  background: #888;
+  color: #fff;
+}
+
+/* 弹窗样式 */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   z-index: 1000;
+  animation: fadeIn 0.3s ease;
 }
 
-.modal {
-  background: white;
-  border-radius: 12px;
+.modal-dialog {
   width: 90%;
-  max-width: 600px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  animation: slideIn 0.3s ease;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
 }
 
 .modal-header {
@@ -819,150 +948,210 @@ onMounted(() => {
   align-items: center;
   padding: 1.5rem;
   border-bottom: 1px solid #e9ecef;
+  background: #f8f9fa;
 }
 
 .modal-header h3 {
   margin: 0;
   color: #2c3e50;
+  font-size: 1.3rem;
 }
 
 .close-btn {
   background: none;
   border: none;
   font-size: 1.5rem;
-  cursor: pointer;
   color: #6c757d;
+  cursor: pointer;
   padding: 0;
   width: 30px;
   height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s;
 }
 
 .close-btn:hover {
-  color: #dc3545;
+  background-color: #e9ecef;
+  color: #495057;
 }
 
 .modal-body {
   padding: 1.5rem;
 }
 
-.form-group {
-  margin-bottom: 1rem;
+.modal-body p {
+  margin: 0 0 1rem 0;
+  color: #495057;
+  font-size: 0.95rem;
 }
 
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
+.modal-body p:last-child {
+  margin-bottom: 1.5rem;
+}
+
+.status-options h4 {
+  margin: 0 0 1rem 0;
   color: #2c3e50;
+  font-size: 1rem;
 }
 
-.form-group input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 2px solid #e9ecef;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  transition: border-color 0.3s;
-}
-
-.form-group input:focus {
-  outline: none;
-  border-color: #007bff;
-}
-
-.form-row {
+.status-buttons {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.status-btn {
+  padding: 0.75rem;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.status-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.status-btn.active {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
 .modal-footer {
-  padding: 1.5rem;
-  border-top: 1px solid #e9ecef;
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e9ecef;
+  background: #f8f9fa;
 }
 
-.cancel-btn,
-.confirm-btn {
+.btn {
   padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 6px;
-  cursor: pointer;
+  border-radius: 8px;
   font-weight: 600;
+  cursor: pointer;
   transition: all 0.3s;
+  font-size: 0.9rem;
 }
 
-.cancel-btn {
-  background: #6c757d;
+.btn-secondary {
+  background-color: #6c757d;
   color: white;
 }
 
-.confirm-btn {
-  background: #007bff;
+.btn-secondary:hover:not(:disabled) {
+  background-color: #5a6268;
+}
+
+.btn-primary {
+  background-color: #007bff;
   color: white;
 }
 
-.cancel-btn:hover {
-  background: #5a6268;
+.btn-primary:hover:not(:disabled) {
+  background-color: #0056b3;
 }
 
-.confirm-btn:hover {
-  background: #0056b3;
+.btn:disabled {
+  background-color: #adb5bd;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 /* 响应式设计 */
-@media (max-width: 1200px) {
-  .table-row {
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .status-filter {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filter-buttons {
+    width: 100%;
+  }
+
+  .filter-btn {
+    flex: 1;
+    text-align: center;
+  }
+
+  .appointment-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .info-item {
+    flex-direction: column;
+    align-items: flex-start;
     gap: 0.5rem;
   }
-  
-  .table-cell:nth-child(6),
-  .table-cell:nth-child(7),
-  .table-cell:nth-child(8),
-  .table-cell:nth-child(9) {
-    grid-column: span 1;
-  }
-}
 
-@media (max-width: 768px) {
-  .filter-row {
+  .info-item .label {
+    min-width: auto;
+  }
+
+  .info-item .value {
+    text-align: left;
+  }
+
+  /* 移动端弹窗适配 */
+  .modal-dialog {
+    width: 95%;
+    margin: 1rem;
+  }
+
+  .status-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-footer {
     flex-direction: column;
   }
-  
-  .table-row {
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
-    border: 1px solid #e9ecef;
-    margin-bottom: 1rem;
-    border-radius: 8px;
-  }
-  
-  .table-cell {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #f8f9fa;
-  }
-  
-  .table-cell:last-child {
-    border-bottom: none;
-  }
-  
-  .table-cell::before {
-    content: attr(data-label);
-    font-weight: 600;
-    color: #2c3e50;
-  }
-  
-  .form-row {
-    grid-template-columns: 1fr;
+
+  .btn {
+    width: 100%;
   }
 }
 </style>

@@ -461,6 +461,7 @@
                     {{ getStatusBtnText(house.status) }}
                   </button>
                   <button @click="openHouseDetail(house)" class="action-btn detail-btn">详情</button>
+                  <button @click="openVrDialog(house)" class="action-btn vr-btn">VR</button>
                 </div>
               </td>
             </tr>
@@ -678,6 +679,63 @@
         </div>
       </div>
     </div>
+
+    <!-- VR全景图管理对话框 -->
+    <div v-if="showVrDialog" class="modal-overlay">
+      <div class="modal-content vr-dialog">
+        <div class="modal-header">
+          <h3>VR全景图管理 - {{ currentVrHouse?.communityName }}</h3>
+          <button @click="closeVrDialog" class="close-btn">×</button>
+        </div>
+        <div class="modal-body">
+          <!-- 现有场景列表 -->
+          <div class="vr-scene-list">
+            <h4>现有场景</h4>
+            <div v-if="vrScenes.length === 0" class="no-scenes">暂无VR场景</div>
+            <div v-else class="scenes-grid">
+              <div v-for="scene in vrScenes" :key="scene.id" class="scene-card">
+                <div class="scene-preview">
+                  <img :src="scene.imageUrl" :alt="scene.sceneName">
+                </div>
+                <div class="scene-info">
+                  <span>{{ scene.sceneName }}</span>
+                  <button @click="deleteVrScene(scene.id)" class="delete-scene-btn">🗑️</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 上传新场景 -->
+          <div class="vr-upload-section">
+            <h4>上传新场景</h4>
+            <div class="upload-form">
+              <input 
+                type="text" 
+                v-model="newSceneName" 
+                placeholder="场景名称（如：客厅、卧室）" 
+                class="scene-name-input"
+              >
+              <input 
+                type="file" 
+                @change="handleVrFileSelect" 
+                accept="image/*" 
+                class="file-input"
+              >
+              <button 
+                @click="uploadVrScene" 
+                class="upload-btn"
+                :disabled="vrUploading || !newSceneName || !vrSelectedFile"
+              >
+                {{ vrUploading ? '上传中...' : '上传' }}
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button @click="closeVrDialog" class="confirm-btn">完成</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -721,6 +779,14 @@ const showAddHouse = ref(false)
 const showEditHouse = ref(false)
 const editingHouse = ref(null)
 const updatingHouse = ref(false)
+
+// VR 相关状态
+const showVrDialog = ref(false)
+const currentVrHouse = ref(null)
+const vrScenes = ref([])
+const newSceneName = ref('')
+const vrSelectedFile = ref(null)
+const vrUploading = ref(false)
 
 // 状态筛选
 const selectedStatus = ref('')
@@ -917,6 +983,94 @@ const closeEditHouse = () => {
     hasElevator: '0',
     rentalType: '0',
     description: ''
+  }
+}
+
+// ========== VR 相关函数 ==========
+
+// 打开VR管理对话框
+const openVrDialog = async (house) => {
+  currentVrHouse.value = house
+  showVrDialog.value = true
+  await loadVrScenes(house.id)
+}
+
+// 关闭VR对话框
+const closeVrDialog = () => {
+  showVrDialog.value = false
+  currentVrHouse.value = null
+  vrScenes.value = []
+  newSceneName.value = ''
+  vrSelectedFile.value = null
+}
+
+// 加载VR场景列表
+const loadVrScenes = async (roomId) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/vr-scenes/${roomId}`)
+    if (response.data.success) {
+      vrScenes.value = response.data.data || []
+    }
+  } catch (error) {
+    console.error('加载VR场景失败:', error)
+  }
+}
+
+// 选择VR全景图文件
+const handleVrFileSelect = (event) => {
+  vrSelectedFile.value = event.target.files[0]
+}
+
+// 上传VR场景
+const uploadVrScene = async () => {
+  if (!currentVrHouse.value || !newSceneName.value || !vrSelectedFile.value) return
+  
+  vrUploading.value = true
+  const formData = new FormData()
+  formData.append('roomId', currentVrHouse.value.id)
+  formData.append('sceneName', newSceneName.value)
+  formData.append('file', vrSelectedFile.value)
+  
+  try {
+    const response = await axios.post(`${API_BASE_URL}/vr-scenes/upload`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    
+    if (response.data.success) {
+      alert('VR场景上传成功')
+      newSceneName.value = ''
+      vrSelectedFile.value = null
+      // 清空文件输入
+      const fileInput = document.querySelector('.vr-dialog .file-input')
+      if (fileInput) fileInput.value = ''
+      
+      await loadVrScenes(currentVrHouse.value.id)
+    } else {
+      alert('上传失败: ' + response.data.message)
+    }
+  } catch (error) {
+    console.error('上传VR场景失败:', error)
+    alert('上传失败')
+  } finally {
+    vrUploading.value = false
+  }
+}
+
+// 删除VR场景
+const deleteVrScene = async (sceneId) => {
+  if (!confirm('确定删除该VR场景吗？')) return
+  
+  try {
+    const response = await axios.delete(`${API_BASE_URL}/vr-scenes/${sceneId}`)
+    if (response.data.success) {
+      await loadVrScenes(currentVrHouse.value.id)
+    } else {
+      alert('删除失败')
+    }
+  } catch (error) {
+    console.error('删除VR场景失败:', error)
   }
 }
 
@@ -1203,75 +1357,71 @@ const formatDate = (dateString) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
-  padding: 1.5rem;
-  background: linear-gradient(135deg, rgb(179, 208, 253) 0%, rgb(164, 202, 248) 100%);
-  border-radius: 16px;
-  box-shadow: 0 8px 25px rgba(79, 156, 232, 0.3);
+  margin-bottom: 1.5rem;
+  padding: 1.25rem 1.5rem;
+  background-color: #1e3a5f;
+  border-radius: 8px;
 }
 
 .page-header h2 {
   margin: 0;
   color: white;
-  font-size: 2rem;
-  font-weight: 700;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: 1.5rem;
+  font-weight: 600;
 }
 
 .header-actions {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
   align-items: center;
 }
 
 /* 状态筛选标签 */
 .status-filter-tabs {
   display: flex;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 12px;
-  padding: 4px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 6px;
+  padding: 3px;
   gap: 2px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .filter-tab {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 12px;
+  padding: 6px 10px;
   border: none;
   background: transparent;
-  border-radius: 8px;
+  border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s ease;
-  color: #64748b;
-  font-size: 13px;
+  color: #5a6c7d;
+  font-size: 12px;
   font-weight: 500;
   white-space: nowrap;
 }
 
 .filter-tab:hover {
-  background: rgba(99, 102, 241, 0.1);
-  color: #4f46e5;
+  background-color: #f5f7fa;
+  color: #1e3a5f;
 }
 
 .filter-tab.active {
-  background: #4f46e5;
+  background-color: #1e3a5f;
   color: white;
-  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
 }
 
 .filter-tab svg {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   flex-shrink: 0;
 }
 
 .filter-tab .count {
-  background: rgba(0, 0, 0, 0.1);
-  padding: 2px 6px;
-  border-radius: 10px;
-  font-size: 11px;
+  background: rgba(0, 0, 0, 0.08);
+  padding: 1px 5px;
+  border-radius: 8px;
+  font-size: 10px;
   font-weight: 600;
 }
 
@@ -1280,152 +1430,115 @@ const formatDate = (dateString) => {
 }
 
 /* 状态颜色 */
-.filter-tab.status-0.active { background: #10b981; }
-.filter-tab.status-1.active { background: #3b82f6; }
-.filter-tab.status-2.active { background: #6b7280; }
-.filter-tab.status-3.active { background: #f59e0b; }
+.filter-tab.status-0.active { background-color: #27ae60; }
+.filter-tab.status-1.active { background-color: #1e3a5f; }
+.filter-tab.status-2.active { background-color: #7f8c8d; }
+.filter-tab.status-3.active { background-color: #e67e22; }
 
-.filter-tab.status-0:not(.active):hover { color: #10b981; }
-.filter-tab.status-1:not(.active):hover { color: #3b82f6; }
-.filter-tab.status-2:not(.active):hover { color: #6b7280; }
-.filter-tab.status-3:not(.active):hover { color: #f59e0b; }
+.filter-tab.status-0:not(.active):hover { color: #27ae60; }
+.filter-tab.status-1:not(.active):hover { color: #1e3a5f; }
+.filter-tab.status-2:not(.active):hover { color: #7f8c8d; }
+.filter-tab.status-3:not(.active):hover { color: #e67e22; }
 
 .search-wrapper {
-  margin-right: 1rem;
+  margin-right: 0.75rem;
 }
 
 .container {
   position: relative;
-  background: linear-gradient(135deg, rgb(179, 208, 253) 0%, rgb(164, 202, 248) 100%);
-  border-radius: 1000px;
-  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 6px;
+  padding: 0;
   display: grid;
   place-content: center;
   z-index: 0;
-  max-width: 320px;
-  margin: 0 5px;
-  width: 320px;
+  max-width: 240px;
+  width: 240px;
 }
 
 .search-container {
   position: relative;
   width: 100%;
-  border-radius: 50px;
-  background: linear-gradient(135deg, rgb(218, 232, 247) 0%, rgb(214, 229, 247) 100%);
-  padding: 5px;
+  border-radius: 6px;
+  background-color: white;
+  padding: 0;
   display: flex;
   align-items: center;
+  border: 1px solid #e9ecef;
 }
 
 .search-container::after, .search-container::before {
-  content: "";
-  width: 100%;
-  height: 100%;
-  border-radius: inherit;
-  position: absolute;
-}
-
-.search-container::before {
-  top: -1px;
-  left: -1px;
-  background: linear-gradient(0deg, rgb(218, 232, 247) 0%, rgb(255, 255, 255) 100%);
-  z-index: -1;
-}
-
-.search-container::after {
-  bottom: -1px;
-  right: -1px;
-  background: linear-gradient(0deg, rgb(163, 206, 255) 0%, rgb(211, 232, 255) 100%);
-  box-shadow: rgba(79, 156, 232, 0.7019607843) 3px 3px 5px 0px, rgba(79, 156, 232, 0.7019607843) 5px 5px 20px 0px;
-  z-index: -2;
+  display: none;
 }
 
 .input {
-  padding: 10px;
-  width: calc(100% - 70px);
-  background: linear-gradient(135deg, rgb(218, 232, 247) 0%, rgb(214, 229, 247) 100%);
+  padding: 8px 12px;
+  width: calc(100% - 40px);
+  background: transparent;
   border: none;
-  color: #9EBCD9;
-  font-size: 16px;
-  border-radius: 50px;
-  margin-left: 8px;
+  color: #2c3e50;
+  font-size: 13px;
+  border-radius: 6px;
+}
+
+.input::placeholder {
+  color: #95a5a6;
 }
 
 .input:focus {
   outline: none;
-  background: linear-gradient(135deg, rgb(239, 247, 255) 0%, rgb(214, 229, 247) 100%);
 }
 
 .search__icon {
-  width: 20px;
+  width: 16px;
   aspect-ratio: 1;
-  border-left: 2px solid white;
-  border-top: 3px solid transparent;
-  border-bottom: 3px solid transparent;
-  border-radius: 50%;
-  padding-left: 8px;
-  margin-right: 8px;
-}
-
-.search__icon:hover {
-  border-left: 3px solid white;
+  border: none;
+  padding: 0;
+  margin-right: 10px;
 }
 
 .search__icon path {
-  fill: white;
+  fill: #7f8c8d;
 }
 
 .refresh-btn, .add-btn {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
   border: none;
-  border-radius: 12px;
+  border-radius: 2px;
   cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(79, 156, 232, 0.3);
-  position: relative;
-  overflow: hidden;
+  font-weight: 500;
+  font-size: 13px;
+  transition: background-color 0.2s ease;
 }
 
 .refresh-btn {
-  background: linear-gradient(135deg, rgb(149, 185, 240) 0%, rgb(119, 162, 224) 100%);
+  background-color: #1e3a5f;
   color: white;
 }
 
 .refresh-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(79, 156, 232, 0.4);
-  background: linear-gradient(135deg, rgb(139, 175, 230) 0%, rgb(109, 152, 214) 100%);
-}
-
-.refresh-btn:active {
-  transform: translateY(0);
+  background-color: #2d5a87;
 }
 
 .add-btn {
-  background: linear-gradient(135deg, rgb(102, 187, 106) 0%, rgb(76, 175, 80) 100%);
+  background-color: #27ae60;
   color: white;
 }
 
 .add-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
-  background: linear-gradient(135deg, rgb(92, 177, 96) 0%, rgb(66, 165, 70) 100%);
-}
-
-.add-btn:active {
-  transform: translateY(0);
+  background-color: #219a52;
 }
 
 /* 房屋列表表格样式 */
 .houses-table-container {
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   overflow: hidden;
+  border: 1px solid #e9ecef;
 }
 
 .loading {
@@ -1462,14 +1575,14 @@ const formatDate = (dateString) => {
 }
 
 .add-first-btn {
-  background-color: #28a745;
+  background-color: #27ae60;
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
-  border-radius: 8px;
+  border-radius: 2px;
   cursor: pointer;
   font-weight: 600;
-  transition: background-color 0.3s;
+  transition: background-color 0.2s;
 }
 
 .add-first-btn:hover {
@@ -1614,25 +1727,25 @@ const formatDate = (dateString) => {
 
 .rental-type {
   padding: 0.25rem 0.5rem;
-  border-radius: 8px;
+  border-radius: 2px;
   font-size: 0.75rem;
   font-weight: 600;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  box-shadow: none;
+  transition: all 0.2s ease;
 }
 
 .rental-type-0 {
-  background: linear-gradient(135deg, rgb(239, 115, 158)0%, rgb(119, 162, 224) 100%);
+  background-color: #1e3a5f;
   color: white;
 }
 
 .rental-type-1 {
-  background: linear-gradient(135deg, rgb(153, 187, 102) 0%, rgb(76, 175, 80) 100%);
+  background-color: #27ae60;
   color: white;
 }
 
 .rental-type-2 {
-  background: linear-gradient(135deg, rgb(255, 193, 7) 0%, rgb(255, 152, 0) 100%);
+  background-color: #e67e22;
   color: white;
 }
 
@@ -1700,52 +1813,34 @@ const formatDate = (dateString) => {
 }
 
 .action-btn {
-  padding: 0.5rem 0.75rem;
+  padding: 0.4rem 0.6rem;
   border: none;
-  border-radius: 8px;
+  border-radius: 2px;
   cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  font-size: 0.8rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+  font-size: 12px;
   white-space: nowrap;
-  box-shadow: 0 2px 6px rgba(79, 156, 232, 0.3);
-  position: relative;
-  overflow: hidden;
-  width: 80px;
+  width: 60px;
   text-align: center;
 }
 
-.action-btn::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 100%);
-  z-index: 1;
-}
-
 .edit-btn {
-  background: linear-gradient(135deg, rgb(149, 185, 240) 0%, rgb(119, 162, 224) 100%);
+  background-color: #1e3a5f;
   color: white;
 }
 
 .edit-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(79, 156, 232, 0.4);
-  background: linear-gradient(135deg, rgb(139, 175, 230) 0%, rgb(109, 152, 214) 100%);
+  background-color: #2d5a87;
 }
 
 .detail-btn {
-  background: linear-gradient(135deg, rgb(102, 187, 106) 0%, rgb(76, 175, 80) 100%);
+  background-color: #27ae60;
   color: white;
 }
 
 .detail-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
-  background: linear-gradient(135deg, rgb(92, 177, 96) 0%, rgb(66, 165, 70) 100%);
+  background-color: #219a52;
 }
 
 .status-btn {
@@ -1753,43 +1848,35 @@ const formatDate = (dateString) => {
 }
 
 .btn-offline {
-  background: linear-gradient(135deg, rgb(255, 107, 107) 0%, rgb(220, 53, 69) 100%);
+  background-color: #e74c3c;
 }
 
 .btn-offline:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
-  background: linear-gradient(135deg, rgb(245, 97, 97) 0%, rgb(200, 35, 51) 100%);
+  background-color: #c0392b;
 }
 
 .btn-available {
-  background: linear-gradient(135deg, rgb(102, 187, 106) 0%, rgb(76, 175, 80) 100%);
+  background-color: #27ae60;
 }
 
 .btn-available:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
-  background: linear-gradient(135deg, rgb(92, 177, 96) 0%, rgb(66, 165, 70) 100%);
+  background-color: #219a52;
 }
 
 .btn-online {
-  background: linear-gradient(135deg, rgb(149, 185, 240) 0%, rgb(119, 162, 224) 100%);
+  background-color: #1e3a5f;
 }
 
 .btn-online:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(79, 156, 232, 0.4);
-  background: linear-gradient(135deg, rgb(139, 175, 230) 0%, rgb(109, 152, 214) 100%);
+  background-color: #2d5a87;
 }
 
 .btn-default {
-  background: linear-gradient(135deg, rgb(149, 185, 240) 0%, rgb(119, 162, 224) 100%);
+  background-color: #7f8c8d;
 }
 
 .btn-default:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(79, 156, 232, 0.4);
-  background: linear-gradient(135deg, rgb(139, 175, 230) 0%, rgb(109, 152, 214) 100%);
+  background-color: #636e72;
 }
 
 /* 模态框样式 */
@@ -1808,106 +1895,97 @@ const formatDate = (dateString) => {
 }
 
 .modal-content {
-  background: linear-gradient(135deg, rgb(255, 255, 255) 0%, rgb(248, 250, 255) 100%);
-  border-radius: 16px;
+  background-color: white;
+  border-radius: 8px;
   width: 100%;
   max-width: 800px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 15px 40px rgba(79, 156, 232, 0.3);
-  border: 1px solid rgba(179, 208, 253, 0.5);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e9ecef;
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem 2rem;
-  border-bottom: 1px solid rgba(179, 208, 253, 0.3);
-  background: linear-gradient(135deg, rgb(179, 208, 253) 0%, rgb(164, 202, 248) 100%);
-  border-radius: 16px 16px 0 0;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+  background-color: #1e3a5f;
+  border-radius: 8px 8px 0 0;
 }
 
 .modal-header h3 {
   margin: 0;
   color: white;
-  font-size: 1.5rem;
-  font-weight: 700;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: 1.25rem;
+  font-weight: 600;
 }
 
 .close-btn {
-  background: rgba(255, 255, 255, 0.2);
-  border: 2px solid white;
-  border-radius: 50%;
-  font-size: 1.5rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 4px;
+  font-size: 1.25rem;
   cursor: pointer;
   color: white;
   padding: 0;
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s ease;
 }
 
 .close-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .modal-body {
-  padding: 2rem;
+  padding: 1.5rem;
 }
 
 .modal-footer {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
   justify-content: flex-end;
-  padding: 1.5rem 2rem;
-  border-top: 1px solid rgba(179, 208, 253, 0.3);
-  background: rgba(248, 250, 255, 0.8);
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e9ecef;
+  background-color: #f8f9fa;
 }
 
 .cancel-btn, .confirm-btn {
-  padding: 0.75rem 1.5rem;
+  padding: 0.5rem 1rem;
   border: none;
-  border-radius: 8px;
+  border-radius: 4px;
   cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 6px rgba(79, 156, 232, 0.3);
+  font-weight: 500;
+  font-size: 13px;
+  transition: background-color 0.2s ease;
 }
 
 .cancel-btn {
-  background: linear-gradient(135deg, rgb(149, 185, 240) 0%, rgb(119, 162, 224) 100%);
+  background-color: #7f8c8d;
   color: white;
 }
 
 .cancel-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(79, 156, 232, 0.4);
-  background: linear-gradient(135deg, rgb(139, 175, 230) 0%, rgb(109, 152, 214) 100%);
+  background-color: #636e72;
 }
 
 .confirm-btn {
-  background: linear-gradient(135deg, rgb(102, 187, 106) 0%, rgb(76, 175, 80) 100%);
+  background-color: #27ae60;
   color: white;
 }
 
 .confirm-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
-  background: linear-gradient(135deg, rgb(92, 177, 96) 0%, rgb(66, 165, 70) 100%);
+  background-color: #219a52;
 }
 
 .confirm-btn:disabled {
-  background: linear-gradient(135deg, rgb(149, 185, 240) 0%, rgb(119, 162, 224) 100%);
+  background-color: #bdc3c7;
   cursor: not-allowed;
-  transform: none;
 }
 
 /* 表单样式 */
@@ -1999,5 +2077,133 @@ const formatDate = (dateString) => {
   .modal-footer {
     flex-direction: column;
   }
+}
+
+/* VR 按钮和对话框样式 */
+.vr-btn {
+  background-color: #9b59b6;
+  color: white;
+}
+
+.vr-btn:hover {
+  background-color: #8e44ad;
+}
+
+.vr-dialog {
+  max-width: 700px;
+}
+
+.vr-scene-list h4,
+.vr-upload-section h4 {
+  margin: 0 0 1rem 0;
+  color: #2c3e50;
+  font-size: 1rem;
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 0.5rem;
+}
+
+.no-scenes {
+  color: #6c757d;
+  text-align: center;
+  padding: 2rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.scenes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.scene-card {
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  background: white;
+}
+
+.scene-preview {
+  width: 100%;
+  height: 100px;
+  overflow: hidden;
+}
+
+.scene-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.scene-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background: #f8f9fa;
+}
+
+.scene-info span {
+  font-size: 0.85rem;
+  color: #2c3e50;
+}
+
+.delete-scene-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0;
+}
+
+.delete-scene-btn:hover {
+  opacity: 0.7;
+}
+
+.vr-upload-section {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e9ecef;
+}
+
+.upload-form {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.scene-name-input {
+  flex: 1;
+  min-width: 150px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.file-input {
+  font-size: 0.85rem;
+}
+
+.upload-btn {
+  background-color: #1e3a5f;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.upload-btn:hover:not(:disabled) {
+  background-color: #2d5a87;
+}
+
+.upload-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
 </style>

@@ -22,6 +22,23 @@
 
       <!-- 聊天管理 -->
       <div v-if="activeTab === 'chat'" class="tab-content">
+        <!-- 搜索筛选 -->
+        <div class="search-filters">
+          <div class="filter-item">
+            <label>发送者:</label>
+            <input type="text" v-model="chatFilters.sender" placeholder="搜索发送者" />
+          </div>
+          <div class="filter-item">
+            <label>内容:</label>
+            <input type="text" v-model="chatFilters.content" placeholder="搜索内容" />
+          </div>
+          <div class="filter-item">
+            <label>接收方:</label>
+            <input type="text" v-model="chatFilters.receiver" placeholder="搜索接收方" />
+          </div>
+          <button class="clear-btn" @click="clearChatFilters">清空</button>
+        </div>
+        
         <div class="table-container">
           <table>
             <thead>
@@ -35,7 +52,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="msg in chatMessages" :key="msg.id">
+              <tr v-for="msg in filteredChatMessages" :key="msg.id">
                 <td>
                   <div class="user-info">
                     <span>{{ msg.senderName }}</span>
@@ -65,6 +82,19 @@
 
       <!-- 社区管理 -->
       <div v-if="activeTab === 'community'" class="tab-content">
+        <!-- 搜索筛选 -->
+        <div class="search-filters">
+          <div class="filter-item">
+            <label>发布者:</label>
+            <input type="text" v-model="communityFilters.publisher" placeholder="搜索发布者" />
+          </div>
+          <div class="filter-item">
+            <label>内容:</label>
+            <input type="text" v-model="communityFilters.content" placeholder="搜索内容" />
+          </div>
+          <button class="clear-btn" @click="clearCommunityFilters">清空</button>
+        </div>
+        
         <div class="table-container">
           <table>
             <thead>
@@ -78,7 +108,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="post in socialPosts" :key="post.id">
+              <tr v-for="post in filteredSocialPosts" :key="post.id">
                 <td>
                   <div class="user-info">
                     <span>{{ post.userName }}</span>
@@ -134,7 +164,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import axios from 'axios';
 
 const activeTab = ref('chat');
@@ -146,7 +176,53 @@ const selectedUserId = ref(null);
 const selectedUserName = ref('');
 const duration = ref(60);
 
-const API_HOST = "http://api.homesee.xyz";
+// 搜索筛选状态
+const chatFilters = ref({
+  sender: '',
+  content: '',
+  receiver: ''
+});
+
+const communityFilters = ref({
+  publisher: '',
+  content: ''
+});
+
+// 筛选后的聊天消息
+const filteredChatMessages = computed(() => {
+  return chatMessages.value.filter(msg => {
+    const matchSender = !chatFilters.value.sender || 
+      (msg.senderName && msg.senderName.toLowerCase().includes(chatFilters.value.sender.toLowerCase()));
+    const matchContent = !chatFilters.value.content || 
+      (msg.content && msg.content.toLowerCase().includes(chatFilters.value.content.toLowerCase()));
+    const matchReceiver = !chatFilters.value.receiver || 
+      (getReceiverInfo(msg).toLowerCase().includes(chatFilters.value.receiver.toLowerCase()));
+    return matchSender && matchContent && matchReceiver;
+  });
+});
+
+// 筛选后的社区动态
+const filteredSocialPosts = computed(() => {
+  return socialPosts.value.filter(post => {
+    const matchPublisher = !communityFilters.value.publisher || 
+      (post.userName && post.userName.toLowerCase().includes(communityFilters.value.publisher.toLowerCase()));
+    const matchContent = !communityFilters.value.content || 
+      (post.content && post.content.toLowerCase().includes(communityFilters.value.content.toLowerCase()));
+    return matchPublisher && matchContent;
+  });
+});
+
+// 清空聊天筛选
+const clearChatFilters = () => {
+  chatFilters.value = { sender: '', content: '', receiver: '' };
+};
+
+// 清空社区筛选
+const clearCommunityFilters = () => {
+  communityFilters.value = { publisher: '', content: '' };
+};
+
+const API_HOST = "https://api.homesee.xyz";
 const FILE_API_HOST = "https://files.homesee.xyz";
 
 const fetchChatMessages = async () => {
@@ -288,47 +364,104 @@ onMounted(() => {
 
 <style scoped>
 .channel-management {
-  padding: 24px;
-  background: #f8fafc;
+  padding: 0;
+  background: #fff;
   min-height: 100vh;
 }
 
 .page-header h2 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #1e293b;
-  margin-bottom: 24px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #ddd;
 }
 
 .content-card {
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 16px;
+}
+
+/* 搜索筛选 */
+.search-filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.filter-item label {
+  font-size: 12px;
+  color: #888;
+  white-space: nowrap;
+}
+
+.filter-item input {
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  font-size: 12px;
+  min-width: 120px;
+}
+
+.filter-item input:focus {
+  outline: none;
+  border-color: #3A6EA5;
+}
+
+.clear-btn {
+  padding: 4px 12px;
+  border: 1px solid #ddd;
+  background: transparent;
+  color: #888;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.clear-btn:hover {
+  background: #f5f5f5;
+  color: #333;
 }
 
 .tabs {
   display: flex;
-  gap: 16px;
-  margin-bottom: 24px;
-  border-bottom: 1px solid #e2e8f0;
-  padding-bottom: 12px;
+  gap: 0;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 0;
 }
 
 .tab-btn {
   padding: 8px 16px;
-  border: none;
+  border: 1px solid #ddd;
+  border-bottom: none;
   background: transparent;
-  font-size: 1rem;
-  color: #64748b;
+  font-size: 12px;
+  color: #888;
   cursor: pointer;
-  border-radius: 6px;
-  transition: all 0.3s;
+  margin-bottom: -1px;
 }
 
 .tab-btn.active {
-  background: #3b82f6;
-  color: white;
+  background: #1e3a5f;
+  color: #fff;
+  border-color: #1e3a5f;
+}
+
+.tab-btn:hover:not(.active) {
+  background: #f5f5f5;
+  color: #333;
 }
 
 .table-container {
@@ -341,93 +474,100 @@ table {
 }
 
 th, td {
-  padding: 12px;
+  padding: 8px 12px;
   text-align: left;
-  border-bottom: 1px solid #e2e8f0;
+  border: 1px solid #ddd;
+  font-size: 12px;
 }
 
 th {
-  font-weight: 600;
-  color: #64748b;
-  background: #f8fafc;
+  font-weight: 500;
+  color: #333;
+  background: #f5f5f5;
 }
 
 .user-info {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+  width: 24px;
+  height: 24px;
   object-fit: cover;
 }
 
 .content-cell {
-  max-width: 300px;
+  max-width: 250px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .preview-img, .preview-video {
-  max-width: 100px;
-  max-height: 100px;
-  border-radius: 4px;
+  max-width: 80px;
+  max-height: 80px;
 }
 
 .media-preview {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 }
 
 .media-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .media-image img,
 .media-video video {
-  max-width: 80px;
-  max-height: 80px;
-  border-radius: 4px;
+  max-width: 60px;
+  max-height: 60px;
   object-fit: cover;
 }
 
 .media-other .file-link {
-  color: #3b82f6;
+  color: #3A6EA5;
   text-decoration: none;
-  font-size: 0.875rem;
-  padding: 4px 8px;
-  border: 1px solid #e2e8f0;
-  border-radius: 4px;
-  background: #f8fafc;
+  font-size: 11px;
+  padding: 2px 6px;
+  border: 1px solid #ddd;
+  background: transparent;
 }
 
 .media-other .file-link:hover {
-  background: #e2e8f0;
+  background: #f5f5f5;
 }
 
 .btn-danger {
-  background: #ef4444;
-  color: white;
-  border: none;
-  padding: 4px 8px;
-  border-radius: 4px;
+  background: transparent;
+  color: #c00;
+  border: 1px solid #c00;
+  padding: 2px 8px;
   cursor: pointer;
-  margin-right: 8px;
+  margin-right: 4px;
+  font-size: 11px;
+}
+
+.btn-danger:hover {
+  background: #c00;
+  color: #fff;
 }
 
 .btn-warning {
-  background: #f59e0b;
-  color: white;
-  border: none;
-  padding: 4px 8px;
-  border-radius: 4px;
+  background: transparent;
+  color: #c07700;
+  border: 1px solid #c07700;
+  padding: 2px 8px;
   cursor: pointer;
+  font-size: 11px;
+}
+
+.btn-warning:hover {
+  background: #c07700;
+  color: #fff;
 }
 
 .modal-overlay {
@@ -444,50 +584,77 @@ th {
 }
 
 .modal {
-  background: white;
-  padding: 24px;
-  border-radius: 12px;
-  width: 400px;
+  background: #fff;
+  padding: 16px;
+  border: 1px solid #ddd;
+  width: 360px;
+}
+
+.modal h3 {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  margin: 0 0 16px 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #ddd;
 }
 
 .form-group {
-  margin: 20px 0;
+  margin: 12px 0;
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 8px;
-  color: #64748b;
+  margin-bottom: 4px;
+  color: #888;
+  font-size: 12px;
 }
 
 .form-group input {
   width: 100%;
-  padding: 8px;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
+  padding: 6px 8px;
+  border: 1px solid #ddd;
+  font-size: 12px;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #3A6EA5;
 }
 
 .modal-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #ddd;
 }
 
 .btn-secondary {
-  background: #e2e8f0;
-  color: #64748b;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
+  background: transparent;
+  color: #888;
+  border: 1px solid #ddd;
+  padding: 4px 12px;
   cursor: pointer;
+  font-size: 12px;
+}
+
+.btn-secondary:hover {
+  background: #f5f5f5;
+  color: #333;
 }
 
 .btn-primary {
-  background: #3b82f6;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
+  background: #1e3a5f;
+  color: #fff;
+  border: 1px solid #1e3a5f;
+  padding: 4px 12px;
   cursor: pointer;
+  font-size: 12px;
+}
+
+.btn-primary:hover {
+  background: #152a45;
 }
 </style>
