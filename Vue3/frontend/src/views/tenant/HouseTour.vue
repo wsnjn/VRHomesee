@@ -119,8 +119,9 @@ const loadVrScenes = async () => {
           sphereSource: {
             // Ensure URL is correct. If it's relative to src/assets, we might need to handle it.
             // But for now, let's use the path stored in DB.
-            url: scene.imageUrl,
-            thumb: scene.imageUrl // Use same image for thumb for now
+            // 确保使用HTTPS防止混合内容错误
+            url: ensureHttps(scene.imageUrl),
+            thumb: ensureHttps(scene.imageUrl) // Use same image for thumb for now
           },
           // Add empty levels to prevent errors if component expects it
           levels: []
@@ -139,6 +140,26 @@ const loadVrScenes = async () => {
     alert('加载VR场景失败')
   } finally {
     loading.value = false
+  }
+}
+
+// 确保URL使用HTTPS
+// 确保URL使用HTTPS，并替换不安全的源
+const ensureHttps = (url) => {
+  if (!url) return ''
+  
+  try {
+    // 如果已经是完整URL
+    if (url.startsWith('http')) {
+      const urlObj = new URL(url)
+      // 强制使用文件服务器域名
+      return `https://files.homesee.xyz${urlObj.pathname}${urlObj.search}`
+    }
+    // 如果是相对路径，直接拼接
+    return `https://files.homesee.xyz${url.startsWith('/') ? '' : '/'}${url}`
+  } catch (e) {
+    // 解析失败，回退到原始逻辑
+    return url
   }
 }
 

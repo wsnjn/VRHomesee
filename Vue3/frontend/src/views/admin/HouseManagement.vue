@@ -268,7 +268,7 @@
                        But we are in dev mode, let's try using the path directly or a computed property.
                        Actually, for dynamic assets in Vite, we might need a different approach.
                        But let's assume the backend returns a path we can use or we fix it later. -->
-                  <img :src="scene.imageUrl" :alt="scene.sceneName">
+                  <img :src="ensureHttps(scene.imageUrl)" :alt="scene.sceneName">
                 </div>
                 <div class="scene-info">
                   <span>{{ scene.sceneName }}</span>
@@ -773,6 +773,25 @@ const deleteVrScene = async (id) => {
   }
 }
 
+
+// 确保URL使用HTTPS，并替换不安全的源
+const ensureHttps = (url) => {
+  if (!url) return ''
+  
+  try {
+    // 如果已经是完整URL
+    if (url.startsWith('http')) {
+      const urlObj = new URL(url)
+      // 强制使用文件服务器域名
+      return `https://files.homesee.xyz${urlObj.pathname}${urlObj.search}`
+    }
+    // 如果是相对路径，直接拼接
+    return `https://files.homesee.xyz${url.startsWith('/') ? '' : '/'}${url}`
+  } catch (e) {
+    // 解析失败，回退到原始逻辑
+    return url
+  }
+}
 
 // 关闭对话框
 const closeDialog = () => {
