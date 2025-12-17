@@ -12,7 +12,7 @@
             :class="{ active: currentTab === 'chat' }" 
             @click="currentTab = 'chat'"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
             <span>聊天</span>
           </div>
           <div 
@@ -20,7 +20,7 @@
             :class="{ active: currentTab === 'feed' }" 
             @click="currentTab = 'feed'"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
             <span>朋友圈</span>
           </div>
           <div 
@@ -28,7 +28,7 @@
             :class="{ active: currentTab === 'community' }" 
             @click="currentTab = 'community'"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
             <span>社区动态</span>
           </div>
         </div>
@@ -57,16 +57,19 @@ const currentTab = ref('chat')
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 .page-container {
   display: flex;
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
-  background: #f8fafc;
+  background: #FFFFFF;
+  font-family: 'Inter', sans-serif;
 }
 
 .page-header-spacer {
-  height: 80px;
+  height: 64px; /* Matches navbar */
   flex-shrink: 0;
 }
 
@@ -79,38 +82,45 @@ const currentTab = ref('chat')
 
 .top-tabs {
   background: white;
-  border-bottom: 1px solid #e2e8f0;
-  padding: 0 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+  border-bottom: 1px solid #E5E7EB;
+  padding: 0 24px;
+  box-shadow: none;
   z-index: 10;
 }
 
 .tab-container {
-  max-width: 800px;
+  max-width: 1400px;
   margin: 0 auto;
   display: flex;
-  gap: 40px;
+  gap: 0; /* Removing gap to have connected tabs */
 }
 
 .tab-item {
-  padding: 16px 4px;
+  padding: 16px 24px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: #64748b;
-  font-weight: 500;
+  gap: 12px;
+  color: #6B7280;
+  font-weight: 600;
   cursor: pointer;
   position: relative;
   transition: all 0.2s;
+  border-right: 1px solid transparent;
+  border-left: 1px solid transparent;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .tab-item:hover {
-  color: #334155;
+  background: #F9FAFB;
+  color: #111827;
 }
 
 .tab-item.active {
-  color: #3b82f6;
-  font-weight: 600;
+  color: #111827;
+  background: white;
+  font-weight: 700;
 }
 
 .tab-item.active::after {
@@ -120,27 +130,21 @@ const currentTab = ref('chat')
   left: 0;
   right: 0;
   height: 2px;
-  background: #3b82f6;
-  border-radius: 2px 2px 0 0;
+  background: #111827;
+  border-radius: 0;
 }
 
 .content-area {
   flex: 1;
   overflow-y: auto;
   position: relative;
-  /* 隐藏滚动条但保持滑动功能 */
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
-}
-
-.content-area::-webkit-scrollbar {
-  display: none; /* Chrome, Safari and Opera */
+  background: #FFFFFF;
 }
 
 /* Transitions */
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.2s ease;
+  transition: opacity 0.15s ease;
 }
 
 .fade-enter-from,

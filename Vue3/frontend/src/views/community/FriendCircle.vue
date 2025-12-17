@@ -14,7 +14,10 @@
     <!-- Create Post -->
     <div class="create-post-card">
       <div class="input-wrapper">
-        <div class="avatar">{{ userState.user?.username?.[0] || 'U' }}</div>
+        <div class="avatar">
+          <img v-if="userState.user?.avatar" :src="getAvatarUrl(userState.user.avatar)" class="current-user-avatar" />
+          <span v-else>{{ userState.user?.username?.[0] || 'U' }}</span>
+        </div>
         <textarea 
           v-model="newPostContent" 
           placeholder="分享你的生活..." 
@@ -29,7 +32,7 @@
           <video v-else-if="mediaPreview.type === 'video'" :src="mediaPreview.url" controls></video>
           <audio v-else-if="mediaPreview.type === 'audio'" :src="mediaPreview.url" controls></audio>
           <button class="remove-media" @click="removeMedia">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
         </div>
       </div>
@@ -41,15 +44,15 @@
           <input type="file" ref="audioInput" accept="audio/*" @change="handleFileUpload($event, 'audio')" style="display: none">
           
           <button class="action-btn" @click="triggerUpload('imageInput')" :disabled="!hasActiveLease">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
             <span>图片</span>
           </button>
           <button class="action-btn" @click="triggerUpload('videoInput')" :disabled="!hasActiveLease">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
             <span>视频</span>
           </button>
           <button class="action-btn" @click="triggerUpload('audioInput')" :disabled="!hasActiveLease">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
             <span>音乐</span>
           </button>
         </div>
@@ -76,6 +79,7 @@
           <div class="avatar-container">
             <img :src="getAvatarUrl(post.avatar)" alt="头像" class="post-avatar" />
           </div>
+
           <div class="user-info">
             <span class="username">{{ post.username || `用户 ${post.userId}` }}</span>
             <span class="time">{{ formatDate(post.createdTime) }}</span>
@@ -124,15 +128,15 @@
         
         <div class="post-footer">
           <button class="footer-btn like-btn" :class="{ 'active': post.liked }" @click="toggleLike(post)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" :fill="post.liked ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-            <span>{{ post.likeCount > 0 ? post.likeCount : '赞' }}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" :fill="post.liked ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+            <span>{{ post.likeCount > 0 ? post.likeCount : '点赞' }}</span>
           </button>
           <button class="footer-btn comment-btn" @click="toggleComments(post)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
             <span>{{ post.commentCount > 0 ? post.commentCount : '评论' }}</span>
           </button>
           <button class="footer-btn share-btn" @click="sharePost(post)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
             <span>分享</span>
           </button>
         </div>
@@ -223,6 +227,7 @@ const checkLease = async () => {
     const res = await fetch(`https://api.homesee.xyz/api/admin/tenant/tenant/${currentUserId.value}`)
     const data = await res.json()
     if (data.success && data.contracts && data.contracts.length > 0) {
+      // Logic for active lease check
       const active = data.contracts.find(c => c.contractStatus === 1 || c.contractStatus === 2)
       hasActiveLease.value = !!active
     } else {
@@ -523,13 +528,6 @@ const getFriendName = (userId) => {
   return `用户${userId}`
 }
 
-// Add click outside listener
-onMounted(() => {
-  document.addEventListener('click', closeMenu)
-})
-
-
-
 const formatDate = (str) => {
   if (!str) return ''
   const date = new Date(str)
@@ -570,12 +568,10 @@ const getAvatarUrl = (avatarName) => {
     return '/models/image/default-avatar.png'
   }
   
-  // 如果是完整的HTTP URL，直接使用
   if (avatarName.startsWith('http')) {
     return avatarName
   }
   
-  // 使用文件服务器获取头像
   const FILE_SERVER_HOST = 'https://files.homesee.xyz'
   return `${FILE_SERVER_HOST}/api/files/download/${avatarName}`
 }
@@ -584,16 +580,13 @@ const isAudio = (url) => {
   return url && url.match(/\.(mp3|wav|aac|flac|m4a)$/i) != null
 }
 
-// 构建完整的文件URL
 const buildFileUrl = (filename) => {
   if (!filename) return ''
   
-  // 如果是完整的HTTP URL，直接使用
   if (filename.startsWith('http')) {
     return filename
   }
   
-  // 使用文件服务器获取文件
   const FILE_SERVER_HOST = 'https://files.homesee.xyz'
   return `${FILE_SERVER_HOST}/api/files/download/${filename}`
 }
@@ -618,8 +611,9 @@ onMounted(() => {
   pollInterval = setInterval(() => {
     fetchPosts()
   }, 5000)
+  
+  document.addEventListener('click', closeMenu)
 })
-
 
 onUnmounted(() => {
   if (pollInterval) clearInterval(pollInterval)
@@ -629,73 +623,57 @@ onUnmounted(() => {
 
 <style scoped>
 .friend-circle-container {
-  max-width: 720px;
+  max-width: 800px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 40px 24px;
   font-family: 'Inter', sans-serif;
-  color: #1f2937;
+  color: #111827;
   min-height: 100vh;
-  overflow-y: auto;
-  /* 隐藏滚动条但保持滑动功能 */
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
-}
-
-.friend-circle-container::-webkit-scrollbar {
-  display: none; /* Chrome, Safari and Opera */
+  background-color: #FFFFFF;
 }
 
 .friend-circle-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 40px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #111827;
 }
 
 .friend-circle-header h1 {
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 1.5rem;
+  font-weight: 800;
   color: #111827;
   margin: 0;
-  letter-spacing: -0.025em;
-}
-
-.filter-controls {
-  display: flex;
-  gap: 12px;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
 }
 
 .filter-select {
-  padding: 8px 16px;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  padding: 8px 32px 8px 16px;
+  border: 1px solid #E5E7EB;
+  border-radius: 0;
   background: white;
-  color: #374151;
-  font-size: 14px;
+  color: #111827;
+  font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s;
-  font-weight: 500;
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
 .filter-select:hover {
-  border-color: #6366f1;
-  color: #6366f1;
+  border-color: #111827;
 }
 
 .create-post-card {
   background: white;
-  padding: 20px;
-  border-radius: 16px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-  margin-bottom: 24px;
-  border: 1px solid #f3f4f6;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.create-post-card:focus-within {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+  padding: 24px;
+  border-radius: 0;
+  box-shadow: none;
+  margin-bottom: 40px;
+  border: 1px solid #111827;
 }
 
 .input-wrapper {
@@ -707,16 +685,24 @@ onUnmounted(() => {
 .avatar {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: #111827;
   color: white;
-  border-radius: 12px;
+  border-radius: 50%; /* Circular */
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
+  font-weight: 700;
   flex-shrink: 0;
   font-size: 16px;
-  box-shadow: 0 2px 4px rgba(99, 102, 241, 0.2);
+  box-shadow: none;
+  font-family: 'JetBrains Mono', monospace;
+  overflow: hidden;
+}
+
+.current-user-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .create-post-card textarea {
@@ -726,14 +712,15 @@ onUnmounted(() => {
   resize: none;
   outline: none;
   font-family: inherit;
-  font-size: 15px;
+  font-size: 1rem;
   padding: 8px 0;
   background: transparent;
   line-height: 1.5;
+  color: #111827;
 }
 
 .create-post-card textarea::placeholder {
-  color: #9ca3af;
+  color: #9CA3AF;
 }
 
 .media-preview {
@@ -749,10 +736,9 @@ onUnmounted(() => {
 .preview-container img, .preview-container video {
   max-width: 100%;
   max-height: 400px;
-  width: auto;
-  height: auto;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border-radius: 0;
+  box-shadow: none;
+  border: 1px solid #E5E7EB;
   object-fit: contain;
 }
 
@@ -760,21 +746,16 @@ onUnmounted(() => {
   position: absolute;
   top: 8px;
   right: 8px;
-  background: rgba(0, 0, 0, 0.6);
+  background: #111827;
   color: white;
   border: none;
-  border-radius: 50%;
+  border-radius: 0;
   width: 24px;
   height: 24px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s;
-}
-
-.remove-media:hover {
-  background: rgba(0, 0, 0, 0.8);
 }
 
 .post-actions {
@@ -782,8 +763,40 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: center;
   padding-top: 16px;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid #E5E7EB;
   padding-left: 56px;
+}
+
+.media-buttons {
+  display: flex;
+  gap: 16px;
+}
+
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6B7280;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  padding: 4px 8px;
+  border-radius: 0;
+}
+
+.action-btn:hover:not(:disabled) {
+  color: #111827;
+  background: #F3F4F6;
+}
+
+.action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .post-settings {
@@ -793,365 +806,300 @@ onUnmounted(() => {
 }
 
 .visibility-select {
-  padding: 8px 12px;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  padding: 6px 12px;
+  border: 1px solid #E5E7EB;
+  border-radius: 0;
   background: white;
-  color: #374151;
-  font-size: 13px;
+  color: #111827;
+  font-size: 0.85rem;
   cursor: pointer;
-  transition: all 0.2s;
-}
-
-.visibility-select:hover:not(:disabled) {
-  border-color: #6366f1;
-}
-
-.visibility-select:disabled {
-  background: #f9fafb;
-  color: #9ca3af;
-  cursor: not-allowed;
-}
-
-.media-buttons {
-  display: flex;
-  gap: 12px;
-}
-
-.action-btn {
-  background: transparent;
-  border: none;
-  color: #6b7280;
-  padding: 8px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.2s;
-}
-
-.action-btn:hover:not(:disabled) {
-  background: #f3f4f6;
-  color: #6366f1;
-}
-
-.action-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 
 .submit-btn {
-  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  background: #111827;
   color: white;
-  border: none;
+  border: 1px solid #111827;
   padding: 8px 24px;
-  border-radius: 20px;
-  cursor: pointer;
+  border-radius: 0;
   font-weight: 600;
-  font-size: 14px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  text-transform: uppercase;
   transition: all 0.2s;
-  box-shadow: 0 2px 4px rgba(99, 102, 241, 0.2);
 }
 
 .submit-btn:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px rgba(99, 102, 241, 0.3);
+  background: white;
+  color: #111827;
 }
 
 .submit-btn:disabled {
-  background: #e5e7eb;
-  color: #9ca3af;
+  background: #E5E7EB;
+  border-color: #E5E7EB;
   cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
 }
 
 .lease-warning {
   margin-top: 12px;
-  padding: 10px;
-  background: #fff7ed;
-  color: #c2410c;
-  border-radius: 8px;
-  font-size: 13px;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
+  color: #EF4444;
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
+/* Feed List */
 .feed-list {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
 }
 
 .post-card {
   background: white;
-  border-radius: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-  border: 1px solid #f3f4f6;
-  overflow: hidden;
-  transition: box-shadow 0.2s;
-}
-
-.post-card:hover {
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.04);
+  border-radius: 0;
+  padding: 24px;
+  box-shadow: none;
+  border: 1px solid #E5E7EB;
 }
 
 .post-header {
-  padding: 20px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  margin-bottom: 16px;
+  position: relative;
 }
 
 .avatar-container {
+  margin-right: 16px;
   flex-shrink: 0;
 }
 
 .post-avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%; /* Circular */
   object-fit: cover;
-  border: 2px solid white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  background: #F3F4F6;
+  border: 1px solid #F3F4F6;
 }
 
 .user-info {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 2px;
 }
 
 .username {
-  font-weight: 600;
+  font-weight: 700;
   color: #111827;
-  font-size: 15px;
+  font-size: 1rem;
 }
 
 .time {
-  font-size: 12px;
-  color: #9ca3af;
+  font-size: 0.75rem;
+  color: #9CA3AF;
+  font-family: 'JetBrains Mono', monospace;
+  margin-top: 2px;
 }
 
 .visibility-badge {
-  font-size: 11px;
   padding: 2px 8px;
-  border-radius: 12px;
-  font-weight: 500;
+  border-radius: 0;
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-left: 12px;
+  text-transform: uppercase;
+  border: 1px solid;
 }
 
 .visibility-badge.public {
-  background: #f3f4f6;
-  color: #6b7280;
+  background: white;
+  color: #111827;
+  border-color: #111827;
 }
 
 .visibility-badge.friends-only {
-  background: #fdf2f8;
-  color: #db2777;
+  background: white;
+  color: #D97706;
+  border-color: #D97706;
 }
 
 .more-menu-container {
   position: relative;
+  margin-left: auto;
 }
 
 .more-btn {
-  background: transparent;
+  background: none;
   border: none;
-  color: #9ca3af;
-  padding: 8px;
-  border-radius: 50%;
   cursor: pointer;
-  transition: all 0.2s;
+  padding: 4px;
+  color: #6B7280;
+  transition: color 0.2s;
 }
 
-.more-btn:hover {
-  background: #f3f4f6;
-  color: #374151;
-}
+.more-btn:hover { color: #111827; }
 
 .dropdown-menu {
   position: absolute;
-  top: 100%;
   right: 0;
+  top: 100%;
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  border: 1px solid #f3f4f6;
-  padding: 6px;
-  min-width: 140px;
+  border: 1px solid #111827;
+  box-shadow: none;
   z-index: 10;
+  min-width: 140px;
 }
 
 .dropdown-menu button {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
-  padding: 10px 12px;
+  padding: 10px 16px;
   border: none;
-  background: transparent;
-  color: #4b5563;
-  font-size: 13px;
+  background: none;
   cursor: pointer;
-  border-radius: 8px;
-  transition: all 0.2s;
+  text-align: left;
+  font-size: 0.85rem;
+  color: #111827;
+  transition: background 0.2s;
 }
 
 .dropdown-menu button:hover {
-  background: #f3f4f6;
-  color: #111827;
+  background: #F3F4F6;
 }
 
-.dropdown-menu button.delete-btn {
-  color: #ef4444;
-}
-
-.dropdown-menu button.delete-btn:hover {
-  background: #fef2f2;
-}
+.dropdown-menu button.delete-btn { color: #EF4444; }
 
 .post-content {
-  padding: 0 20px 20px;
+  margin-bottom: 24px;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #1f2937;
 }
 
 .post-content p {
-  margin: 0 0 16px;
-  color: #374151;
-  line-height: 1.6;
-  font-size: 15px;
-  white-space: pre-wrap;
+  margin: 0 0 16px 0;
 }
 
-.post-media {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 8px;
-  border-radius: 12px;
-  overflow: hidden;
+.post-media img, .post-media video {
+  max-width: 100%;
+  max-height: 400px;
+  border-radius: 0;
+  margin-top: 12px;
+  object-fit: contain;
+  border: 1px solid #E5E7EB;
 }
 
-.media-item img, .media-item video {
+.post-media audio {
   width: 100%;
-  height: 200px;
-  object-fit: cover;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: opacity 0.2s;
-}
-
-.media-item img:hover {
-  opacity: 0.95;
+  max-width: 400px;
+  margin-top: 12px;
+  border-radius: 0;
 }
 
 .post-footer {
-  padding: 12px 20px;
-  border-top: 1px solid #f9fafb;
   display: flex;
+  justify-content: flex-start;
   gap: 24px;
+  border-top: 1px solid #E5E7EB;
+  padding-top: 16px;
 }
 
 .footer-btn {
-  background: transparent;
+  background: none;
   border: none;
-  color: #6b7280;
+  color: #6B7280;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
   transition: all 0.2s;
-  padding: 4px 8px;
-  border-radius: 6px;
+  text-transform: uppercase;
 }
 
 .footer-btn:hover {
-  background: #f3f4f6;
-  color: #374151;
+  background: #F3F4F6;
+  color: #111827;
 }
 
-.footer-btn.like-btn.active {
-  color: #ef4444;
-}
+.like-btn.active { color: #EF4444; }
+.like-btn.active:hover { background: #fee2e2; }
 
-.footer-btn.like-btn.active svg {
-  fill: #ef4444;
-  stroke: #ef4444;
-}
-
+/* Comments Styles */
 .comments-section {
-  background: #f9fafb;
-  padding: 16px 20px;
-  border-top: 1px solid #f3f4f6;
+  background: #F9FAFB;
+  padding: 16px;
+  margin-top: 16px;
+  border: 1px solid #E5E7EB;
+  border-radius: 0;
 }
 
 .comment-list {
+  margin-bottom: 16px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 16px;
+  gap: 12px;
 }
 
 .comment-item {
-  font-size: 13px;
+  font-size: 0.9rem;
   line-height: 1.5;
 }
 
 .comment-user {
-  font-weight: 600;
+  font-weight: 700;
   color: #111827;
-  margin-right: 6px;
+  margin-right: 8px;
 }
 
 .comment-content {
-  color: #4b5563;
+  color: #374151;
 }
 
 .comment-input-area {
   display: flex;
-  gap: 10px;
+  gap: 0; /* Connected input */
 }
 
 .comment-input-area input {
   flex: 1;
-  padding: 8px 12px;
-  border: 1px solid #e5e7eb;
-  border-radius: 20px;
-  font-size: 13px;
+  padding: 10px 16px;
+  border: 1px solid #111827;
+  border-right: none;
+  border-radius: 0;
+  font-size: 0.9rem;
   outline: none;
-  transition: all 0.2s;
-}
-
-.comment-input-area input:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+  background: white;
 }
 
 .comment-input-area button {
-  background: #6366f1;
+  background: #111827;
   color: white;
-  border: none;
-  padding: 6px 16px;
-  border-radius: 16px;
-  font-size: 13px;
-  font-weight: 500;
+  border: 1px solid #111827;
+  padding: 0 24px;
+  border-radius: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  text-transform: uppercase;
 }
 
 .comment-input-area button:hover:not(:disabled) {
-  background: #4f46e5;
+  background: black;
 }
 
 .comment-input-area button:disabled {
-  background: #e5e7eb;
-  color: #9ca3af;
+  background: #9CA3AF;
+  border-color: #9CA3AF;
   cursor: not-allowed;
 }
 </style>
-```

@@ -1,6 +1,6 @@
 <template>
   <div class="appointment-page">
-    <!-- 顶部导航栏 -->
+    <!-- Top Nav -->
     <nav class="navbar">
       <div class="nav-brand">
         <h2>预约看房</h2>
@@ -10,30 +10,47 @@
       </div>
     </nav>
 
-    <!-- 主要内容 -->
+    <!-- Main Content -->
     <div class="appointment-container">
-      <!-- 房屋信息卡片 -->
+      <!-- House Info Section -->
+      <div class="section-title">房屋信息</div>
       <div class="house-card" v-if="houseInfo">
         <div class="house-header">
           <h3>{{ houseInfo.communityName }} {{ houseInfo.buildingUnit || '' }}{{ houseInfo.doorNumber }}</h3>
           <span class="house-status" :class="getStatusClass(houseInfo.status)">
+            <span class="status-dot"></span>
             {{ getStatusText(houseInfo.status) }}
           </span>
         </div>
-        <div class="house-details">
-          <p><strong>地址：</strong>{{ houseInfo.province }}{{ houseInfo.city }}{{ houseInfo.district }}{{ houseInfo.street }}{{ houseInfo.communityName }}</p>
-          <p><strong>租金：</strong>{{ houseInfo.rentPrice }}元/月</p>
-          <p><strong>面积：</strong>{{ houseInfo.roomArea }}㎡</p>
-          <p><strong>楼层：</strong>{{ houseInfo.floorInfo }}</p>
-          <p><strong>装修：</strong>{{ getDecorationText(houseInfo.decoration) }}</p>
+        <div class="house-details-grid">
+          <div class="detail-item">
+            <span class="label">地址</span>
+            <span class="value">{{ houseInfo.province }}{{ houseInfo.city }}{{ houseInfo.district }}{{ houseInfo.street }}{{ houseInfo.communityName }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">租金</span>
+            <span class="value price">{{ houseInfo.rentPrice }} <small>元/月</small></span>
+          </div>
+          <div class="detail-item">
+            <span class="label">面积</span>
+            <span class="value">{{ houseInfo.roomArea }}㎡</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">楼层</span>
+            <span class="value">{{ houseInfo.floorInfo }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">装修</span>
+            <span class="value">{{ getDecorationText(houseInfo.decoration) }}</span>
+          </div>
         </div>
       </div>
 
-      <!-- 预约表单 -->
+      <!-- Appointment Form -->
+      <div class="section-title">预约信息</div>
       <div class="appointment-form">
-        <h3>填写预约信息</h3>
         <form @submit.prevent="submitAppointment">
-          <div class="form-row">
+          <div class="form-grid">
             <div class="form-group">
               <label for="preferredDate">期望看房日期 *</label>
               <input
@@ -62,9 +79,7 @@
                 <option value="17:00-18:00">17:00-18:00</option>
               </select>
             </div>
-          </div>
 
-          <div class="form-row">
             <div class="form-group">
               <label for="appointmentType">看房方式 *</label>
               <select
@@ -85,13 +100,11 @@
                 v-model="appointmentForm.tenantCount"
                 min="1"
                 max="10"
-                placeholder="请输入租客人数"
+                placeholder="请输入人数"
                 required
               />
             </div>
-          </div>
 
-          <div class="form-row">
             <div class="form-group">
               <label for="expectedMoveInDate">期望入住日期 *</label>
               <input
@@ -109,20 +122,18 @@
                 id="contactName"
                 type="text"
                 v-model="appointmentForm.contactName"
-                placeholder="请输入联系人姓名"
+                placeholder="请输入姓名"
                 required
               />
             </div>
-          </div>
 
-          <div class="form-row">
             <div class="form-group">
               <label for="contactPhone">联系电话 *</label>
               <input
                 id="contactPhone"
                 type="tel"
                 v-model="appointmentForm.contactPhone"
-                placeholder="请输入联系电话"
+                placeholder="请输入电话"
                 required
               />
             </div>
@@ -136,16 +147,16 @@
                 placeholder="请输入微信号（可选）"
               />
             </div>
-          </div>
 
-          <div class="form-group full-width">
-            <label for="rentalIntention">租赁意向描述</label>
-            <textarea
-              id="rentalIntention"
-              v-model="appointmentForm.rentalIntention"
-              placeholder="请描述您的租赁需求，如租期、预算、特殊要求等（可选）"
-              rows="4"
-            ></textarea>
+            <div class="form-group full-width">
+              <label for="rentalIntention">租赁意向描述</label>
+              <textarea
+                id="rentalIntention"
+                v-model="appointmentForm.rentalIntention"
+                placeholder="请描述您的租赁需求..."
+                rows="4"
+              ></textarea>
+            </div>
           </div>
 
           <div class="form-actions">
@@ -160,7 +171,6 @@
               type="submit"
               :disabled="submitting"
               class="submit-btn"
-              :class="{ 'disabled': submitting }"
             >
               {{ submitting ? '提交中...' : '提交预约' }}
             </button>
@@ -169,33 +179,43 @@
       </div>
     </div>
 
-    <!-- 预约成功弹窗 -->
+    <!-- Success Modal -->
     <div v-if="showSuccessModal" class="modal-overlay">
       <div class="modal-content">
         <div class="modal-header">
-          <h3>预约成功！</h3>
+          <h3>预约提交成功</h3>
         </div>
         <div class="modal-body">
-          <p>您的预约已提交成功，预约编号：<strong>{{ appointmentNumber }}</strong></p>
-          <p>业务员会尽快与您联系确认看房事宜。</p>
-          <div class="appointment-details">
-            <p><strong>房屋信息：</strong>{{ houseInfo.communityName }} {{ houseInfo.buildingUnit || '' }}{{ houseInfo.doorNumber }}</p>
-            <p><strong>预约时间：</strong>{{ appointmentForm.preferredDate }} {{ appointmentForm.preferredTimeSlot }}</p>
-            <p><strong>看房方式：</strong>{{ appointmentForm.appointmentType === '1' ? '现场看房' : '视频看房' }}</p>
+          <p>预约编号</p>
+          <div class="appointment-number">{{ appointmentNumber }}</div>
+          
+          <div class="modal-info-list">
+             <div class="info-row">
+               <span>房屋</span>
+               <span>{{ houseInfo.communityName }} {{ houseInfo.buildingUnit || '' }}{{ houseInfo.doorNumber }}</span>
+             </div>
+             <div class="info-row">
+               <span>时间</span>
+               <span>{{ appointmentForm.preferredDate }} {{ appointmentForm.preferredTimeSlot }}</span>
+             </div>
+             <div class="info-row">
+               <span>方式</span>
+               <span>{{ appointmentForm.appointmentType === '1' ? '现场看房' : '视频看房' }}</span>
+             </div>
           </div>
+          
+          <p class="modal-tip">业务员将尽快联系您确认。</p>
         </div>
         <div class="modal-actions">
-          <button @click="goToHouseSelection" class="primary-btn">返回房屋列表</button>
-          <button @click="viewMyAppointments" class="secondary-btn">查看我的预约</button>
+          <button @click="goToHouseSelection" class="btn-outline">返回列表</button>
+          <button @click="viewMyAppointments" class="btn-primary">查看我的预约</button>
         </div>
       </div>
     </div>
 
-    <!-- 加载状态 -->
+    <!-- Loading -->
     <div v-if="loading" class="loading-overlay">
-      <div class="loading-content">
-        <p>加载中...</p>
-      </div>
+      <div class="loading-spinner"></div>
     </div>
   </div>
 </template>
@@ -377,16 +397,12 @@ const getStatusText = (status) => {
     0: '在租',
     1: '已下架'
   }
-  return statusMap[status] || '未知状态'
+  return statusMap[status] || '未知'
 }
 
 // 获取状态样式类
 const getStatusClass = (status) => {
-  const classMap = {
-    0: 'status-available',
-    1: 'status-unavailable'
-  }
-  return classMap[status] || 'status-unknown'
+  return status === 0 ? 'status-available' : 'status-unavailable'
 }
 
 // 获取装修程度文字
@@ -400,23 +416,19 @@ const getDecorationText = (decoration) => {
   return types[decoration] || '未知'
 }
 
-// 返回上一页
 const goBack = () => {
   router.back()
 }
 
-// 返回房屋列表
 const goToHouseSelection = () => {
   router.push('/house-selection')
 }
 
-// 查看我的预约
 const viewMyAppointments = () => {
   showSuccessModal.value = false
   router.push('/my-appointments')
 }
 
-// 页面加载时初始化数据
 onMounted(() => {
   loadHouseInfo()
 })
@@ -425,405 +437,390 @@ onMounted(() => {
 <style scoped>
 .appointment-page {
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background-color: #FFFFFF;
+  font-family: 'Inter', sans-serif;
+  color: #111827;
 }
 
+/* Navbar: Industrial Minimal */
 .navbar {
   position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
-  background-color: rgba(44, 62, 80, 0.9);
-  color: white;
+  padding: 16px 24px;
+  background-color: white;
+  border-bottom: 1px solid #111827;
   z-index: 100;
-  backdrop-filter: blur(10px);
 }
 
 .nav-brand h2 {
   margin: 0;
-  color: white;
-}
-
-.nav-links {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
+  font-size: 1.25rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #111827;
+  letter-spacing: -0.5px;
 }
 
 .nav-link {
-  color: white;
+  color: #6B7280;
   text-decoration: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  transition: background-color 0.3s;
-  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  transition: color 0.2s;
 }
 
 .nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  color: #111827;
 }
 
+/* Container */
 .appointment-container {
   max-width: 800px;
-  margin: 20px auto;
-  padding: 0 20px;
+  margin: 0 auto;
+  padding: 24px 20px; /* Tighter container padding */
 }
 
+.section-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #9CA3AF;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px; /* Reduced margin */
+  margin-top: 24px; /* Reduced margin */
+}
+
+.section-title:first-child {
+  margin-top: 0;
+}
+
+/* House Card */
 .house-card {
   background: white;
-  padding: 24px;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 20px; /* Reduced padding */
+  border: 1px solid #E5E7EB;
+  border-radius: 0;
   margin-bottom: 24px;
-  border: 1px solid #f0f0f0;
 }
 
 .house-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 16px;
+  align-items: center;
+  margin-bottom: 16px; /* Reduced margin */
+  padding-bottom: 12px; /* Reduced padding */
+  border-bottom: 1px solid #E5E7EB;
 }
 
 .house-header h3 {
   margin: 0;
-  color: #2c3e50;
-  font-size: 1.5rem;
-  flex: 1;
-  margin-right: 16px;
+  color: #111827;
+  font-size: 1.15rem; /* Slightly smaller */
+  font-weight: 700;
 }
 
 .house-status {
-  padding: 6px 12px;
-  border-radius: 16px;
-  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
   font-weight: 600;
-  white-space: nowrap;
+  text-transform: uppercase;
 }
 
-.status-available {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%; /* Circle Exception */
 }
 
-.status-unavailable {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
+.status-available .status-dot { background-color: #10B981; }
+.status-available { color: #10B981; }
+
+.status-unavailable .status-dot { background-color: #EF4444; }
+.status-unavailable { color: #EF4444; }
+
+/* Details Grid */
+.house-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Tighter grid */
+  gap: 16px; /* Reduced gap */
 }
 
-.status-unknown {
-  background-color: #e2e3e5;
-  color: #383d41;
-  border: 1px solid #d6d8db;
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px; /* Tighter gap */
 }
 
-.house-details p {
-  margin: 8px 0;
-  color: #666;
-  line-height: 1.5;
+.detail-item .label {
+  font-size: 0.75rem;
+  color: #6B7280;
+  text-transform: uppercase;
 }
 
-.house-details strong {
-  color: #333;
+.detail-item .value {
+  font-size: 0.95rem;
+  color: #111827;
+  font-weight: 500;
 }
 
+.detail-item .price {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+}
+
+/* Form */
 .appointment-form {
   background: white;
-  padding: 32px;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid #f0f0f0;
+  padding: 20px; /* Added card padding */
+  border: 1px solid #E5E7EB; /* Added card border */
+  border-radius: 0;
 }
 
-.appointment-form h3 {
-  margin: 0 0 24px 0;
-  color: #2c3e50;
-  font-size: 1.25rem;
-  border-bottom: 2px solid #007bff;
-  padding-bottom: 12px;
-}
-
-.form-row {
-  display: flex;
-  gap: 24px;
-  margin-bottom: 20px;
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px; /* Reduced gap */
+  margin-bottom: 24px;
 }
 
 .form-group {
-  flex: 1;
   display: flex;
   flex-direction: column;
 }
 
 .form-group.full-width {
-  flex: 0 0 100%;
+  grid-column: span 2;
 }
 
 .form-group label {
-  margin-bottom: 8px;
+  margin-bottom: 6px; /* Reduced margin */
   font-weight: 600;
-  color: #2c3e50;
-  font-size: 14px;
+  color: #374151;
+  font-size: 0.8rem; /* Slightly smaller */
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
-  padding: 12px 16px;
-  border: 2px solid #e9ecef;
-  border-radius: 8px;
+  padding: 10px; /* Reduced padding */
+  border: 1px solid #E5E7EB;
+  border-radius: 0; /* Square Law */
   background: white;
-  font-size: 14px;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  font-size: 0.9rem;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s;
+  color: #111827;
 }
 
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
-  background-color: #f8f9fa;
+  border-color: #111827; /* Industrial Black Focus */
 }
 
 .form-group input:hover,
 .form-group select:hover,
 .form-group textarea:hover {
-  border-color: #adb5bd;
-}
-
-.form-group select {
-  appearance: none;
-  background-image: url("data:image/svg+xml;charset=US-ASCII,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'><path fill='%23666' d='M2 0L0 2h4zm0 5L0 3h4z'/></svg>");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  background-size: 12px;
-  padding-right: 40px;
-}
-
-.form-group textarea {
-  resize: vertical;
-  min-height: 80px;
-  font-family: inherit;
+  border-color: #9CA3AF;
 }
 
 .form-actions {
   display: flex;
-  gap: 16px;
   justify-content: flex-end;
-  margin-top: 32px;
-  padding-top: 24px;
-  border-top: 1px solid #f0f0f0;
+  gap: 16px;
+  padding-top: 20px;
+  border-top: 1px solid #E5E7EB;
 }
 
-.cancel-btn,
-.submit-btn {
-  padding: 12px 32px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 15px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  min-width: 120px;
-}
-
+/* Buttons */
 .cancel-btn {
   background: white;
-  color: #6c757d;
-  border: 2px solid #6c757d;
+  border: 1px solid #E5E7EB;
+  color: #111827;
+  padding: 8px 24px; /* Smaller button */
+  cursor: pointer;
+  border-radius: 0;
+  font-weight: 600;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  font-size: 0.9rem;
 }
 
 .cancel-btn:hover {
-  background: #f8f9fa;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.2);
+  border-color: #111827;
 }
 
 .submit-btn {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  background: #111827;
   color: white;
-  border: 2px solid #28a745;
+  border: 1px solid #111827;
+  padding: 10px 48px;
+  cursor: pointer;
+  border-radius: 0;
+  font-weight: 600;
+  text-transform: uppercase;
+  transition: all 0.2s;
 }
 
-.submit-btn:hover:not(.disabled) {
-  background: linear-gradient(135deg, #20c997 0%, #1ba87e 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+.submit-btn:hover:not(:disabled) {
+  background: black;
 }
 
-.submit-btn.disabled {
-  opacity: 0.6;
+.submit-btn:disabled {
+  background: #E5E7EB;
+  border-color: #E5E7EB;
   cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
 }
 
-.submit-btn.disabled:hover {
-  transform: none;
-  box-shadow: none;
-}
-
-/* 模态框样式 */
+/* Modal */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(255, 255, 255, 0.9); /* Lighter backdrop */
+  backdrop-filter: blur(5px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: 20px;
 }
 
 .modal-content {
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-  max-width: 500px;
-  width: 100%;
-  overflow: hidden;
+  width: 440px;
+  border: 1px solid #111827; /* Hard border */
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
 }
 
 .modal-header {
-  padding: 24px 24px 0;
+  padding: 24px 32px 0;
   text-align: center;
 }
 
 .modal-header h3 {
   margin: 0;
-  color: #28a745;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #111827;
 }
 
 .modal-body {
-  padding: 24px;
+  padding: 24px 32px;
   text-align: center;
 }
 
-.modal-body p {
-  margin: 12px 0;
-  color: #666;
-  line-height: 1.5;
+.appointment-number {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 8px 0 24px;
+  padding: 12px;
+  background: #F3F4F6;
+  border: 1px dashed #9CA3AF;
 }
 
-.appointment-details {
-  background: #f8f9fa;
-  padding: 16px;
-  border-radius: 8px;
-  margin-top: 16px;
+.modal-info-list {
   text-align: left;
+  margin-bottom: 24px;
+  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.appointment-details p {
-  margin: 8px 0;
-  font-size: 0.9rem;
+.info-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.info-row span:first-child {
+  color: #6B7280;
+  font-weight: 500;
+}
+
+.info-row span:last-child {
+  color: #111827;
+  font-weight: 600;
+  text-align: right;
+}
+
+.modal-tip {
+  color: #6B7280;
+  font-size: 0.85rem;
+  margin-top: 16px;
 }
 
 .modal-actions {
   display: flex;
-  gap: 12px;
-  padding: 0 24px 24px;
+  border-top: 1px solid #E5E7EB;
 }
 
-.primary-btn,
-.secondary-btn {
+.modal-actions button {
   flex: 1;
-  padding: 12px 16px;
+  padding: 16px;
   border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.primary-btn {
-  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-  color: white;
-}
-
-.primary-btn:hover {
-  background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
-  transform: translateY(-1px);
-}
-
-.secondary-btn {
   background: white;
-  color: #6c757d;
-  border: 2px solid #6c757d;
+  cursor: pointer;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  border-radius: 0;
+  transition: all 0.2s;
 }
 
-.secondary-btn:hover {
-  background: #f8f9fa;
-  transform: translateY(-1px);
+.btn-outline {
+  color: #6B7280;
+  border-right: 1px solid #E5E7EB;
 }
 
-/* 加载状态 */
+.btn-outline:hover { background: #F9FAFB; color: #111827; }
+
+.btn-primary {
+  color: white;
+  background: #111827;
+}
+
+.btn-primary:hover { background: black; }
+
+/* Loading */
 .loading-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.9);
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
 }
 
-.loading-content {
-  background: white;
-  padding: 32px;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  text-align: center;
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #E5E7EB;
+  border-top-color: #111827;
+  border-radius: 50%; /* Circle Exception */
+  animation: spin 1s linear infinite;
 }
 
-.loading-content p {
-  margin: 0;
-  color: #666;
-  font-size: 1.1rem;
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
-@media (max-width: 768px) {
-  .appointment-container {
-    margin: 10px auto;
-    padding: 0 10px;
+@media (max-width: 640px) {
+  .form-grid {
+    grid-template-columns: 1fr;
   }
-
-  .form-row {
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .form-actions {
-    flex-direction: column;
-  }
-
-  .cancel-btn,
-  .submit-btn {
-    width: 100%;
-  }
-
-  .modal-actions {
-    flex-direction: column;
-  }
-
-  .navbar {
-    padding: 1rem;
+  .form-group.full-width {
+    grid-column: span 1;
   }
 }
 </style>

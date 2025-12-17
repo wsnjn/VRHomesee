@@ -47,15 +47,15 @@
         
         <div class="post-footer">
           <button class="footer-btn like-btn" :class="{ 'active': post.liked }" @click="toggleLike(post)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" :fill="post.liked ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-            <span>{{ post.likeCount > 0 ? post.likeCount : '赞' }}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" :fill="post.liked ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+            <span>{{ post.likeCount > 0 ? post.likeCount : '点赞' }}</span>
           </button>
           <button class="footer-btn comment-btn" @click="toggleComments(post)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
             <span>{{ post.commentCount > 0 ? post.commentCount : '评论' }}</span>
           </button>
           <button class="footer-btn share-btn" @click="sharePost(post)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
             <span>分享</span>
           </button>
         </div>
@@ -263,26 +263,21 @@ const getAvatarUrl = (avatarName) => {
     return '/models/image/default-avatar.png'
   }
   
-  // 如果是完整的HTTP URL，直接使用
   if (avatarName.startsWith('http')) {
     return avatarName
   }
   
-  // 使用文件服务器获取头像
   const FILE_SERVER_HOST = 'https://files.homesee.xyz'
   return `${FILE_SERVER_HOST}/api/files/download/${avatarName}`
 }
 
-// 构建完整的文件URL
 const buildFileUrl = (filename) => {
   if (!filename) return ''
   
-  // 如果是完整的HTTP URL，直接使用
   if (filename.startsWith('http')) {
     return filename
   }
   
-  // 使用文件服务器获取文件
   const FILE_SERVER_HOST = 'https://files.homesee.xyz'
   return `${FILE_SERVER_HOST}/api/files/download/${filename}`
 }
@@ -295,110 +290,103 @@ onMounted(() => {
 
 <style scoped>
 .community-page-container {
-  max-width: 680px;
+  max-width: 800px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 40px 24px;
   font-family: 'Inter', sans-serif;
-  color: #1f2937;
+  color: #111827;
   min-height: 100vh;
-  overflow-y: auto;
-  /* 隐藏滚动条但保持滑动功能 */
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
-}
-
-.community-page-container::-webkit-scrollbar {
-  display: none; /* Chrome, Safari and Opera */
+  background-color: #FFFFFF;
 }
 
 .community-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #f3f4f6;
+  margin-bottom: 40px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #111827;
 }
 
 .community-header h1 {
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 1.5rem;
+  font-weight: 800;
   color: #111827;
   margin: 0;
-}
-
-.filter-controls {
-  display: flex;
-  gap: 12px;
+  text-transform: uppercase;
 }
 
 .filter-select {
-  padding: 8px 16px;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  padding: 8px 32px 8px 16px;
+  border: 1px solid #E5E7EB;
+  border-radius: 0;
   background: white;
-  color: #374151;
-  font-size: 14px;
+  color: #111827;
+  font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s;
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
 .filter-select:hover {
-  border-color: #6366f1;
+  border-color: #111827;
 }
 
 .feed-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 24px;
 }
 
 .post-card {
   background: white;
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 12px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-  border: 1px solid #f3f4f6;
+  border-radius: 0;
+  padding: 24px;
+  box-shadow: none;
+  border: 1px solid #E5E7EB;
 }
 
 .post-header {
   display: flex;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 16px;
 }
 
 .post-header .avatar-container {
-  margin-right: 12px;
+  margin-right: 16px;
   flex-shrink: 0;
 }
 
 .post-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%; /* Circular */
   object-fit: cover;
-  background: #f3f4f6;
+  background: #F3F4F6;
+  border: 1px solid #F3F4F6;
 }
 
 .visibility-badge {
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
-  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 0;
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-left: 12px;
+  text-transform: uppercase;
+  border: 1px solid;
 }
 
 .visibility-badge.public {
-  background: #dbeafe;
-  color: #1e40af;
-  border: 1px solid #93c5fd;
+  background: white;
+  color: #111827;
+  border-color: #111827;
 }
 
 .visibility-badge.friends-only {
-  background: #fef3c7;
-  color: #92400e;
-  border: 1px solid #fcd34d;
+  background: white;
+  color: #D97706;
+  border-color: #D97706;
 }
 
 .user-info {
@@ -408,45 +396,47 @@ onMounted(() => {
 }
 
 .username {
-  font-weight: 600;
+  font-weight: 700;
   color: #111827;
+  font-size: 1rem;
 }
 
 .time {
-  font-size: 12px;
-  color: #9ca3af;
+  font-size: 0.75rem;
+  color: #9CA3AF;
+  font-family: 'JetBrains Mono', monospace;
+  margin-top: 2px;
 }
 
 .post-content {
-  margin-bottom: 15px;
-  font-size: 15px;
+  margin-bottom: 24px;
+  font-size: 1rem;
   line-height: 1.6;
-  color: #374151;
+  color: #1f2937;
 }
 
 .post-content p {
-  margin: 0 0 12px 0;
+  margin: 0 0 16px 0;
 }
 
 .post-media img, .post-media video {
   max-width: 100%;
   max-height: 400px;
-  width: auto;
-  height: auto;
-  border-radius: 12px;
-  margin-top: 8px;
+  border-radius: 0;
+  margin-top: 12px;
   object-fit: contain;
+  border: 1px solid #E5E7EB;
 }
 
 .post-media audio {
   width: 100%;
   max-width: 400px;
-  margin-top: 8px;
-  border-radius: 8px;
+  margin-top: 12px;
+  border-radius: 0;
 }
 
 .media-item {
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .media-item:last-child {
@@ -455,60 +445,61 @@ onMounted(() => {
 
 .post-footer {
   display: flex;
-  justify-content: space-between;
-  border-top: 1px solid #f3f4f6;
-  padding-top: 12px;
+  justify-content: flex-start;
+  gap: 24px;
+  border-top: 1px solid #E5E7EB;
+  padding-top: 16px;
 }
 
 .footer-btn {
-  flex: 1;
   background: none;
   border: none;
-  color: #6b7280;
+  color: #6B7280;
   cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 6px;
-  border-radius: 8px;
-  font-size: 14px;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
   transition: all 0.2s;
+  text-transform: uppercase;
 }
 
 .footer-btn:hover {
-  background: #f3f4f6;
+  background: #F3F4F6;
+  color: #111827;
 }
 
-.like-btn.active { color: #ef4444; }
-.like-btn:hover { color: #ef4444; background: #fef2f2; }
-.comment-btn:hover { color: #3b82f6; background: #eff6ff; }
-.share-btn:hover { color: #10b981; background: #ecfdf5; }
+.like-btn.active { color: #EF4444; }
+.like-btn.active:hover { background: #fee2e2; }
 
 /* Comments Styles */
 .comments-section {
-  background: #f9fafb;
-  padding: 12px;
-  margin-top: 12px;
-  border-radius: 8px;
+  background: #F9FAFB;
+  padding: 16px;
+  margin-top: 16px;
+  border: 1px solid #E5E7EB;
+  border-radius: 0;
 }
 
 .comment-list {
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
 }
 
 .comment-item {
-  font-size: 13px;
-  line-height: 1.4;
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
 
 .comment-user {
-  font-weight: 600;
-  color: #4b5563;
-  margin-right: 6px;
+  font-weight: 700;
+  color: #111827;
+  margin-right: 8px;
 }
 
 .comment-content {
@@ -517,41 +508,39 @@ onMounted(() => {
 
 .comment-input-area {
   display: flex;
-  gap: 8px;
+  gap: 0; /* Connected input */
 }
 
 .comment-input-area input {
   flex: 1;
-  padding: 8px 12px;
-  border: 1px solid #e5e7eb;
-  border-radius: 20px;
-  font-size: 13px;
+  padding: 10px 16px;
+  border: 1px solid #111827;
+  border-right: none;
+  border-radius: 0;
+  font-size: 0.9rem;
   outline: none;
-  transition: border-color 0.2s;
-}
-
-.comment-input-area input:focus {
-  border-color: #6366f1;
+  background: white;
 }
 
 .comment-input-area button {
-  background: #6366f1;
+  background: #111827;
   color: white;
-  border: none;
-  padding: 0 16px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 500;
+  border: 1px solid #111827;
+  padding: 0 24px;
+  border-radius: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  text-transform: uppercase;
 }
 
 .comment-input-area button:hover:not(:disabled) {
-  background: #4f46e5;
+  background: black;
 }
 
 .comment-input-area button:disabled {
-  background: #e5e7eb;
+  background: #9CA3AF;
+  border-color: #9CA3AF;
   cursor: not-allowed;
 }
 </style>

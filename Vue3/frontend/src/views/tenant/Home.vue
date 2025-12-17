@@ -125,22 +125,22 @@ const formatDate = (dateString) => {
     <!-- Hero Section -->
     <header class="hero-section">
       <div class="hero-content">
-       <h1 class="hero-title">发现理想生活</h1>
+       <h1 class="hero-title">发现<br>理想生活</h1>
         <p class="hero-subtitle">专业的租房平台，为您提供优质的房屋租赁服务</p>
         <div class="hero-actions">
           <button class="primary-btn" @click="navigateToHouseSelection">
-            开始找房
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            Start Finding
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
           </button>
           <button class="secondary-btn" @click="navigateToSmartMatching">
-            智能匹配
+            AI Matching
           </button>
         </div>
       </div>
       <div class="hero-background">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
+        <!-- Industrial Grid Background -->
+        <div class="grid-line horizontal" v-for="i in 20" :key="`h-${i}`" :style="{ top: `${i * 5}%` }"></div>
+        <div class="grid-line vertical" v-for="i in 20" :key="`v-${i}`" :style="{ left: `${i * 5}%` }"></div>
       </div>
     </header>
 
@@ -148,61 +148,61 @@ const formatDate = (dateString) => {
     <main class="main-content">
       <!-- 特性卡片 -->
       <section class="features-section">
-        <h2 class="section-title">核心功能</h2>
+        <h2 class="section-title">CORE FEATURES</h2>
         <div class="features-grid">
           <div class="feature-card" @click="navigateToHouseSelection">
             <div class="card-icon vr-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h20"></path><path d="M2 12l5-5"></path><path d="M22 12l-5-5"></path><path d="M12 7v10"></path></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><path d="M2 12h20"></path><path d="M2 12l5-5"></path><path d="M22 12l-5-5"></path><path d="M12 7v10"></path></svg>
             </div>
-            <h3>VR漫游看房</h3>
-            <p>体验沉浸式的房屋漫游功能，支持360度全景浏览和场景切换</p>
-            <span class="link-text">立即体验 <span class="arrow">→</span></span>
+            <h3>VR Tour</h3>
+            <p>全景漫游 / 沉浸式体验 / 360度浏览</p>
+            <span class="link-text">EXPLORE <span class="arrow">→</span></span>
           </div>
           
           <div class="feature-card" @click="navigateToSmartMatching">
             <div class="card-icon match-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="14.31" y1="8" x2="20.05" y2="17.94"></line><line x1="9.69" y1="8" x2="21.17" y2="8"></line><line x1="7.38" y1="12" x2="13.12" y2="2.06"></line><line x1="9.69" y1="16" x2="3.95" y2="6.06"></line><line x1="14.31" y1="16" x2="2.83" y2="16"></line><line x1="16.62" y1="12" x2="10.88" y2="21.94"></line></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><circle cx="12" cy="12" r="10"></circle><line x1="14.31" y1="8" x2="20.05" y2="17.94"></line><line x1="9.69" y1="8" x2="21.17" y2="8"></line><line x1="7.38" y1="12" x2="13.12" y2="2.06"></line><line x1="9.69" y1="16" x2="3.95" y2="6.06"></line><line x1="14.31" y1="16" x2="2.83" y2="16"></line><line x1="16.62" y1="12" x2="10.88" y2="21.94"></line></svg>
             </div>
-            <h3>智能匹配</h3>
-            <p>根据您的偏好和预算，智能推荐最适合的房源</p>
-            <span class="link-text">开始匹配 <span class="arrow">→</span></span>
+            <h3>Smart Match</h3>
+            <p>智能算法 / 偏好分析 / 精准推荐</p>
+            <span class="link-text">START <span class="arrow">→</span></span>
           </div>
           
           <div class="feature-card" @click="navigateToMyAppointments">
             <div class="card-icon safe-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><rect x="3" y="11" width="18" height="11" rx="0" ry="0"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
             </div>
-            <h3>安全保障</h3>
-            <p>严格的房源审核机制，确保每一笔交易的安全可靠</p>
-            <span class="link-text">查看预约 <span class="arrow">→</span></span>
+            <h3>Security</h3>
+            <p>实名认证 / 交易担保 / 隐私保护</p>
+            <span class="link-text">CHECK <span class="arrow">→</span></span>
           </div>
           
           <div class="feature-card" @click="navigateToMaintenance">
             <div class="card-icon fix-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
             </div>
-            <h3>维修处理</h3>
-            <p>房屋维修服务，快速响应您的维修需求</p>
-            <span class="link-text">申请维修 <span class="arrow">→</span></span>
+            <h3>Maintenance</h3>
+            <p>在线报修 / 进度追踪 / 快速响应</p>
+            <span class="link-text">APPLY <span class="arrow">→</span></span>
           </div>
           
           <div class="feature-card" @click="navigateToCommunity">
             <div class="card-icon community-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
             </div>
-            <h3>社区交流</h3>
-            <p>与邻居交流，分享生活点滴，建立社区联系</p>
-            <span class="link-text">进入社区 <span class="arrow">→</span></span>
+            <h3>Community</h3>
+            <p>邻里互动 / 经验分享 / 活动组织</p>
+            <span class="link-text">JOIN <span class="arrow">→</span></span>
           </div>
 
 
           <div class="feature-card" @click="navigateToVirtualWorld">
             <div class="card-icon virtual-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><rect x="2" y="3" width="20" height="14" rx="0" ry="0"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
             </div>
-            <h3>交互方块</h3>
-            <p>探索全息交互的未来实验场，体验多维空间</p>
-            <span class="link-text">进入方块 <span class="arrow">→</span></span>
+            <h3>The Cube</h3>
+            <p>未来实验 / 全息交互 / 多维空间</p>
+            <span class="link-text">ENTER <span class="arrow">→</span></span>
           </div>
         </div>
       </section>
@@ -210,8 +210,8 @@ const formatDate = (dateString) => {
       <!-- 预约信息概览 (仅登录显示) -->
       <section v-if="isLoggedIn && appointments.length > 0" class="appointments-section">
         <div class="section-header">
-          <h2 class="section-title">我的预约</h2>
-          <button class="view-all-btn" @click="navigateToMyAppointments">查看全部</button>
+          <h2 class="section-title">APPOINTMENTS</h2>
+          <button class="view-all-btn" @click="navigateToMyAppointments">VIEW ALL</button>
         </div>
         
         <div class="appointments-list">
@@ -224,7 +224,7 @@ const formatDate = (dateString) => {
               <div class="apt-type">{{ getAppointmentTypeText(apt.type) }}</div>
             </div>
             <div class="apt-action">
-              <button class="detail-btn" @click="navigateToMyAppointments">详情</button>
+              <button class="detail-btn" @click="navigateToMyAppointments">DETAIL</button>
             </div>
           </div>
         </div>
@@ -239,11 +239,12 @@ const formatDate = (dateString) => {
 </template>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 .home-container {
   min-height: 100vh;
-  background-color: #f8f9fa;
+  background-color: #FFFFFF; /* Pure White */
+  color: #111827; /* Near Black */
   font-family: 'Inter', sans-serif;
   overflow-x: hidden;
 }
@@ -254,390 +255,343 @@ const formatDate = (dateString) => {
   top: 0;
   left: 0;
   right: 0;
-  height: 80px;
+  height: 64px; /* More compact */
   z-index: 1000;
-  transition: all 0.3s ease;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(0,0,0,0.05);
-}
-
-.navbar.scrolled {
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  background: white;
+  border-bottom: 1px solid #E5E7EB; /* Simple border */
 }
 
 .nav-content {
-  max-width: 1200px;
+  max-width: 1400px; /* Wider container */
   margin: 0 auto;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 2rem;
-}
-
-.logo-container {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.nav-logo-canvas {
-  height: 50px;
-  width: auto;
+  padding: 0 24px;
 }
 
 .logo-text {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #111827;
   letter-spacing: -0.5px;
+  text-transform: uppercase;
 }
 
-.nav-links-container {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-.login-btn {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-  border: none;
-  padding: 0.75rem 2rem;
-  border-radius: 50px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-}
-
-.login-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-}
-
-/* Hero Section */
+/* Hero Section - Industrial */
 .hero-section {
   position: relative;
-  min-height: 90vh;
+  min-height: 80vh;
   display: flex;
   align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 8rem 2rem 4rem;
-  overflow: hidden;
+  justify-content: flex-start; /* Left Align */
+  text-align: left;
+  padding: 0 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  border-left: 1px solid #F3F4F6;
+  border-right: 1px solid #F3F4F6;
 }
 
 .hero-content {
   position: relative;
   z-index: 2;
-  max-width: 800px;
-  animation: fadeUp 1s ease-out;
+  max-width: 600px;
+  padding-left: 48px; /* Offset from border */
 }
 
 .hero-title {
-  font-size: 4.5rem;
+  font-size: 5rem;
   font-weight: 800;
-  line-height: 1.1;
-  margin-bottom: 1.5rem;
-  background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  letter-spacing: -1px;
+  line-height: 0.9;
+  margin-bottom: 2rem;
+  color: #111827;
+  letter-spacing: -3px;
+  text-transform: uppercase;
 }
 
 .hero-subtitle {
-  font-size: 1.5rem;
-  color: #666;
+  font-size: 1.1rem;
+  color: #6B7280;
   margin-bottom: 3rem;
-  font-weight: 300;
+  font-weight: 400;
+  font-family: 'JetBrains Mono', monospace;
+  max-width: 400px;
+  border-left: 2px solid #2563EB;
+  padding-left: 16px;
 }
 
 .hero-actions {
   display: flex;
-  gap: 1.5rem;
-  justify-content: center;
+  gap: 16px;
 }
 
 .primary-btn {
-  background: #2c3e50;
+  background: #111827; /* Black */
   color: white;
-  border: none;
-  padding: 1rem 2.5rem;
-  border-radius: 50px;
-  font-size: 1.1rem;
+  border: 1px solid #111827;
+  padding: 12px 32px;
+  border-radius: 0; /* Square */
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  transition: all 0.3s ease;
+  gap: 8px;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .primary-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 20px rgba(44, 62, 80, 0.2);
+  background: white;
+  color: #111827;
 }
 
 .secondary-btn {
   background: white;
-  color: #2c3e50;
-  border: 2px solid #2c3e50;
-  padding: 1rem 2.5rem;
-  border-radius: 50px;
-  font-size: 1.1rem;
+  color: #111827;
+  border: 1px solid #E5E7EB;
+  padding: 12px 32px;
+  border-radius: 0; /* Square */
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .secondary-btn:hover {
-  background: #f8f9fa;
-  transform: translateY(-3px);
+  border-color: #111827;
 }
 
-/* Background Blobs */
+/* Industrial Grid Background */
 .hero-background {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  top: 0; left: 0; right: 0; bottom: 0;
   z-index: 1;
-  overflow: hidden;
-}
-
-.blob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
+  pointer-events: none;
   opacity: 0.4;
-  animation: float 20s infinite ease-in-out;
 }
 
-.blob-1 {
-  width: 500px;
-  height: 500px;
-  background: #667eea;
-  top: -100px;
-  left: -100px;
-  animation-delay: 0s;
+.grid-line {
+  position: absolute;
+  background: #E5E7EB;
 }
 
-.blob-2 {
-  width: 400px;
-  height: 400px;
-  background: #764ba2;
-  bottom: -50px;
-  right: -50px;
-  animation-delay: -5s;
+.grid-line.horizontal {
+  left: 0; right: 0; height: 1px;
 }
 
-.blob-3 {
-  width: 300px;
-  height: 300px;
-  background: #4facfe;
-  top: 40%;
-  left: 60%;
-  animation-delay: -10s;
+.grid-line.vertical {
+  top: 0; bottom: 0; width: 1px;
 }
 
 /* Features Section */
 .main-content {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 4rem 2rem;
-  position: relative;
-  z-index: 2;
+  border-left: 1px solid #F3F4F6;
+  border-right: 1px solid #F3F4F6;
+}
+
+.features-section {
+  padding: 80px 24px;
+  border-top: 1px solid #E5E7EB;
 }
 
 .section-title {
-  font-size: 2rem;
+  font-size: 1rem;
   font-weight: 700;
-  color: #2c3e50;
-  margin-bottom: 3rem;
-  text-align: center;
-  position: relative;
+  color: #9CA3AF;
+  margin-bottom: 48px;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
-.section-title::after {
-  content: '';
-  display: block;
-  width: 60px;
-  height: 4px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  margin: 1rem auto 0;
-  border-radius: 2px;
-}
+.section-title::after { display: none; }
 
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(3, 1fr); /* Strict 3-col grid */
+  gap: 0; /* Minimal gap for border overlap effect */
+  border: 1px solid #E5E7EB;
 }
 
 .feature-card {
   background: white;
-  padding: 2.5rem;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  padding: 48px;
+  border-radius: 0;
+  box-shadow: none;
+  transition: all 0.2s;
   cursor: pointer;
-  border: 1px solid rgba(0,0,0,0.05);
+  border: 1px solid #E5E7EB; /* Grid borders */
+  margin: -1px 0 0 -1px; /* Overlap borders */
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  min-height: 300px;
 }
 
 .feature-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  transform: none;
+  border-color: #111827;
+  z-index: 10;
+  background: #F9FAFB;
 }
 
 .card-icon {
-  width: 60px;
-  height: 60px;
-  border-radius: 16px;
+  width: 48px;
+  height: 48px;
+  border-radius: 0; /* Square */
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1.5rem;
-  color: white;
+  margin-bottom: 24px;
+  color: #111827;
+  background: transparent !important; /* Override gradients */
+  border: 1px solid #E5E7EB;
 }
 
-.card-icon svg {
-  width: 30px;
-  height: 30px;
-}
-
-.vr-icon { background: linear-gradient(135deg, #667eea, #764ba2); }
-.match-icon { background: linear-gradient(135deg, #FF9A9E, #FECFEF); }
-.safe-icon { background: linear-gradient(135deg, #a18cd1, #fbc2eb); }
-.fix-icon { background: linear-gradient(135deg, #84fab0, #8fd3f4); }
-.community-icon { background: linear-gradient(135deg, #fccb90, #d57eeb); }
-.virtual-icon { background: linear-gradient(135deg, #00f2ff, #007bff); }
+.card-icon svg { width: 24px; height: 24px; stroke-width: 1.5; }
 
 .feature-card h3 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #2c3e50;
-  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
 }
 
 .feature-card p {
-  color: #666;
+  color: #6B7280;
   line-height: 1.6;
-  margin-bottom: 2rem;
-  flex-grow: 1;
+  margin-bottom: 32px;
+  font-size: 0.95rem;
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .link-text {
-  color: #667eea;
-  font-weight: 600;
+  color: #2563EB; /* Industrial Blue */
+  font-weight: 700;
+  font-size: 0.8rem;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  transition: gap 0.3s ease;
+  gap: 8px;
+  transition: gap 0.2s ease;
+  margin-top: auto;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-.feature-card:hover .link-text {
-  gap: 1rem;
-}
+.feature-card:hover .link-text { gap: 12px; }
 
 /* Appointments Section */
 .appointments-section {
-  margin-top: 6rem;
+  margin-top: 0;
   background: white;
-  border-radius: 20px;
-  padding: 2rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  border-radius: 0;
+  padding: 80px 24px;
+  box-shadow: none;
+  border-top: 1px solid #E5E7EB;
 }
 
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 48px;
 }
 
-.section-header .section-title {
-  margin: 0;
-  text-align: left;
-}
-
-.section-header .section-title::after {
-  display: none;
-}
+.section-header .section-title { margin: 0; }
 
 .view-all-btn {
-  color: #667eea;
+  color: #111827;
   background: none;
-  border: none;
+  border: 1px solid #E5E7EB;
+  padding: 8px 24px;
   font-weight: 600;
+  font-size: 0.8rem;
   cursor: pointer;
+  border-radius: 0;
+  transition: all 0.2s;
+}
+
+.view-all-btn:hover {
+  background: #111827;
+  color: white;
 }
 
 .appointments-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
 }
 
 .appointment-card {
-  background: #f8f9fa;
-  padding: 1.5rem;
-  border-radius: 12px;
-  border: 1px solid #e9ecef;
-  transition: all 0.3s ease;
+  background: white;
+  padding: 32px;
+  border-radius: 0;
+  border: 1px solid #E5E7EB;
+  transition: all 0.2s ease;
 }
 
 .appointment-card:hover {
   background: white;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  border-color: #111827;
+  box-shadow: none;
 }
 
 .apt-status {
   display: inline-block;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
+  padding: 4px 12px;
+  border-radius: 0;
+  font-size: 0.75rem;
   font-weight: 600;
-  margin-bottom: 1rem;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+  font-family: 'JetBrains Mono', monospace;
 }
 
-.apt-info {
-  margin-bottom: 1rem;
-}
+.status-pending { color: #D97706; border-color: #D97706; background: transparent; }
+.status-confirmed { color: #2563EB; border-color: #2563EB; background: transparent; }
+.status-completed { color: #059669; border: 1px solid #059669; background: transparent; }
+.status-cancelled { color: #9CA3AF; border-color: #E5E7EB; background: transparent; text-decoration: line-through; }
+
+.apt-info { margin-bottom: 24px; }
 
 .apt-time {
-  font-weight: 600;
-  color: #2c3e50;
-  margin-bottom: 0.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 4px;
+  font-family: 'JetBrains Mono', monospace;
 }
 
-.apt-type {
-  font-size: 0.9rem;
-  color: #666;
-}
+.apt-type { font-size: 0.85rem; color: #6B7280; }
 
 .detail-btn {
   width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #e0e0e0;
+  padding: 12px;
+  border: 1px solid #111827;
   background: white;
-  border-radius: 6px;
+  border-radius: 0;
   cursor: pointer;
   transition: all 0.2s;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
 }
 
 .detail-btn:hover {
-  background: #f8f9fa;
-  border-color: #ccc;
+  background: #111827;
+  color: white;
 }
+
 
 /* User Menu Styles (Updated) */
 .user-info-container {
