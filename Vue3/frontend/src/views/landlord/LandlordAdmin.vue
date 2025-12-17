@@ -307,15 +307,23 @@ const loadPendingMaintenance = async () => {
 const pendingAppointments = ref([])
 
 // 加载待确认预约
+// 加载待确认及已确认预约 (用于预租计数)
 const loadPendingAppointments = async () => {
   if (!userPhone.value) return
   try {
-    const res = await axios.get(`${API_BASE_URL}/viewing-appointment/landlord/${userPhone.value}/status/0`)
-    if (res.data.success) {
-      pendingAppointments.value = res.data.appointments || []
+    const res0 = await axios.get(`${API_BASE_URL}/viewing-appointment/landlord/${userPhone.value}/status/0`)
+    const res1 = await axios.get(`${API_BASE_URL}/viewing-appointment/landlord/${userPhone.value}/status/1`)
+    
+    let appointments = []
+    if (res0.data.success) {
+      appointments = [...appointments, ...(res0.data.appointments || [])]
     }
+    if (res1.data.success) {
+      appointments = [...appointments, ...(res1.data.appointments || [])]
+    }
+    pendingAppointments.value = appointments
   } catch (e) {
-    console.error('加载待确认预约失败:', e)
+    console.error('加载预约数据失败:', e)
   }
 }
 
@@ -396,7 +404,7 @@ const loadStatistics = async () => {
 
     const response = await axios.get(`${API_BASE_URL}/landlord/statistics?landlordPhone=${userPhone.value}`)
     if (response.data.success) {
-      statistics.value = response.data.statistics
+      statistics.value = response.data.data || response.data.statistics || {}
     } else {
       console.error('获取统计数据失败:', response.data.message)
       // 使用默认数据
@@ -465,7 +473,8 @@ const loadMyHouses = async () => {
   try {
     const response = await axios.get(`${API_BASE_URL}/landlord/houses?landlordPhone=${userPhone.value}`)
     if (response.data.success) {
-      myHouses.value = response.data.houses || []
+      // 兼容多种 API 返回格式
+      myHouses.value = response.data.data || response.data.houses || response.data.rooms || []
     } else {
       console.error('获取房屋列表失败:', response.data.message)
     }

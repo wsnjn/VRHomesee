@@ -351,168 +351,49 @@ defineExpose({ resetForm })
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
-  padding: 1rem 1.5rem;
+  margin-bottom: 16px; /* Compact margin */
+  padding: 12px 16px; /* Compact padding */
   background-color: #1e3a5f;
-  border-radius: 8px;
+  border-radius: 0; /* Square */
 }
 
 .page-header h2 {
   margin: 0;
   color: white;
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: 1.4rem; /* Slightly smaller */
+  font-weight: 500;
 }
 
 .header-actions {
   display: flex;
-  gap: 0.75rem;
+  gap: 8px; /* Compact gap */
   align-items: center;
 }
 
-.cancel-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 500;
-  font-size: 13px;
-  transition: background-color 0.2s ease;
-  background-color: #e74c3c;
-  color: white;
-}
-
-.cancel-btn:hover {
-  background-color: #c0392b;
-}
-
-.form-container {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(79, 156, 232, 0.15);
-  overflow: hidden;
-  border: 1px solid rgba(179, 208, 253, 0.2);
-}
-
-.house-form {
-  padding: 1.25rem;
-}
-
-.form-section {
-  margin-bottom: 1.25rem;
-  padding-bottom: 1.25rem;
-  border-bottom: 1px solid rgba(179, 208, 253, 0.2);
-}
-
-.form-section:last-child {
-  border-bottom: none;
-  margin-bottom: 0;
-}
-
-.form-section h3 {
-  margin: 0 0 0.875rem 0;
-  color: #2c3e50;
-  font-size: 1.1rem;
-  font-weight: 600;
-  padding-left: 0.5rem;
-  border-left: 3px solid rgb(179, 208, 253);
-}
-
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 0.875rem;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.form-group.full-width {
-  grid-column: 1 / -1;
-}
-
-.form-group label {
-  margin-bottom: 0.375rem;
-  color: #2c3e50;
-  font-weight: 500;
-  font-size: 0.8rem;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #e9ecef;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  transition: all 0.2s;
-  background: white;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: rgb(179, 208, 253);
-  box-shadow: 0 0 0 2px rgba(179, 208, 253, 0.15);
-}
-
-.form-group input::placeholder,
-.form-group textarea::placeholder {
-  color: #9ca3af;
-  font-size: 0.8rem;
-}
-
-.form-group textarea {
-  resize: vertical;
-  min-height: 60px;
-  font-family: inherit;
-}
-
-/* 必填字段标记 */
-.form-group label:after {
-  content: ' *';
-  color: #dc3545;
-}
-
-/* 表单操作按钮 */
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid rgba(179, 208, 253, 0.2);
-}
-
+/* Common Button Styles */
 .cancel-btn,
 .submit-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.375rem;
-  padding: 0.5rem 1.25rem;
+  gap: 6px;
+  padding: 6px 12px; /* Compact button */
   border: none;
-  border-radius: 4px;
+  border-radius: 0; /* Square */
   font-weight: 500;
   font-size: 13px;
   cursor: pointer;
   transition: background-color 0.2s ease;
-  min-width: 100px;
+  min-width: 80px; /* Reduced width */
 }
 
 .cancel-btn {
-  background-color: #e74c3c;
+  background-color: #c0392b; /* Slightly darker red */
   color: white;
 }
 
 .cancel-btn:hover {
-  background-color: #c0392b;
+  background-color: #a93226;
 }
 
 .submit-btn {
@@ -530,21 +411,122 @@ defineExpose({ resetForm })
   opacity: 0.7;
 }
 
+.form-container {
+  background: white;
+  border-radius: 0; /* Square */
+  box-shadow: none; /* Flat */
+  border: 1px solid #ddd;
+}
+
+.house-form {
+  padding: 16px; /* Compact padding */
+}
+
+.form-section {
+  margin-bottom: 16px; /* Compact margin */
+  padding-bottom: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.form-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.form-section h3 {
+  margin: 0 0 12px 0; /* Compact margin */
+  color: #333;
+  font-size: 1rem; /* Smaller font */
+  font-weight: 600;
+  padding-left: 8px;
+  border-left: 3px solid #1e3a5f; /* Industrial Blue Accent */
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 8px 16px; /* Compact Gap: 8px vertical, 16px horizontal */
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  margin-bottom: 4px; /* Compact */
+  color: #555;
+  font-weight: 500;
+  font-size: 12px; /* Smaller label */
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 8px; /* Compact input */
+  border: 1px solid #ccc;
+  border-radius: 0; /* Square */
+  font-size: 13px; /* Smaller text */
+  transition: all 0.2s;
+  background: white;
+  color: #333;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #1e3a5f; /* Sharp Focus */
+  box-shadow: none; /* No Glow */
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #999;
+  font-size: 12px;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 60px; /* Reduced min-height */
+  font-family: inherit;
+}
+
+/* 必填字段标记 */
+.form-group label:after {
+  content: ' *';
+  color: #e74c3c;
+}
+
+/* 表单操作按钮 */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px; /* Compact margin */
+  padding-top: 16px;
+  border-top: 1px solid #eee;
+}
+
 /* 响应式设计 */
 @media (max-width: 768px) {
   .house-form {
-    padding: 1.5rem;
+    padding: 12px;
   }
   
   .form-grid {
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: 12px;
   }
   
   .page-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 1rem;
+    gap: 10px;
   }
   
   .header-actions {
@@ -559,25 +541,6 @@ defineExpose({ resetForm })
   .cancel-btn,
   .submit-btn {
     width: 100%;
-  }
-}
-
-@media (max-width: 480px) {
-  .house-form {
-    padding: 1rem;
-  }
-  
-  .form-section {
-    margin-bottom: 2rem;
-    padding-bottom: 1.5rem;
-  }
-  
-  .form-section h3 {
-    font-size: 1.3rem;
-  }
-  
-  .page-header h2 {
-    font-size: 1.6rem;
   }
 }
 </style>

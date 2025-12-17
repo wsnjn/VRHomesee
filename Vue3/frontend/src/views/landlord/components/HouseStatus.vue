@@ -3,6 +3,16 @@
     <div class="page-header">
       <h2>我的房屋</h2>
       <div class="header-actions">
+        <!-- 租赁类型筛选器 -->
+        <div class="rental-type-filter">
+          <select v-model="filterRentalType">
+            <option value="">全部类型</option>
+            <option value="0">整租</option>
+            <option value="1">合租</option>
+            <option value="2">单间</option>
+          </select>
+        </div>
+
         <!-- 状态筛选器 -->
         <div class="status-filter-tabs">
           <button 
@@ -357,8 +367,8 @@
       </div>
     </div>
 
-    <!-- 房屋列表表格 -->
-    <div class="houses-table-container">
+    <!-- 房屋列表 (Admin Style) -->
+    <div class="house-list-container">
       <div v-if="loadingHouses" class="loading">加载中...</div>
       
       <div v-else-if="myHouses.length === 0" class="no-houses">
@@ -370,103 +380,90 @@
         </div>
       </div>
 
-      <div v-else class="houses-table">
+      <div v-else class="house-list">
         <!-- 搜索结果提示 -->
         <div v-if="searchQuery && filteredHouses.length === 0" class="search-no-results">
-          <div class="no-results-message">
-            <span class="no-results-icon">🔍</span>
-            <h4>没有找到匹配的房屋</h4>
-            <p>请尝试使用其他关键词搜索，或清空搜索框查看所有房屋</p>
-            <button @click="searchQuery = ''" class="clear-search-btn">清空搜索</button>
-          </div>
+          没有找到匹配的房屋
+          <button @click="searchQuery = ''" class="clear-search-btn">清空</button>
         </div>
         
-        <table class="houses-table-content" v-if="filteredHouses.length > 0">
-          <thead>
-            <tr>
-              <th>地址信息</th>
-              <th>房屋信息</th>
-              <th>价格信息</th>
-              <th>状态</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr 
-              v-for="house in filteredHouses" 
-              :key="house.id" 
-              class="house-row"
-              :class="getHouseStatusClass(house.status)"
+        <div class="house-row" v-for="house in filteredHouses" :key="house.id">
+          <!-- 左侧：地址盒子 -->
+          <div class="row-address">
+            <div class="addr-main">{{ getHouseFullAddress(house) }}</div>
+            <div class="addr-sub">{{ house.communityName }} · {{ getRentalTypeText(house.rentalType) }} · {{ house.roomNumber || '' }}</div>
+          </div>
+          <!-- 中间：房屋信息 -->
+          <div class="row-info">
+            <span class="info-label">面积:</span><span class="info-val">{{ house.roomArea || '-' }}㎡</span>
+            <span class="info-label">楼层:</span><span class="info-val">{{ house.floorInfo || '-' }}</span>
+            <span class="info-label">朝向:</span><span class="info-val">{{ house.orientation || '-' }}</span>
+            <span class="info-label">装修:</span><span class="info-val">{{ getDecorationText(house.decoration) }}</span>
+            <span class="info-label">电梯:</span><span class="info-val">{{ house.hasElevator === 1 ? '有' : '无' }}</span>
+          </div>
+          <!-- 价格 -->
+          <div class="row-price">
+            <div class="price-main">{{ house.rentPrice }}元/月</div>
+            <div class="price-sub">水费:{{ house.waterPrice || '-' }}元/吨</div>
+            <div class="price-sub">电费:{{ house.electricPrice || '-' }}元/度</div>
+          </div>
+          <!-- 状态 -->
+          <div class="row-status">
+            <span class="status-tag" :class="getStatusClass(house.status)">{{ getStatusText(house.status) }}</span>
+          </div>
+          <!-- 操作按钮 -->
+          <div class="row-actions">
+            <button @click="openEditHouse(house)">编辑</button>
+            <button 
+              @click="toggleHouseStatus(house)" 
+              :class="getStatusBtnClass(house.status)"
+              style="color: white;" 
             >
-              <td class="address-cell">
-                <div class="address-info">
-                  <strong>{{ getHouseFullAddress(house) }}</strong>
-                  <div class="address-details">
-                    <span v-if="house.communityName">{{ house.communityName }}</span>
-                    <span v-if="house.buildingUnit">{{ house.buildingUnit }}</span>
-                    <span v-if="house.doorNumber">{{ house.doorNumber }}</span>
-                    <span v-if="house.roomNumber">{{ house.roomNumber }}</span>
-                  </div>
+              {{ getStatusBtnText(house.status) }}
+            </button>
+            <button @click="openHouseDetail(house)">详情</button>
+            <button @click="openVrDialog(house)">VR</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VR管理对话框 -->
+    <div v-if="showVrDialogVisible" class="modal-overlay">
+      <div class="modal-content vr-dialog">
+        <div class="modal-header">
+          <h3>VR全景图管理 - {{ currentVrHouse?.communityName }}</h3>
+          <button @click="closeVrDialog" class="close-btn">×</button>
+        </div>
+        <div class="modal-body">
+           <!-- 现有场景列表 -->
+          <div class="scene-list-manage">
+            <h4>现有场景</h4>
+            <div v-if="vrScenes.length === 0" class="no-scenes">暂无VR场景</div>
+            <div v-else class="scenes-grid">
+              <div v-for="scene in vrScenes" :key="scene.id" class="scene-card">
+                <div class="scene-preview">
+                  <img :src="scene.imageUrl" :alt="scene.sceneName">
                 </div>
-              </td>
-              <td class="info-cell">
-                <div class="house-basic-info">
-                  <div class="info-item">
-                    <span class="info-label">面积：</span>
-                    <span class="info-value">{{ house.roomArea || '--' }} ㎡</span>
-                  </div>
-                  <div class="info-item">
-                    <span class="info-label">楼层：</span>
-                    <span class="info-value">{{ house.floorInfo || '--' }}</span>
-                  </div>
-                  <div class="info-item">
-                    <span class="info-label">朝向：</span>
-                    <span class="info-value">{{ house.orientation || '--' }}</span>
-                  </div>
-                  <div class="info-item">
-                    <span class="info-label">装修：</span>
-                    <span class="info-value">{{ getDecorationText(house.decoration) }}</span>
-                  </div>
-                  <div class="info-item">
-                    <span class="info-label">电梯：</span>
-                    <span class="info-value">{{ house.hasElevator === 1 ? '有' : '无' }}</span>
-                  </div>
+                <div class="scene-info">
+                  <span>{{ scene.sceneName }}</span>
+                  <button @click="deleteVrScene(scene.id)" class="delete-icon">🗑️</button>
                 </div>
-              </td>
-              <td class="price-cell">
-                <div class="price-info">
-                  <div class="main-price">
-                    <strong>{{ house.rentPrice }} 元/月</strong>
-                  <span class="rental-type" :class="'rental-type-' + house.rentalType">{{ getRentalTypeText(house.rentalType) }}</span>
-                  </div>
-                  <div class="utility-prices">
-                    <span v-if="house.waterPrice">水费: {{ house.waterPrice }}元/吨</span>
-                    <span v-if="house.electricPrice">电费: {{ house.electricPrice }}元/度</span>
-                  </div>
-                </div>
-              </td>
-              <td class="status-cell">
-                <span class="house-status" :class="getStatusClass(house.status)">
-                  {{ getStatusText(house.status) }}
-                </span>
-              </td>
-              <td class="actions-cell">
-                <div class="house-actions">
-                  <button @click="openEditHouse(house)" class="action-btn edit-btn">编辑</button>
-                  <button 
-                    @click="toggleHouseStatus(house)" 
-                    class="action-btn status-btn"
-                    :class="getStatusBtnClass(house.status)"
-                  >
-                    {{ getStatusBtnText(house.status) }}
-                  </button>
-                  <button @click="openHouseDetail(house)" class="action-btn detail-btn">详情</button>
-                  <button @click="openVrDialog(house)" class="action-btn vr-btn">VR</button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+              </div>
+            </div>
+          </div>
+          <!-- 上传新场景 -->
+          <div class="upload-section">
+            <h4>上传新场景</h4>
+            <div class="upload-form">
+              <input v-model="newSceneName" type="text" placeholder="场景名称 (如: 客厅)" class="scene-name-input" />
+              <input type="file" @change="handleVrFileSelect" accept="image/*" class="vr-file-input" />
+              <button @click="uploadVrScene" :disabled="!newSceneName || !selectedFile || uploadingVr" class="upload-btn">
+                {{ uploadingVr ? '上传中...' : '上传' }}
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -679,63 +676,6 @@
         </div>
       </div>
     </div>
-
-    <!-- VR全景图管理对话框 -->
-    <div v-if="showVrDialog" class="modal-overlay">
-      <div class="modal-content vr-dialog">
-        <div class="modal-header">
-          <h3>VR全景图管理 - {{ currentVrHouse?.communityName }}</h3>
-          <button @click="closeVrDialog" class="close-btn">×</button>
-        </div>
-        <div class="modal-body">
-          <!-- 现有场景列表 -->
-          <div class="vr-scene-list">
-            <h4>现有场景</h4>
-            <div v-if="vrScenes.length === 0" class="no-scenes">暂无VR场景</div>
-            <div v-else class="scenes-grid">
-              <div v-for="scene in vrScenes" :key="scene.id" class="scene-card">
-                <div class="scene-preview">
-                  <img :src="scene.imageUrl" :alt="scene.sceneName">
-                </div>
-                <div class="scene-info">
-                  <span>{{ scene.sceneName }}</span>
-                  <button @click="deleteVrScene(scene.id)" class="delete-scene-btn">🗑️</button>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- 上传新场景 -->
-          <div class="vr-upload-section">
-            <h4>上传新场景</h4>
-            <div class="upload-form">
-              <input 
-                type="text" 
-                v-model="newSceneName" 
-                placeholder="场景名称（如：客厅、卧室）" 
-                class="scene-name-input"
-              >
-              <input 
-                type="file" 
-                @change="handleVrFileSelect" 
-                accept="image/*" 
-                class="file-input"
-              >
-              <button 
-                @click="uploadVrScene" 
-                class="upload-btn"
-                :disabled="vrUploading || !newSceneName || !vrSelectedFile"
-              >
-                {{ vrUploading ? '上传中...' : '上传' }}
-              </button>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button @click="closeVrDialog" class="confirm-btn">完成</button>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -780,16 +720,9 @@ const showEditHouse = ref(false)
 const editingHouse = ref(null)
 const updatingHouse = ref(false)
 
-// VR 相关状态
-const showVrDialog = ref(false)
-const currentVrHouse = ref(null)
-const vrScenes = ref([])
-const newSceneName = ref('')
-const vrSelectedFile = ref(null)
-const vrUploading = ref(false)
-
 // 状态筛选
 const selectedStatus = ref('')
+const filterRentalType = ref('')
 
 // 状态计数（允许重叠：一个房屋可能同时属于多个状态）
 const statusCounts = computed(() => {
@@ -826,7 +759,7 @@ const statusCounts = computed(() => {
     if (rentedRoomIds.has(house.id)) {
       rented++
     }
-    // 预租：有待确认预约
+    // 预租：有待确认或已确认预约
     if (preRentRoomIds.has(house.id)) {
       preRent++
     }
@@ -858,6 +791,11 @@ const matchesStatus = (house, statusType) => {
 
 const filteredHouses = computed(() => {
   let houses = props.myHouses
+  
+  // 再按搜索关键词筛选
+  if (filterRentalType.value !== '') {
+    houses = houses.filter(h => h.rentalType === parseInt(filterRentalType.value))
+  }
   
   // 先按状态筛选（允许一个房屋匹配多个状态）
   if (selectedStatus.value !== '') {
@@ -983,94 +921,6 @@ const closeEditHouse = () => {
     hasElevator: '0',
     rentalType: '0',
     description: ''
-  }
-}
-
-// ========== VR 相关函数 ==========
-
-// 打开VR管理对话框
-const openVrDialog = async (house) => {
-  currentVrHouse.value = house
-  showVrDialog.value = true
-  await loadVrScenes(house.id)
-}
-
-// 关闭VR对话框
-const closeVrDialog = () => {
-  showVrDialog.value = false
-  currentVrHouse.value = null
-  vrScenes.value = []
-  newSceneName.value = ''
-  vrSelectedFile.value = null
-}
-
-// 加载VR场景列表
-const loadVrScenes = async (roomId) => {
-  try {
-    const response = await axios.get(`${API_BASE_URL}/vr-scenes/${roomId}`)
-    if (response.data.success) {
-      vrScenes.value = response.data.data || []
-    }
-  } catch (error) {
-    console.error('加载VR场景失败:', error)
-  }
-}
-
-// 选择VR全景图文件
-const handleVrFileSelect = (event) => {
-  vrSelectedFile.value = event.target.files[0]
-}
-
-// 上传VR场景
-const uploadVrScene = async () => {
-  if (!currentVrHouse.value || !newSceneName.value || !vrSelectedFile.value) return
-  
-  vrUploading.value = true
-  const formData = new FormData()
-  formData.append('roomId', currentVrHouse.value.id)
-  formData.append('sceneName', newSceneName.value)
-  formData.append('file', vrSelectedFile.value)
-  
-  try {
-    const response = await axios.post(`${API_BASE_URL}/vr-scenes/upload`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    })
-    
-    if (response.data.success) {
-      alert('VR场景上传成功')
-      newSceneName.value = ''
-      vrSelectedFile.value = null
-      // 清空文件输入
-      const fileInput = document.querySelector('.vr-dialog .file-input')
-      if (fileInput) fileInput.value = ''
-      
-      await loadVrScenes(currentVrHouse.value.id)
-    } else {
-      alert('上传失败: ' + response.data.message)
-    }
-  } catch (error) {
-    console.error('上传VR场景失败:', error)
-    alert('上传失败')
-  } finally {
-    vrUploading.value = false
-  }
-}
-
-// 删除VR场景
-const deleteVrScene = async (sceneId) => {
-  if (!confirm('确定删除该VR场景吗？')) return
-  
-  try {
-    const response = await axios.delete(`${API_BASE_URL}/vr-scenes/${sceneId}`)
-    if (response.data.success) {
-      await loadVrScenes(currentVrHouse.value.id)
-    } else {
-      alert('删除失败')
-    }
-  } catch (error) {
-    console.error('删除VR场景失败:', error)
   }
 }
 
@@ -1203,9 +1053,9 @@ const getRentalTypeText = (rentalType) => {
 // 获取状态按钮文本
 const getStatusBtnText = (status) => {
   const textMap = {
-    0: '下架',
+    0: '设为已租',
     1: '设为可租',
-    2: '上架',
+    2: '设为可租',
     3: '设为可租'
   }
   return textMap[status] || '操作'
@@ -1214,9 +1064,9 @@ const getStatusBtnText = (status) => {
 // 获取状态按钮样式类
 const getStatusBtnClass = (status) => {
   const classMap = {
-    0: 'btn-offline',
-    1: 'btn-available',
-    2: 'btn-online',
+    0: 'btn-offline', // Redish for toggling away
+    1: 'btn-available', // Green for setting available
+    2: 'btn-available',
     3: 'btn-available'
   }
   return classMap[status] || 'btn-default'
@@ -1231,8 +1081,8 @@ const toggleHouseStatus = async (house) => {
   
   // 根据当前状态确定新状态
   switch (currentStatus) {
-    case 0: // 可租 -> 下架
-      newStatus = 2
+    case 0: // 可租 -> 已租 (Admin Logic: Set as Rented)
+      newStatus = 1
       break
     case 1: // 已租 -> 可租
       newStatus = 0
@@ -1262,6 +1112,92 @@ const toggleHouseStatus = async (house) => {
   } catch (error) {
     console.error('更新房屋状态失败:', error)
     alert('更新房屋状态失败，请稍后重试')
+  }
+}
+
+// VR 相关逻辑
+const showVrDialogVisible = ref(false)
+const vrScenes = ref([])
+const currentVrHouse = ref(null)
+const newSceneName = ref('')
+const selectedFile = ref(null)
+const uploadingVr = ref(false)
+
+const openVrDialog = async (house) => {
+  currentVrHouse.value = house
+  showVrDialogVisible.value = true
+  await loadVrScenes(house.id)
+}
+
+const closeVrDialog = () => {
+  showVrDialogVisible.value = false
+  currentVrHouse.value = null
+  vrScenes.value = []
+  newSceneName.value = ''
+  selectedFile.value = null
+}
+
+const loadVrScenes = async (roomId) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/vr-scenes/${roomId}`)
+    if (response.data.success) {
+       vrScenes.value = response.data.data
+    }
+  } catch (error) {
+    console.error('Load scenes failed:', error)
+  }
+}
+
+const handleVrFileSelect = (event) => {
+  selectedFile.value = event.target.files[0]
+}
+
+const uploadVrScene = async () => {
+  if (!currentVrHouse.value || !newSceneName.value || !selectedFile.value) return
+  
+  uploadingVr.value = true
+  const formData = new FormData()
+  formData.append('roomId', currentVrHouse.value.id)
+  formData.append('sceneName', newSceneName.value)
+  formData.append('file', selectedFile.value)
+  try {
+    const response = await axios.post(`${API_BASE_URL}/vr-scenes/upload`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    
+    if (response.data.success) {
+      alert('上传成功')
+      newSceneName.value = ''
+      selectedFile.value = null
+      const fileInput = document.querySelector('.vr-file-input')
+      if (fileInput) fileInput.value = ''
+      
+      await loadVrScenes(currentVrHouse.value.id)
+    } else {
+       alert('上传失败: ' + response.data.message)
+    }
+  } catch (error) {
+     console.error('Upload failed:', error)
+    alert('上传失败')
+  } finally {
+    uploadingVr.value = false
+  }
+}
+
+const deleteVrScene = async (id) => {
+  if (!confirm('确定删除该场景吗？')) return
+  
+  try {
+    const response = await axios.delete(`${API_BASE_URL}/vr-scenes/${id}`)
+    if (response.data.success) {
+      await loadVrScenes(currentVrHouse.value.id)
+    } else {
+      alert('删除失败')
+    }
+  } catch (error) {
+    console.error('Delete failed:', error)
   }
 }
 
@@ -1374,6 +1310,22 @@ const formatDate = (dateString) => {
   display: flex;
   gap: 0.75rem;
   align-items: center;
+}
+
+.rental-type-filter select {
+  padding: 6px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  font-size: 13px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  cursor: pointer;
+  outline: none;
+}
+
+.rental-type-filter select option {
+  background: white;
+  color: #333;
 }
 
 /* 状态筛选标签 */
@@ -1532,351 +1484,239 @@ const formatDate = (dateString) => {
   background-color: #219a52;
 }
 
-/* 房屋列表表格样式 */
-.houses-table-container {
-  background: white;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
-  border: 1px solid #e9ecef;
+/* 房屋列表样式 (Admin Style - Personal Refined) */
+.house-list {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 0; /* Square */
 }
 
-.loading {
+/* 搜索无结果提示 */
+.search-no-results {
+  padding: 30px;
   text-align: center;
-  padding: 3rem;
-  color: #6c757d;
-  font-size: 1.1rem;
+  color: #666;
+  font-size: 14px;
+  border-bottom: 1px solid #e5e5e5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
-.no-houses {
-  padding: 4rem 2rem;
-}
-
-.empty-state {
-  text-align: center;
-  max-width: 400px;
-  margin: 0 auto;
-}
-
-.empty-icon {
-  font-size: 4rem;
-  display: block;
-  margin-bottom: 1rem;
-}
-
-.empty-state h3 {
-  margin: 0 0 1rem 0;
-  color: #2c3e50;
-}
-
-.empty-state p {
-  color: #6c757d;
-  margin-bottom: 2rem;
-}
-
-.add-first-btn {
-  background-color: #27ae60;
-  color: white;
+.clear-search-btn {
+  color: #1e3a5f;
+  background: none;
   border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 2px;
   cursor: pointer;
-  font-weight: 600;
-  transition: background-color 0.2s;
-}
-
-.add-first-btn:hover {
-  background-color: #218838;
-}
-
-.houses-table {
-  width: 100%;
-}
-
-.houses-table-content {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.houses-table-content th {
-  background-color: #f8f9fa;
-  padding: 1rem;
-  text-align: left;
-  font-weight: 600;
-  color: #2c3e50;
-  border-bottom: 2px solid #e9ecef;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.houses-table-content td {
-  padding: 1rem;
-  border-bottom: 1px solid #f8f9fa;
-  vertical-align: top;
+  text-decoration: underline;
+  padding: 0;
+  font-size: 13px;
 }
 
 .house-row {
-  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  padding: 8px 16px; /* Compact */
+  border-bottom: 1px solid #e5e5e5;
+  font-size: 13px;
+  transition: background-color 0.2s;
 }
 
-.house-row:hover {
-  background-color: #f8f9fa;
-}
-
-.house-row:last-child td {
+.house-row:last-child {
   border-bottom: none;
 }
 
-/* 房屋状态行样式 */
-.house-available {
-  border-left: 4px solid #28a745;
+.house-row:hover {
+  background: #f9f9f9;
 }
 
-.house-rented {
-  border-left: 4px solid #dc3545;
+.row-address {
+  flex: 0 0 280px;
+  padding-right: 16px;
+  border-right: 1px solid #e5e5e5;
 }
 
-.house-offline {
-  border-left: 4px solid #6c757d;
+.addr-main {
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 4px;
+  font-size: 14px;
+  line-height: 1.4;
 }
 
-.house-pre-rent {
-  border-left: 4px solid #ffc107;
+.addr-sub {
+  font-size: 12px;
+  color: #888;
 }
 
-.house-unknown {
-  border-left: 4px solid #6c757d;
-}
-
-/* 表格单元格样式 */
-.address-cell {
-  min-width: 200px;
-}
-
-.address-info strong {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: #2c3e50;
-  font-size: 1rem;
-}
-
-.address-details {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  font-size: 0.85rem;
-  color: #6c757d;
-}
-
-.address-details span {
-  background: #f8f9fa;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-}
-
-.info-cell {
-  min-width: 200px;
-}
-
-.house-basic-info {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 4px 12px;
-}
-
-.info-item {
+.row-info {
+  flex: 1;
+  padding: 0 16px;
+  color: #666;
   display: flex;
   align-items: center;
-  font-size: 0.85rem;
-  white-space: nowrap;
+  flex-wrap: wrap;
+  gap: 8px 16px; /* Standardize gap */
 }
 
 .info-label {
-  color: #6c757d;
+  color: #999;
+  margin-right: 2px;
+}
+
+.info-val {
+  color: #333;
   font-weight: 500;
-  min-width: 40px;
 }
 
-.info-value {
-  color: #2c3e50;
+.row-price {
+  flex: 0 0 140px;
+  padding: 0 16px;
+  text-align: right;
+  border-left: 1px solid #e5e5e5;
+}
+
+.price-main {
   font-weight: 600;
-  margin-left: 4px;
+  color: #c00;
+  font-size: 15px;
+  margin-bottom: 4px;
 }
 
-.price-cell {
-  min-width: 150px;
+.price-sub {
+  font-size: 11px;
+  color: #999;
+  line-height: 1.4;
 }
 
-.price-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.main-price {
+.row-status {
+  flex: 0 0 80px;
+  padding: 0 16px;
+  text-align: center;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
 }
 
-.main-price strong {
-  color: #dc3545;
-  font-size: 1.1rem;
+.status-tag {
+  display: inline-block;
+  padding: 2px 6px; /* Compact */
+  font-size: 12px;
+  border-radius: 0; /* Square */
+  white-space: nowrap;
 }
 
-.rental-type {
-  padding: 0.25rem 0.5rem;
-  border-radius: 2px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  box-shadow: none;
-  transition: all 0.2s ease;
+/* 状态标签颜色 */
+.status-available { background: #d4edda; color: #155724; }
+.status-rented { background: #f8d7da; color: #721c24; }
+.status-offline { background: #e2e3e5; color: #383d41; }
+.status-pre-rent { background: #fff3cd; color: #856404; }
+.status-unknown { background: #e2e3e5; color: #383d41; }
+
+.row-actions {
+  flex: 0 0 auto;
+  padding-left: 16px;
+  display: flex;
+  gap: 8px; /* Standardize gap */
 }
 
-.rental-type-0 {
-  background-color: #1e3a5f;
-  color: white;
+.row-actions button {
+  padding: 4px 10px;
+  border: 1px solid #ddd;
+  background: #fff;
+  color: #333;
+  font-size: 12px;
+  border-radius: 0; /* Square */
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
 }
 
-.rental-type-1 {
+.row-actions button:hover {
+  background: #f5f5f5;
+  border-color: #ccc;
+  color: #000;
+}
+
+/* 特定按钮样式覆盖 */
+.row-actions button.btn-available {
   background-color: #27ae60;
   color: white;
+  border-color: #27ae60;
+}
+.row-actions button.btn-available:hover {
+  background-color: #219a52;
+  border-color: #219a52;
 }
 
-.rental-type-2 {
-  background-color: #e67e22;
+.row-actions button.btn-offline {
+  background-color: #dc3545;
   color: white;
+  border-color: #dc3545;
+}
+.row-actions button.btn-offline:hover {
+  background-color: #c82333;
+  border-color: #bd2130;
 }
 
-.rental-type:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+.row-actions button.btn-online {
+  background-color: #1e3a5f;
+  color: white;
+  border-color: #1e3a5f;
+}
+.row-actions button.btn-online:hover {
+  background-color: #2d5a87;
+  border-color: #2d5a87;
 }
 
-.utility-prices {
+.loading {
+  padding: 40px;
+  text-align: center;
+  color: #999;
+}
+
+.no-houses {
+  padding: 40px;
+  text-align: center;
+}
+
+.empty-state {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  font-size: 0.8rem;
-  color: #6c757d;
+  align-items: center;
+  gap: 16px;
 }
 
-.status-cell {
-  min-width: 80px;
+.empty-icon {
+  font-size: 48px;
+  opacity: 0.5;
 }
 
-.house-status {
-  padding: 0.5rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  white-space: nowrap;
-  display: inline-block;
-  text-align: center;
-  min-width: 60px;
+.empty-state h3 {
+  margin: 0;
+  color: #333;
+  font-size: 18px;
 }
 
-.status-available {
-  background-color: #d4edda;
-  color: #155724;
+.empty-state p {
+  margin: 0;
+  color: #666;
 }
 
-.status-rented {
-  background-color: #f8d7da;
-  color: #721c24;
-}
-
-.status-offline {
-  background-color: #e2e3e5;
-  color: #383d41;
-}
-
-.status-pre-rent {
-  background-color: #fff3cd;
-  color: #856404;
-}
-
-.status-unknown {
-  background-color: #e2e3e5;
-  color: #383d41;
-}
-
-.actions-cell {
-  min-width: 180px;
-}
-
-.house-actions {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.action-btn {
-  padding: 0.4rem 0.6rem;
+.add-first-btn {
+  margin-top: 10px;
+  padding: 8px 20px;
+  background-color: #27ae60;
+  color: white;
   border: none;
-  border-radius: 2px;
+  border-radius: 0; /* Square */
   cursor: pointer;
   font-weight: 500;
-  transition: background-color 0.2s ease;
-  font-size: 12px;
-  white-space: nowrap;
-  width: 60px;
-  text-align: center;
 }
 
-.edit-btn {
-  background-color: #1e3a5f;
-  color: white;
-}
-
-.edit-btn:hover {
-  background-color: #2d5a87;
-}
-
-.detail-btn {
-  background-color: #27ae60;
-  color: white;
-}
-
-.detail-btn:hover {
+.add-first-btn:hover {
   background-color: #219a52;
-}
-
-.status-btn {
-  color: white;
-}
-
-.btn-offline {
-  background-color: #e74c3c;
-}
-
-.btn-offline:hover {
-  background-color: #c0392b;
-}
-
-.btn-available {
-  background-color: #27ae60;
-}
-
-.btn-available:hover {
-  background-color: #219a52;
-}
-
-.btn-online {
-  background-color: #1e3a5f;
-}
-
-.btn-online:hover {
-  background-color: #2d5a87;
-}
-
-.btn-default {
-  background-color: #7f8c8d;
-}
-
-.btn-default:hover {
-  background-color: #636e72;
 }
 
 /* 模态框样式 */
@@ -1896,96 +1736,100 @@ const formatDate = (dateString) => {
 
 .modal-content {
   background-color: white;
-  border-radius: 8px;
+  border-radius: 0; /* Square */
   width: 100%;
   max-width: 800px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  border: 1px solid #e9ecef;
+  box-shadow: none; /* No shadow */
+  border: 1px solid #333; /* Stronger border for modal */
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid #e9ecef;
-  background-color: #1e3a5f;
-  border-radius: 8px 8px 0 0;
+  padding: 16px;
+  border-bottom: 1px solid #ddd;
+  background-color: #f9f9f9;
+  border-radius: 0; /* Square */
 }
 
 .modal-header h3 {
   margin: 0;
-  color: white;
-  font-size: 1.25rem;
-  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .close-btn {
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 4px;
-  font-size: 1.25rem;
+  border: 1px solid #ddd;
+  border-radius: 0; /* Square */
+  width: 24px;
+  height: 24px;
+  font-size: 14px;
   cursor: pointer;
-  color: white;
+  color: #888;
   padding: 0;
-  width: 28px;
-  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .close-btn:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: #f5f5f5;
+  color: #333;
 }
 
 .modal-body {
-  padding: 1.5rem;
+  padding: 16px;
 }
 
 .modal-footer {
+  padding: 16px;
+  border-top: 1px solid #ddd;
   display: flex;
-  gap: 0.75rem;
   justify-content: flex-end;
-  padding: 1rem 1.5rem;
-  border-top: 1px solid #e9ecef;
-  background-color: #f8f9fa;
+  gap: 8px;
+  background-color: transparent;
 }
 
 .cancel-btn, .confirm-btn {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
+  padding: 6px 16px;
+  border: 1px solid #ddd;
   cursor: pointer;
-  font-weight: 500;
-  font-size: 13px;
+  font-weight: 400;
+  font-size: 12px;
+  background: transparent;
+  border-radius: 0; /* Square */
   transition: background-color 0.2s ease;
 }
 
 .cancel-btn {
-  background-color: #7f8c8d;
-  color: white;
+  color: #333;
 }
 
 .cancel-btn:hover {
-  background-color: #636e72;
+  background-color: #f5f5f5;
 }
 
 .confirm-btn {
-  background-color: #27ae60;
+  background-color: #1e3a5f;
   color: white;
+  border-color: #1e3a5f;
 }
 
 .confirm-btn:hover {
-  background-color: #219a52;
+  background-color: #2d5a87;
+  border-color: #2d5a87;
 }
 
 .confirm-btn:disabled {
   background-color: #bdc3c7;
   cursor: not-allowed;
+  border-color: #bdc3c7;
 }
 
 /* 表单样式 */
@@ -1995,8 +1839,9 @@ const formatDate = (dateString) => {
 
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
 .form-group {
@@ -2009,19 +1854,20 @@ const formatDate = (dateString) => {
 }
 
 .form-group label {
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-  color: #2c3e50;
-  font-size: 0.9rem;
+  margin-bottom: 4px;
+  font-weight: 500;
+  color: #333;
+  font-size: 12px;
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
-  padding: 0.75rem;
-  border: 1px solid #e9ecef;
-  border-radius: 6px;
-  font-size: 0.9rem;
+  padding: 8px;
+  border: 1px solid #ddd;
+  font-size: 13px;
+  background: #fff;
+  border-radius: 0; /* Square */
   transition: border-color 0.3s;
 }
 
@@ -2029,13 +1875,135 @@ const formatDate = (dateString) => {
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #28a745;
-  box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.2);
+  border-color: #3A6EA5;
+  box-shadow: none;
 }
 
 .form-group textarea {
   resize: vertical;
   min-height: 80px;
+}
+
+/* VR Dialog Styles */
+.vr-dialog {
+  max-width: 700px;
+}
+
+.scene-list-manage {
+  margin-bottom: 2rem;
+}
+
+.scene-list-manage h4,
+.upload-section h4 {
+  font-size: 0.9rem;
+  color: #333;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  border-left: 3px solid #1e3a5f;
+  padding-left: 8px;
+}
+
+.scenes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 16px;
+}
+
+.scene-card {
+  border: 1px solid #eee;
+  border-radius: 0; /* Square */
+  overflow: hidden;
+  background: #f9f9f9;
+}
+
+.scene-preview {
+  height: 100px;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.scene-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.scene-info {
+  padding: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #eee;
+}
+
+.scene-info span {
+  font-size: 12px;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 90px;
+}
+
+.delete-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 4px;
+  font-size: 14px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.delete-icon:hover {
+  opacity: 1;
+}
+
+.no-scenes {
+  text-align: center;
+  padding: 2rem;
+  color: #999;
+  font-size: 0.9rem;
+  background: #fcfcfc;
+  border: 1px dashed #ddd;
+}
+
+.upload-form {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.scene-name-input {
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  font-size: 13px;
+  flex: 1;
+  border-radius: 0; /* Square */
+}
+
+.vr-file-input {
+  font-size: 12px;
+  flex: 1;
+}
+
+.upload-btn {
+  padding: 6px 16px;
+  background: #1e3a5f;
+  color: white;
+  border: none;
+  border-radius: 0; /* Square */
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.upload-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
 }
 
 /* 响应式设计 */
@@ -2077,133 +2045,5 @@ const formatDate = (dateString) => {
   .modal-footer {
     flex-direction: column;
   }
-}
-
-/* VR 按钮和对话框样式 */
-.vr-btn {
-  background-color: #9b59b6;
-  color: white;
-}
-
-.vr-btn:hover {
-  background-color: #8e44ad;
-}
-
-.vr-dialog {
-  max-width: 700px;
-}
-
-.vr-scene-list h4,
-.vr-upload-section h4 {
-  margin: 0 0 1rem 0;
-  color: #2c3e50;
-  font-size: 1rem;
-  border-bottom: 1px solid #e9ecef;
-  padding-bottom: 0.5rem;
-}
-
-.no-scenes {
-  color: #6c757d;
-  text-align: center;
-  padding: 2rem;
-  background: #f8f9fa;
-  border-radius: 4px;
-}
-
-.scenes-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.scene-card {
-  border: 1px solid #e9ecef;
-  border-radius: 4px;
-  overflow: hidden;
-  background: white;
-}
-
-.scene-preview {
-  width: 100%;
-  height: 100px;
-  overflow: hidden;
-}
-
-.scene-preview img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.scene-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem;
-  background: #f8f9fa;
-}
-
-.scene-info span {
-  font-size: 0.85rem;
-  color: #2c3e50;
-}
-
-.delete-scene-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
-  padding: 0;
-}
-
-.delete-scene-btn:hover {
-  opacity: 0.7;
-}
-
-.vr-upload-section {
-  margin-top: 1.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid #e9ecef;
-}
-
-.upload-form {
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.scene-name-input {
-  flex: 1;
-  min-width: 150px;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #e9ecef;
-  border-radius: 4px;
-  font-size: 0.9rem;
-}
-
-.file-input {
-  font-size: 0.85rem;
-}
-
-.upload-btn {
-  background-color: #1e3a5f;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 2px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: all 0.2s;
-}
-
-.upload-btn:hover:not(:disabled) {
-  background-color: #2d5a87;
-}
-
-.upload-btn:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
 }
 </style>

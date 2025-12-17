@@ -797,59 +797,61 @@ onMounted(() => {
 .my-tenants {
   padding: 0;
   font-family: 'Inter', sans-serif;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
+/* Page Header */
 .page-header {
-  margin-bottom: 2rem;
+  margin-bottom: 20px;
 }
 
 .page-header h2 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #333;
+  margin: 0 0 8px 0;
 }
 
 .page-description {
-  color: #6b7280;
+  color: #666;
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
-/* 统计信息样式 */
+/* Stats Grid */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+  gap: 16px; /* Compact */
+  margin-bottom: 20px;
 }
 
 .stat-card {
   background: white;
-  padding: 1.5rem;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e9ecef;
+  padding: 16px;
+  border-radius: 0; /* Square */
+  box-shadow: none; /* Flat */
+  border: 1px solid #ddd;
   display: flex;
   align-items: center;
-  gap: 1rem;
-  transition: transform 0.2s, box-shadow 0.2s;
+  gap: 12px;
+  transition: border-color 0.2s;
 }
 
 .stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #1e3a5f;
 }
 
 .stat-icon {
-  width: 48px;
-  height: 48px;
-  background-color: #1e3a5f;
-  border-radius: 4px;
+  width: 40px;
+  height: 40px;
+  background-color: #f0f2f5;
+  color: #1e3a5f;
+  border-radius: 0; /* Square */
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
 }
 
 .stat-content {
@@ -858,29 +860,29 @@ onMounted(() => {
 
 .stat-value {
   display: block;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #1f2937;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #333;
   line-height: 1.2;
 }
 
 .stat-label {
-  font-size: 0.85rem;
-  color: #6b7280;
+  font-size: 0.8rem;
+  color: #888;
   font-weight: 500;
 }
 
-/* 筛选区域样式 */
+/* Filter Section */
 .filter-section {
   background: white;
-  padding: 1.5rem;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  margin-bottom: 2rem;
+  padding: 12px 16px; /* Compact */
+  border-radius: 0; /* Square */
+  box-shadow: none;
+  margin-bottom: 20px;
   display: flex;
-  gap: 1.5rem;
+  gap: 12px;
   align-items: center;
-  border: 1px solid #e9ecef;
+  border: 1px solid #ddd;
 }
 
 .search-box {
@@ -892,60 +894,63 @@ onMounted(() => {
 
 .search-box svg {
   position: absolute;
-  left: 1rem;
-  color: #9ca3af;
+  left: 10px;
+  color: #999;
+  width: 16px;
+  height: 16px;
 }
 
 .search-box input {
   width: 100%;
-  padding: 0.75rem 1rem 0.75rem 2.5rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 2px;
-  font-size: 0.95rem;
+  padding: 8px 12px 8px 32px; /* Compact */
+  border: 1px solid #ddd;
+  border-radius: 0; /* Square */
+  font-size: 13px;
   transition: border-color 0.2s;
 }
 
 .search-box input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #1e3a5f;
 }
 
 .filter-controls {
   display: flex;
-  gap: 1rem;
+  gap: 8px;
 }
 
 .filter-controls select {
-  padding: 0.75rem 1rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 2px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 0; /* Square */
   background: white;
-  font-size: 0.95rem;
+  font-size: 13px;
   cursor: pointer;
-  min-width: 140px;
+  min-width: 120px;
 }
 
 .filter-controls select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #1e3a5f;
 }
 
-/* 加载状态样式 */
-.loading-section {
+/* Loading & Empty States */
+.loading-section, .empty-state {
   text-align: center;
-  padding: 4rem;
-  color: #6b7280;
+  padding: 40px;
+  color: #666;
+  border: 1px dashed #ddd; /* Engineering style */
+  background: #fcfcfc;
 }
 
 .spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid #f3f4f6;
-  border-top: 3px solid #667eea;
+  width: 30px;
+  height: 30px;
+  border: 3px solid #eee;
+  border-top: 3px solid #1e3a5f;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin: 0 auto 1rem;
+  margin: 0 auto 10px;
 }
 
 @keyframes spin {
@@ -953,251 +958,194 @@ onMounted(() => {
   100% { transform: rotate(360deg); }
 }
 
-/* 空状态样式 */
-.empty-state {
-  text-align: center;
-  padding: 4rem;
-  color: #9ca3af;
-}
-
-.empty-state svg {
-  margin-bottom: 1rem;
-}
-
-/* 租户卡片样式 */
+/* Tenant Cards */
 .tenant-cards {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 16px;
 }
 
 .tenant-card {
   background: white;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e9ecef;
-  padding: 1.5rem;
-  transition: transform 0.2s, box-shadow 0.2s;
+  border-radius: 0; /* Square */
+  box-shadow: none; /* Flat */
+  border: 1px solid #eee;
+  padding: 0; /* Reset */
+  transition: border-color 0.2s;
 }
 
 .tenant-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #1e3a5f;
 }
 
 .tenant-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 1rem;
+  padding: 12px 16px;
+  background: #f9f9f9;
+  border-bottom: 1px solid #eee;
 }
 
 .tenant-info h4 {
-  margin: 0 0 0.25rem 0;
-  font-size: 1.1rem;
+  margin: 0;
+  font-size: 0.95rem;
   font-weight: 600;
-  color: #1f2937;
+  color: #333;
 }
 
 .tenant-phone {
-  margin: 0;
-  color: #6b7280;
-  font-size: 0.9rem;
+  margin: 2px 0 0 0;
+  color: #666;
+  font-size: 0.85rem;
 }
 
 .contract-status {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  align-items: flex-end;
+  gap: 8px;
+  align-items: center;
 }
 
 .status-tag, .rent-status {
-  padding: 0.25rem 0.75rem;
-  border-radius: 2px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  white-space: nowrap;
+  padding: 2px 8px;
+  border-radius: 0; /* Square */
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid transparent; /* Ensure borders align */
 }
 
-/* 合同状态样式 */
-.status-pending { background: #fff7ed; color: #c2410c; }
-.status-signed { background: #eff6ff; color: #1d4ed8; }
-.status-active { background: #f0fdf4; color: #15803d; }
-.status-expired { background: #f3f4f6; color: #6b7280; }
-.status-terminated { background: #fef2f2; color: #dc2626; }
-.status-moved-out { background: #f3f4f6; color: #4b5563; }
+/* Status Colors (Flat) */
+.status-pending { background: #fff3cd; color: #856404; border-color: #ffeeba; }
+.status-signed { background: #d1ecf1; color: #0c5460; border-color: #bee5eb; }
+.status-active { background: #d4edda; color: #155724; border-color: #c3e6cb; }
+.status-expired { background: #e2e3e5; color: #383d41; border-color: #d6d8db; }
+.status-terminated { background: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+.status-moved-out { background: #fcfcfc; color: #666; border-color: #ddd; }
 
-/* 租金状态样式 */
-.rent-unpaid { background: #fef2f2; color: #dc2626; }
-.rent-paid { background: #f0fdf4; color: #15803d; }
-.rent-overdue { background: #fff7ed; color: #c2410c; }
-.rent-partial { background: #eff6ff; color: #1d4ed8; }
+.rent-unpaid { background: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+.rent-paid { background: #d4edda; color: #155724; border-color: #c3e6cb; }
+.rent-overdue { background: #fff3cd; color: #856404; border-color: #ffeeba; }
+.rent-partial { background: #d1ecf1; color: #0c5460; border-color: #bee5eb; }
 
-/* 房屋信息样式 */
+/* Content Sections */
+.house-info, .contract-info, .emergency-contact {
+  padding: 12px 16px;
+}
+
 .house-info {
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid #eee;
 }
 
 .house-title {
-  margin: 0 0 0.75rem 0;
-  font-size: 1rem;
+  margin: 0 0 8px 0;
+  font-size: 0.9rem;
   font-weight: 600;
-  color: #374151;
+  color: #333;
 }
 
 .house-details {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.85rem;
-  color: #6b7280;
+  gap: 8px;
+  font-size: 13px;
+  color: #666;
 }
 
 .detail-divider {
-  color: #d1d5db;
+  color: #ddd;
 }
 
-/* 合同信息样式 */
 .contract-info {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.contract-dates, .financial-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  gap: 16px;
+  border-bottom: 1px solid #eee;
 }
 
 .date-item, .amount-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 4px;
 }
 
 .date-label, .amount-label {
-  font-size: 0.85rem;
-  color: #6b7280;
+  font-size: 12px;
+  color: #888;
 }
 
 .date-value, .amount-value {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #1f2937;
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
 }
 
-/* 剩余天数样式 */
-.days-critical { color: #dc2626; }
-.days-warning { color: #c2410c; }
-.days-normal { color: #15803d; }
+.days-critical { color: #d9534f; }
+.days-warning { color: #f0ad4e; }
+.days-normal { color: #5cb85c; }
 
-/* 操作按钮样式 */
+/* Actions */
 .tenant-actions {
   display: flex;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #fff;
 }
 
 .action-btn {
   flex: 1;
-  padding: 0.75rem 1rem;
-  border: none;
-  border-radius: 2px;
-  font-size: 0.9rem;
+  padding: 6px 12px;
+  border: 1px solid #ddd;
+  border-radius: 0; /* Square */
+  font-size: 12px;
   font-weight: 500;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 6px;
   transition: all 0.2s;
+  background: white;
+  color: #333;
 }
 
-.contact-btn {
-  background: #eff6ff;
-  color: #1d4ed8;
+.action-btn:hover {
+  border-color: #1e3a5f;
+  color: #1e3a5f;
+  background-color: #f8f9fa;
 }
 
-.contact-btn:hover {
-  background: #dbeafe;
-}
+/* Specific override if needed, but generic style is cleaner */
 
-.details-btn {
-  background: #f8f9fa;
-  color: #374151;
-}
-
-.details-btn:hover {
-  background: #e9ecef;
-}
-
-/* 紧急联系人样式 */
+/* Emergency Contact */
 .emergency-contact {
-  padding-top: 1rem;
-  border-top: 1px solid #f3f4f6;
+  background: #fafafa;
+  border-top: 1px solid #eee;
+  padding: 8px 16px;
 }
 
 .emergency-label {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.8rem;
-  color: #6b7280;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
+  gap: 6px;
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 4px;
 }
 
 .emergency-info {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  font-size: 0.9rem;
-  color: #374151;
+  font-size: 13px;
+  color: #333;
 }
 
 .emergency-phone {
-  color: #6b7280;
-  font-size: 0.85rem;
+  color: #666;
+  font-family: monospace;
 }
 
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .filter-section {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .filter-controls {
-    flex-direction: column;
-  }
-  
-  .contract-info {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  
-  .tenant-header {
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .contract-status {
-    align-items: flex-start;
-    flex-direction: row;
-    gap: 0.5rem;
-  }
-  
-  .tenant-actions {
-    flex-direction: column;
-  }
-}
-
-/* 弹窗样式 */
+/* Modal */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -1209,7 +1157,7 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(2px);
 }
 
 .modal-content {
@@ -1217,90 +1165,70 @@ onMounted(() => {
   width: 90%;
   max-width: 600px;
   max-height: 90vh;
-  border-radius: 4px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border-radius: 0; /* Square */
+  box-shadow: none;
+  border: 1px solid #333;
   display: flex;
   flex-direction: column;
-  animation: modal-slide-up 0.3s ease-out;
-}
-
-@keyframes modal-slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .modal-header {
-  padding: 1.5rem;
-  border-bottom: 1px solid #f3f4f6;
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: #f9f9f9;
 }
 
 .modal-header h3 {
   margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1f2937;
+  font-size: 14px;
+  color: #333;
 }
 
 .close-btn {
   background: none;
   border: none;
-  color: #9ca3af;
+  color: #999;
   cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 50%;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 0;
 }
 
 .close-btn:hover {
-  background: #f3f4f6;
-  color: #4b5563;
+  color: #333;
 }
 
 .modal-body {
-  padding: 1.5rem;
+  padding: 16px;
   overflow-y: auto;
   flex: 1;
 }
 
 .detail-section {
-  margin-bottom: 2rem;
-}
-
-.detail-section:last-child {
-  margin-bottom: 0;
+  margin-bottom: 24px;
 }
 
 .section-title {
-  font-size: 1rem;
+  font-size: 13px;
   font-weight: 600;
-  color: #374151;
-  margin: 0 0 1rem 0;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid #f3f4f6;
+  color: #333;
+  margin: 0 0 12px 0;
+  padding-bottom: 4px;
+  border-bottom: 2px solid #1e3a5f; /* Accent underline */
+  display: inline-block;
 }
 
 .detail-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
+  gap: 12px 24px;
 }
 
 .detail-item {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 4px;
 }
 
 .detail-item.full-width {
@@ -1308,138 +1236,114 @@ onMounted(() => {
 }
 
 .detail-item .label {
-  font-size: 0.85rem;
-  color: #6b7280;
+  font-size: 12px;
+  color: #888;
 }
 
 .detail-item .value {
-  font-size: 0.95rem;
-  color: #1f2937;
+  font-size: 13px;
+  color: #333;
   font-weight: 500;
 }
 
 .detail-item .value.highlight {
-  color: #667eea;
+  color: #1e3a5f;
   font-weight: 600;
-  font-size: 1.1rem;
 }
 
 .modal-footer {
-  padding: 1.5rem;
-  border-top: 1px solid #f3f4f6;
+  padding: 12px 16px;
+  border-top: 1px solid #eee;
   display: flex;
-  gap: 1rem;
+  gap: 8px;
   justify-content: flex-end;
+  background: #fcfcfc;
 }
 
-.secondary-btn {
-  background: white;
-  border: 1px solid #e5e7eb;
-  color: #374151;
+/* Edit Inputs/Selects in Modal */
+.status-select, .reading-input {
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  border-radius: 0; /* Square */
+  font-size: 12px;
 }
 
-.secondary-btn:hover {
-  background: #f9fafb;
-  border-color: #d1d5db;
-}
-
-/* 滚动条样式 */
-.modal-body::-webkit-scrollbar {
-  width: 6px;
-}
-
-.modal-body::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.modal-body::-webkit-scrollbar-thumb {
-  background-color: #e5e7eb;
-  border-radius: 3px;
-}
-
-/* 读数编辑样式 */
-.edit-reading {
-  display: flex;
-  align-items: center;
-}
-
-.reading-input {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  transition: border-color 0.2s;
-}
-
-.reading-input:focus {
+.status-select:focus, .reading-input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
-}
-
-.reading-actions {
-  margin-top: 1rem;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.save-btn {
-  background: #667eea;
-  color: white;
-  width: auto;
-  padding: 0.5rem 1.5rem;
-}
-
-.save-btn:hover {
-  background: #5a67d8;
-}
-
-.save-btn:disabled {
-  background: #a0aec0;
-  cursor: not-allowed;
-}
-
-/* 状态编辑样式 */
-.status-edit {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.status-select {
-  padding: 0.25rem 0.5rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  background-color: white;
-  min-width: 100px;
-}
-
-.status-select:focus {
-  outline: none;
-  border-color: #667eea;
+  border-color: #1e3a5f;
 }
 
 .save-icon-btn {
-  background: none;
-  border: none;
-  color: #667eea;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 0;
+  padding: 2px 6px;
+  margin-left: 4px;
   cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s;
+  color: #1e3a5f;
 }
 
 .save-icon-btn:hover {
-  background-color: #ebf4ff;
+  background: #f0f2f5;
 }
 
-.save-icon-btn:disabled {
-  color: #a0aec0;
-  cursor: not-allowed;
+.save-btn {
+  background: #1e3a5f;
+  color: white;
+  border: none;
+  padding: 4px 12px;
+  font-size: 12px;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.save-btn:hover {
+  background: #2d5a87;
+}
+
+.secondary-btn {
+  background: #eee;
+  border: none;
+  color: #333;
+  padding: 6px 16px;
+  font-size: 12px;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.secondary-btn:hover {
+  background: #e0e0e0;
+}
+
+/* Scrollbar */
+.modal-body::-webkit-scrollbar {
+  width: 4px;
+}
+.modal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+.modal-body::-webkit-scrollbar-thumb {
+  background-color: #ddd;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .filter-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .filter-controls {
+    flex-direction: column;
+  }
+  .contract-info {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+  .detail-item.full-width {
+    grid-column: span 1;
+  }
 }
 </style>

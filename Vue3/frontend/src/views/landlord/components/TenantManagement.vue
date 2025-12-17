@@ -453,74 +453,66 @@ onMounted(() => {
 <style scoped>
 .tenant-management {
   width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
+/* Page Header */
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
-  padding: 1.25rem 1.5rem;
+  margin-bottom: 20px;
+  padding: 16px 24px;
   background-color: #1e3a5f;
-  border-radius: 8px;
+  border-radius: 0; /* Square */
 }
 
 .page-header h2 {
   margin: 0;
   color: white;
   font-size: 1.5rem;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .header-actions {
   display: flex;
-  gap: 0.75rem;
+  gap: 12px;
   align-items: center;
 }
 
 .search-wrapper {
-  margin-right: 0.75rem;
+  margin-right: 0;
 }
 
 .container {
   position: relative;
-  background-color: rgba(255, 255, 255, 0.9);
-  border-radius: 6px;
+  background-color: white;
+  border-radius: 0; /* Square */
   padding: 0;
   display: grid;
   place-content: center;
-  z-index: 0;
-  max-width: 240px;
   width: 240px;
 }
 
 .search-container {
-  position: relative;
   width: 100%;
-  border-radius: 6px;
+  border-radius: 0; /* Square */
   background-color: white;
   padding: 0;
   display: flex;
   align-items: center;
-  border: 1px solid #e9ecef;
-}
-
-.search-container::after, .search-container::before {
-  display: none;
+  border: 1px solid #ddd;
 }
 
 .input {
-  padding: 8px 12px;
-  width: calc(100% - 40px);
+  padding: 8px 12px; /* Compact */
+  width: 100%;
   background: transparent;
   border: none;
-  color: #2c3e50;
+  border-radius: 0;
+  color: #333;
   font-size: 13px;
-  border-radius: 6px;
-}
-
-.input::placeholder {
-  color: #95a5a6;
 }
 
 .input:focus {
@@ -529,23 +521,24 @@ onMounted(() => {
 
 .search__icon {
   width: 16px;
-  aspect-ratio: 1;
+  height: 16px;
   border: none;
   padding: 0;
   margin-right: 10px;
 }
 
 .search__icon path {
-  fill: #7f8c8d;
+  fill: #888;
 }
 
+/* Refresh Button */
 .refresh-btn {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.5rem 1rem;
+  gap: 6px;
+  padding: 8px 16px;
   border: none;
-  border-radius: 6px;
+  border-radius: 0; /* Square */
   cursor: pointer;
   font-weight: 500;
   font-size: 13px;
@@ -564,41 +557,42 @@ onMounted(() => {
   opacity: 0.7;
 }
 
-/* 状态筛选器样式 */
+/* Status Filter */
 .status-filter {
   background: white;
-  padding: 1.5rem;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  margin-bottom: 2rem;
+  padding: 12px 16px; /* Compact */
+  border-radius: 0; /* Square */
+  box-shadow: none;
+  margin-bottom: 20px;
   display: flex;
   align-items: center;
-  gap: 1rem;
-  border: 1px solid #e9ecef;
+  gap: 12px;
+  border: 1px solid #ddd;
 }
 
 .filter-title {
   font-weight: 600;
-  color: #2c3e50;
+  color: #333;
+  font-size: 13px;
   white-space: nowrap;
 }
 
 .filter-buttons {
   display: flex;
-  gap: 0.75rem;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
 .filter-btn {
-  padding: 0.4rem 0.8rem;
-  border: 1px solid #e9ecef;
-  border-radius: 2px;
+  padding: 4px 10px; /* Compact */
+  border: 1px solid #ddd;
+  border-radius: 0; /* Square */
   background: white;
-  color: #5a6c7d;
+  color: #666;
   cursor: pointer;
   transition: all 0.2s;
   font-weight: 500;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .filter-btn:hover {
@@ -612,42 +606,21 @@ onMounted(() => {
   color: white;
 }
 
-/* 租约列表样式 */
+/* Appointments List */
 .appointments-container {
   background: white;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border-radius: 0; /* Square */
+  box-shadow: none;
   overflow: hidden;
-  border: 1px solid #e9ecef;
+  border: 1px solid #ddd;
 }
 
 .loading, .no-appointments {
   text-align: center;
   color: #666;
-  padding: 3rem;
+  padding: 40px;
   font-style: italic;
-}
-
-.empty-state {
-  text-align: center;
-  max-width: 400px;
-  margin: 0 auto;
-}
-
-.empty-icon {
-  font-size: 4rem;
-  display: block;
-  margin-bottom: 1rem;
-}
-
-.empty-state h3 {
-  margin: 0 0 1rem 0;
-  color: #2c3e50;
-}
-
-.empty-state p {
-  color: #6c757d;
-  margin-bottom: 0;
+  font-size: 13px;
 }
 
 .appointments-list {
@@ -656,366 +629,247 @@ onMounted(() => {
 }
 
 .appointment-item {
-  border-bottom: 1px solid #e9ecef;
-  padding: 1.5rem;
+  border-bottom: 1px solid #eee;
+  padding: 0; /* Reset */
   transition: background-color 0.3s;
-}
-
-.appointment-item:hover {
-  background-color: #f8f9fa;
 }
 
 .appointment-item:last-child {
   border-bottom: none;
 }
 
+/* Header Row */
 .appointment-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #f8f9fa;
+  padding: 12px 16px; /* Compact */
   cursor: pointer;
-  transition: all 0.3s;
+  background: #fff;
+  transition: all 0.2s;
 }
 
 .appointment-header:hover {
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  padding: 1rem;
-  margin: -1rem -1rem 0 -1rem;
+  background-color: #f9f9f9;
 }
 
 .appointment-number {
-  font-weight: 600;
-  color: #2c3e50;
-  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+  font-size: 13px;
 }
 
 .header-right {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 12px;
 }
 
+.clickable-status {
+  padding: 2px 8px; /* Compact Tag */
+  border-radius: 0; /* Square */
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  min-width: 60px;
+  cursor: pointer;
+  border: 1px solid transparent; /* To handle borders if needed */
+}
+
+/* Status Colors (Flat/Pastel) */
+.status-pending { background-color: #fff3cd; color: #856404; }
+.status-confirmed { background-color: #d1ecf1; color: #0c5460; }
+.status-completed { background-color: #d4edda; color: #155724; }
+.status-cancelled { background-color: #f8d7da; color: #721c24; }
+.status-expired { background-color: #e2e3e5; color: #383d41; }
+.status-missed { background-color: #f5e6e8; color: #721c24; }
+.status-unknown { background-color: #f8f9fa; color: #6c757d; }
+
 .expand-icon {
+  color: #999;
   transition: transform 0.3s ease;
-  color: #6c757d;
 }
 
 .expand-icon.expanded {
   transform: rotate(180deg);
 }
 
-.clickable-status {
-  padding: 0.5rem 1rem;
-  border-radius: 2px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-align: center;
-  min-width: 80px;
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.clickable-status:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.status-pending {
-  background-color: #fff3cd;
-  color: #856404;
-  border: 1px solid #ffeaa7;
-}
-
-.status-confirmed {
-  background-color: #d1ecf1;
-  color: #0c5460;
-  border: 1px solid #bee5eb;
-}
-
-.status-completed {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-}
-
-.status-cancelled {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
-}
-
-.status-expired {
-  background-color: #e2e3e5;
-  color: #383d41;
-  border: 1px solid #d6d8db;
-}
-
-.status-missed {
-  background-color: #f5e6e8;
-  color: #721c24;
-  border: 1px solid #f1b0b7;
-}
-
-.status-unknown {
-  background-color: #f8f9fa;
-  color: #6c757d;
-  border: 1px solid #e9ecef;
-}
-
+/* Expanded Content */
 .appointment-content {
+  padding: 16px;
+  background: #fcfcfc;
+  border-top: 1px solid #eee;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 16px;
 }
 
 .info-section h4 {
-  margin: 0 0 0.5rem 0;
-  color: #2c3e50;
-  font-size: 0.85rem;
+  margin: 0 0 8px 0;
+  color: #333;
+  font-size: 12px;
   font-weight: 600;
+  border-left: 2px solid #1e3a5f;
+  padding-left: 6px;
 }
 
 .info-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 0.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 8px 16px; /* Compact Grid */
 }
 
 .info-item {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  padding: 0.4rem 0.6rem;
-  background: #f8f9fa;
-  border-radius: 4px;
-  font-size: 0.8rem;
+  padding: 4px 0;
+  font-size: 12px;
+  border-bottom: 1px dashed #eee;
+  background: transparent;
+}
+
+.info-item .label {
+  color: #888;
+}
+
+.info-item .value {
+  color: #333;
+  font-weight: 500;
 }
 
 .info-item.full-width {
   grid-column: 1 / -1;
 }
 
-.info-item .label {
-  font-weight: 500;
-  color: #495057;
-  min-width: 70px;
-  margin-right: 0.5rem;
-}
-
-.info-item .value {
-  color: #2c3e50;
-  text-align: left;
-  flex: 1;
-  word-break: break-word;
-}
-
-/* 快捷操作按钮 */
 .quick-actions {
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
-  border-top: 1px dashed #e9ecef;
   display: flex;
-  gap: 0.5rem;
+  justify-content: flex-end;
+  margin-top: 8px;
 }
 
 .quick-match-btn {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.4rem 0.8rem;
+  gap: 6px;
+  padding: 6px 12px;
   background-color: #27ae60;
   color: white;
   border: none;
-  border-radius: 2px;
+  border-radius: 0; /* Square */
   font-size: 12px;
-  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s ease;
 }
 
 .quick-match-btn:hover {
   background-color: #219a52;
 }
 
-/* 弹窗样式 */
+/* Modals */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  animation: fadeIn 0.3s ease;
 }
 
 .modal-dialog {
-  width: 90%;
-  max-width: 500px;
-  animation: slideIn 0.3s ease;
-}
-
-.modal-content {
   background: white;
-  border-radius: 4px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  overflow: hidden;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 0; /* Square */
+  box-shadow: none;
+  border: 1px solid #333;
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem;
-  border-bottom: 1px solid #e9ecef;
-  background: #f8f9fa;
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  background: #f9f9f9;
 }
 
 .modal-header h3 {
   margin: 0;
-  color: #2c3e50;
-  font-size: 1.3rem;
+  font-size: 14px;
+  color: #333;
 }
 
 .close-btn {
   background: none;
   border: none;
-  font-size: 1.5rem;
-  color: #6c757d;
+  font-size: 18px;
   cursor: pointer;
-  padding: 0;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: all 0.3s;
-}
-
-.close-btn:hover {
-  background-color: #e9ecef;
-  color: #495057;
+  color: #999;
 }
 
 .modal-body {
-  padding: 1.5rem;
-}
-
-.modal-body p {
-  margin: 0 0 1rem 0;
-  color: #495057;
-  font-size: 0.95rem;
-}
-
-.modal-body p:last-child {
-  margin-bottom: 1.5rem;
+  padding: 16px;
 }
 
 .status-options h4 {
-  margin: 0 0 1rem 0;
-  color: #2c3e50;
-  font-size: 1rem;
+  margin: 16px 0 8px 0;
+  font-size: 13px;
+  color: #333;
 }
 
 .status-buttons {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
 }
 
 .status-btn {
-  padding: 0.75rem;
-  border: 2px solid transparent;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
+  padding: 6px;
   text-align: center;
-  font-size: 0.9rem;
-}
-
-.status-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+  font-size: 12px;
+  border-radius: 0; /* Square */
 }
 
 .status-btn.active {
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  border-color: #1e3a5f;
+  box-shadow: inset 0 0 0 1px #1e3a5f;
 }
 
 .modal-footer {
+  padding: 12px 16px;
+  border-top: 1px solid #eee;
   display: flex;
   justify-content: flex-end;
-  gap: 1rem;
-  padding: 1rem 1.5rem;
-  border-top: 1px solid #e9ecef;
-  background: #f8f9fa;
+  gap: 8px;
 }
 
 .btn {
-  padding: 0.75rem 1.5rem;
+  padding: 6px 16px;
+  border-radius: 0; /* Square */
   border: none;
-  border-radius: 8px;
-  font-weight: 600;
+  font-size: 12px;
   cursor: pointer;
-  transition: all 0.3s;
-  font-size: 0.9rem;
 }
 
 .btn-secondary {
-  background-color: #6c757d;
-  color: white;
-}
-
-.btn-secondary:hover:not(:disabled) {
-  background-color: #5a6268;
+  background: #ccc;
+  color: #333;
 }
 
 .btn-primary {
-  background-color: #007bff;
+  background: #1e3a5f;
   color: white;
 }
 
-.btn-primary:hover:not(:disabled) {
-  background-color: #0056b3;
-}
-
 .btn:disabled {
-  background-color: #adb5bd;
+  opacity: 0.6;
   cursor: not-allowed;
-  opacity: 0.7;
-}
-
-/* 动画效果 */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateY(-50px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
 }
 
 /* 响应式设计 */
@@ -1023,63 +877,12 @@ onMounted(() => {
   .page-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 1rem;
+    gap: 16px;
   }
-
+  
   .status-filter {
     flex-direction: column;
     align-items: flex-start;
-  }
-
-  .filter-buttons {
-    width: 100%;
-  }
-
-  .filter-btn {
-    flex: 1;
-    text-align: center;
-  }
-
-  .appointment-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-
-  .info-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .info-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-
-  .info-item .label {
-    min-width: auto;
-  }
-
-  .info-item .value {
-    text-align: left;
-  }
-
-  /* 移动端弹窗适配 */
-  .modal-dialog {
-    width: 95%;
-    margin: 1rem;
-  }
-
-  .status-buttons {
-    grid-template-columns: 1fr;
-  }
-
-  .modal-footer {
-    flex-direction: column;
-  }
-
-  .btn {
-    width: 100%;
   }
 }
 </style>

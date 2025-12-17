@@ -36,30 +36,6 @@
         </div>
 
         <div class="menu-section">
-          <h3>社区管理</h3>
-          <ul class="menu-list">
-            <li 
-              :class="{ active: activeTab === 'resource-management' }"
-              @click="switchTab('resource-management')"
-            >
-              <span class="menu-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-              </span>
-              资源管理
-            </li>
-            <li 
-              :class="{ active: activeTab === 'channel-management' }"
-              @click="switchTab('channel-management')"
-            >
-              <span class="menu-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-              </span>
-              频道管理
-            </li>
-          </ul>
-        </div>
-
-        <div class="menu-section">
           <h3>房屋管理</h3>
           <ul class="menu-list">
             <li 
@@ -97,7 +73,7 @@
                   <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                 </svg>
               </span>
-              我的租户
+              租户合同
             </li>
           </ul>
         </div>
@@ -121,7 +97,31 @@
               <span class="menu-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
               </span>
-              租客匹配
+              合同创建
+            </li>
+          </ul>
+        </div>
+
+        <div class="menu-section">
+          <h3>社区管理</h3>
+          <ul class="menu-list">
+            <li 
+              :class="{ active: activeTab === 'resource-management' }"
+              @click="switchTab('resource-management')"
+            >
+              <span class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+              </span>
+              资源管理
+            </li>
+            <li 
+              :class="{ active: activeTab === 'channel-management' }"
+              @click="switchTab('channel-management')"
+            >
+              <span class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+              </span>
+              频道管理
             </li>
           </ul>
         </div>
@@ -592,7 +592,7 @@ const initCharts = async () => {
   await nextTick()
 
   // 1. 房屋状态分布饼图 (保留)
-  if (houseStatusChartRef.value && houseStatusChartRef.value.offsetWidth) {
+  if (houseStatusChartRef.value && houseStatusChartRef.value.offsetWidth && houseStatusChartRef.value.offsetHeight) {
     const houseStatusChart = echarts.init(houseStatusChartRef.value)
     houseStatusChart.setOption({
       tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
@@ -615,7 +615,7 @@ const initCharts = async () => {
   }
 
   // 2. 房源出租率 (仪表盘)
-  if (occupancyChartRef.value && occupancyChartRef.value.offsetWidth) {
+  if (occupancyChartRef.value && occupancyChartRef.value.offsetWidth && occupancyChartRef.value.offsetHeight) {
     const occupancyChart = echarts.init(occupancyChartRef.value)
     const rate = occupancyRate.value || 0
 
@@ -650,7 +650,7 @@ const initCharts = async () => {
   }
 
   // 3. 签约趋势 (折线图)
-  if (trendChartRef.value && trendChartRef.value.offsetWidth) {
+  if (trendChartRef.value && trendChartRef.value.offsetWidth && trendChartRef.value.offsetHeight) {
     const trendChart = echarts.init(trendChartRef.value)
     const trendKeys = Object.keys(contractTrends.value).sort()
     const trendValues = trendKeys.map(key => contractTrends.value[key])
@@ -691,7 +691,7 @@ const initCharts = async () => {
   }
 
   // 4. 中国地图 (模拟飞行)
-  if (mapChartRef.value && mapChartRef.value.offsetWidth) {
+  if (mapChartRef.value && mapChartRef.value.offsetWidth && mapChartRef.value.offsetHeight) {
     const mapChart = echarts.init(mapChartRef.value)
    
     try {
@@ -824,7 +824,7 @@ const initCharts = async () => {
   }
 
   // 6. 用户增长趋势 (折线图 - 模拟数据)
-  if (userTrendChartRef.value) {
+  if (userTrendChartRef.value && userTrendChartRef.value.offsetWidth && userTrendChartRef.value.offsetHeight) {
     const userTrendChart = echarts.init(userTrendChartRef.value)
     // 模拟7天数据
     const days = []
@@ -859,7 +859,7 @@ const initCharts = async () => {
   }
 
   // 7. 社区活跃趋势 (折线图)
-  if (communityTrendChartRef.value) {
+  if (communityTrendChartRef.value && communityTrendChartRef.value.offsetWidth && communityTrendChartRef.value.offsetHeight) {
     const communityTrendChart = echarts.init(communityTrendChartRef.value)
     const days = []
     const postsData = []
@@ -888,7 +888,7 @@ const initCharts = async () => {
   }
 
   // 8. 预约完成趋势 (折线图)
-  if (appointmentTrendChartRef.value) {
+  if (appointmentTrendChartRef.value && appointmentTrendChartRef.value.offsetWidth && appointmentTrendChartRef.value.offsetHeight) {
     const appointmentTrendChart = echarts.init(appointmentTrendChartRef.value)
     const days = []
     const completedData = []
@@ -1241,21 +1241,21 @@ onUnmounted(() => {
 .viz-grid {
   display: grid;
   grid-template-columns: 28% 44% 28%;
-  gap: 0.8rem;
+  gap: 0.4rem;
   flex: 1;
 }
 
 .viz-col {
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  gap: 0.4rem;
 }
 
 .viz-card {
   background: rgba(20, 20, 35, 0.8);
   border: 1px solid #2a2a40;
   border-radius: 0;
-  padding: 0.6rem;
+  padding: 0.4rem;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -1275,31 +1275,31 @@ onUnmounted(() => {
 }
 
 .card-header {
-  margin-bottom: 1rem;
+  margin-bottom: 0.3rem;
 }
 
 .card-header h3 {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 0.9rem;
   color: #fff;
   font-weight: 500;
 }
 
 .decoration-line {
   height: 2px;
-  width: 30px;
+  width: 20px;
   background: #00f2ff;
-  margin-top: 5px;
+  margin-top: 3px;
   box-shadow: 0 0 5px #00f2ff;
 }
 
 .chart-container {
   flex: 1;
-  min-height: 140px;
+  min-height: 100px;
 }
 
 .map-container {
-  min-height: 280px;
+  min-height: 200px;
 }
 
 /* Full height map for center column */
@@ -1427,17 +1427,17 @@ onUnmounted(() => {
 .kpi-row {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 0.5rem;
-  margin-bottom: 0.8rem;
+  gap: 0.3rem;
+  margin-bottom: 0.4rem;
 }
 
 .kpi-card {
   background: rgba(20, 20, 35, 0.8);
   border: 1px solid #2a2a40;
-  padding: 0.6rem 0.8rem;
+  padding: 0.4rem 0.5rem;
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.4rem;
   position: relative;
   overflow: hidden;
 }
@@ -1453,8 +1453,8 @@ onUnmounted(() => {
 }
 
 .kpi-card .kpi-icon {
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1485,7 +1485,7 @@ onUnmounted(() => {
 }
 
 .kpi-card .kpi-value {
-  font-size: 1.4rem;
+  font-size: 1.1rem;
   font-weight: bold;
   color: #fff;
   line-height: 1;
@@ -1493,15 +1493,15 @@ onUnmounted(() => {
 
 .kpi-card .kpi-label {
   color: #888;
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   text-transform: uppercase;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.2px;
 }
 
 .kpi-card .kpi-sub {
   color: #555;
-  font-size: 0.65rem;
-  margin-top: 0.1rem;
+  font-size: 0.55rem;
+  margin-top: 0;
 }
 
 /* Old KPI Item (keep for compatibility) */

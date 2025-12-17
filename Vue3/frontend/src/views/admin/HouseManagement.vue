@@ -291,6 +291,110 @@
         </div>
       </div>
     </div>
+
+    <!-- 房屋详情弹窗 -->
+    <div v-if="showDetailDialog && detailHouse" class="dialog-overlay" @click.self="closeDetailDialog">
+      <div class="dialog detail-dialog">
+        <div class="dialog-header">
+          <h3>房屋详情</h3>
+          <button @click="closeDetailDialog" class="close-btn">×</button>
+        </div>
+        <div class="dialog-content">
+          <!-- 基本信息 -->
+          <div class="detail-section">
+            <h4>地址信息</h4>
+            <div class="detail-grid">
+              <div class="detail-item full-width">
+                <span class="label">完整地址：</span>
+                <span class="value">{{ detailHouse.province }}{{ detailHouse.city }}{{ detailHouse.district }}{{ detailHouse.street }}{{ detailHouse.communityName }}{{ detailHouse.buildingUnit }}{{ detailHouse.doorNumber }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">小区名称：</span>
+                <span class="value">{{ detailHouse.communityName || '-' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">门牌号：</span>
+                <span class="value">{{ detailHouse.doorNumber || '-' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 房屋信息 -->
+          <div class="detail-section">
+            <h4>房屋信息</h4>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <span class="label">面积：</span>
+                <span class="value">{{ detailHouse.roomArea || '-' }} ㎡</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">楼层：</span>
+                <span class="value">{{ detailHouse.floorInfo || '-' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">朝向：</span>
+                <span class="value">{{ detailHouse.orientation || '-' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">装修：</span>
+                <span class="value">{{ getDecorationText(detailHouse.decoration) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">电梯：</span>
+                <span class="value">{{ detailHouse.hasElevator ? '有' : '无' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">租赁类型：</span>
+                <span class="value">{{ getRentalTypeText(detailHouse.rentalType) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">状态：</span>
+                <span class="status-tag" :class="getStatusClass(detailHouse.status)">{{ getStatusText(detailHouse.status) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 价格信息 -->
+          <div class="detail-section">
+            <h4>价格信息</h4>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <span class="label">月租金：</span>
+                <span class="value price-highlight">{{ detailHouse.rentPrice || '-' }} 元/月</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">水费单价：</span>
+                <span class="value">{{ detailHouse.waterPrice ? detailHouse.waterPrice + ' 元/吨' : '包含在租金内' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">电费单价：</span>
+                <span class="value">{{ detailHouse.electricPrice ? detailHouse.electricPrice + ' 元/度' : '包含在租金内' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 房东信息 -->
+          <div class="detail-section">
+            <h4>房东信息</h4>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <span class="label">联系电话：</span>
+                <span class="value">{{ detailHouse.landlordPhone || '-' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 描述信息 -->
+          <div v-if="detailHouse.description" class="detail-section">
+            <h4>房屋描述</h4>
+            <div class="description-content">{{ detailHouse.description }}</div>
+          </div>
+        </div>
+        <div class="dialog-footer">
+          <button @click="closeDetailDialog" class="cancel-btn">关闭</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -503,7 +607,31 @@ const editHouse = (house) => {
 // 更新房屋
 const updateHouse = async () => {
   try {
-    const response = await axios.put(`${API_BASE_URL}/rooms/update/${editingHouseId}`, houseForm)
+    // 构建更新数据，确保类型正确（参考房东端实现）
+    const updateData = {
+      province: houseForm.province,
+      city: houseForm.city,
+      district: houseForm.district,
+      street: houseForm.street,
+      communityName: houseForm.communityName,
+      buildingUnit: houseForm.buildingUnit,
+      doorNumber: houseForm.doorNumber,
+      roomNumber: houseForm.roomNumber,
+      hasElevator: houseForm.hasElevator === true || houseForm.hasElevator === 1 || houseForm.hasElevator === '1' ? 1 : 0,
+      roomArea: houseForm.roomArea ? parseFloat(houseForm.roomArea) : null,
+      floorInfo: houseForm.floorInfo,
+      orientation: houseForm.orientation,
+      decoration: houseForm.decoration ? parseInt(houseForm.decoration) : null,
+      rentPrice: houseForm.rentPrice ? parseFloat(houseForm.rentPrice) : null,
+      waterPrice: houseForm.waterPrice ? parseFloat(houseForm.waterPrice) : null,
+      electricPrice: houseForm.electricPrice ? parseFloat(houseForm.electricPrice) : null,
+      rentalType: parseInt(houseForm.rentalType) || 0,
+      landlordPhone: houseForm.landlordPhone,
+      status: parseInt(houseForm.status) || 0,
+      description: houseForm.description
+    }
+    
+    const response = await axios.put(`${API_BASE_URL}/rooms/update/${editingHouseId}`, updateData)
     if (response.data.success) {
       alert('房屋信息更新成功')
       closeDialog()
@@ -549,6 +677,22 @@ const updateHouseStatus = async (id, newStatus) => {
     console.error('更新房屋状态失败:', error)
     alert('状态更新失败: ' + error.message)
   }
+}
+
+// 房屋详情相关
+const showDetailDialog = ref(false)
+const detailHouse = ref(null)
+
+// 查看房屋详情
+const viewHouseDetail = (house) => {
+  detailHouse.value = house
+  showDetailDialog.value = true
+}
+
+// 关闭详情弹窗
+const closeDetailDialog = () => {
+  showDetailDialog.value = false
+  detailHouse.value = null
 }
 
 // VR Dialog Logic
@@ -1507,5 +1651,79 @@ onMounted(() => {
   .house-management {
     padding: 10px;
   }
+}
+
+/* 详情弹窗样式 */
+.detail-dialog {
+  max-width: 550px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.detail-section {
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.detail-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.detail-section h4 {
+  margin: 0 0 0.4rem 0;
+  color: #1e3a5f;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.4rem;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.detail-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.detail-item .label {
+  color: #6c757d;
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+.detail-item .value {
+  color: #2c3e50;
+  font-size: 0.8rem;
+}
+
+.price-highlight {
+  color: #dc3545 !important;
+  font-weight: 600;
+  font-size: 0.9rem !important;
+}
+
+.description-content {
+  background: #f8f9fa;
+  padding: 0.5rem;
+  border-radius: 4px;
+  color: #495057;
+  line-height: 1.4;
+  font-size: 0.8rem;
+}
+
+.dialog-footer {
+  padding: 0.5rem 1rem;
+  border-top: 1px solid #e9ecef;
+  display: flex;
+  justify-content: flex-end;
 }
 </style>
