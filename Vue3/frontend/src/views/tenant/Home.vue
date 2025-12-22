@@ -55,9 +55,7 @@ const navigateToCommunity = () => {
   router.push('/community')
 }
 
-const navigateToVirtualWorld = () => {
-  router.push('/interactive-cube')
-}
+
 
 // 获取用户预约信息
 const fetchUserAppointments = async () => {
@@ -196,14 +194,7 @@ const formatDate = (dateString) => {
           </div>
 
 
-          <div class="feature-card" @click="navigateToVirtualWorld">
-            <div class="card-icon virtual-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><rect x="2" y="3" width="20" height="14" rx="0" ry="0"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-            </div>
-            <h3>The Cube</h3>
-            <p>未来实验 / 全息交互 / 多维空间</p>
-            <span class="link-text">ENTER <span class="arrow">→</span></span>
-          </div>
+
         </div>
       </section>
 
