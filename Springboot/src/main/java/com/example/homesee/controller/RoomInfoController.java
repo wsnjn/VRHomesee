@@ -199,6 +199,8 @@ public class RoomInfoController {
                 existingRoom.setLandlordPhone(roomInfo.getLandlordPhone());
                 existingRoom.setStatus(roomInfo.getStatus());
                 existingRoom.setDescription(roomInfo.getDescription());
+                existingRoom.setLatitude(roomInfo.getLatitude());
+                existingRoom.setLongitude(roomInfo.getLongitude());
                 existingRoom.setUpdatedTime(java.time.LocalDateTime.now());
 
                 RoomInfo updatedRoom = roomInfoRepository.save(existingRoom);

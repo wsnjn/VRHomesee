@@ -1,6 +1,19 @@
 <template>
   <div class="vr-house-tour">
     <div ref="container" class="vr-container"></div>
+    
+    <!-- Loading Overlay -->
+    <div v-if="isLoading" class="loading-overlay">
+      <div class="loading-content">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">加载全景图中...</p>
+        <div class="progress-bar">
+          <div class="progress-fill" :style="{ width: loadProgress + '%' }"></div>
+        </div>
+        <p class="progress-text">{{ loadProgress }}%</p>
+      </div>
+    </div>
+    
     <div class="scene-info">
       <h3>{{ currentScene?.scene?.title || '未知场景' }}</h3>
     </div>
@@ -9,7 +22,7 @@
 
 <script>
 import * as THREE from 'three';
-import { ref, onMounted, onUnmounted, reactive } from 'vue';
+import { ref, onMounted, onUnmounted, reactive, toRefs } from 'vue';
 
 export default {
   name: 'VrHouseTour',
@@ -34,7 +47,9 @@ export default {
     const state = reactive({
       currentScene: null,
       currentSceneIndex: 0,
-      overlays: []
+      overlays: [],
+      isLoading: false,
+      loadProgress: 0
     });
 
     // 初始化场景
@@ -53,7 +68,7 @@ export default {
 
       // 创建相机 - 直接位于球体内部
       camera = new THREE.PerspectiveCamera(75, container.value.clientWidth / container.value.clientHeight, 0.1, 1000);
-      camera.position.set(0, -20, -1); // 相机位置在球体内部，Y轴降低20个单位，使视角更矮
+      camera.position.set(0, -20, -1);
 
       // 添加环境光
       const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
@@ -79,7 +94,6 @@ export default {
     // 设置控制器
     const setupOrbitControls = () => {
       try {
-        // 尝试使用简单的鼠标控制替代OrbitControls
         controls = {
           update: () => {},
           reset: () => {
@@ -88,7 +102,6 @@ export default {
           }
         };
         
-        // 添加简单的鼠标控制
         let isMouseDown = false;
         let previousMousePosition = { x: 0, y: 0 };
         
@@ -103,7 +116,6 @@ export default {
           const deltaX = event.clientX - previousMousePosition.x;
           const deltaY = event.clientY - previousMousePosition.y;
           
-          // 旋转球体
           if (sphere) {
             sphere.rotation.y += deltaX * 0.01;
             sphere.rotation.x += deltaY * 0.01;
@@ -116,14 +128,26 @@ export default {
           isMouseDown = false;
         };
         
-        // 添加鼠标事件监听
         if (container.value) {
           container.value.addEventListener('mousedown', onMouseDown);
           container.value.addEventListener('mousemove', onMouseMove);
           container.value.addEventListener('mouseup', onMouseUp);
+          
+          // 触摸支持
+          container.value.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 1) {
+              onMouseDown({ clientX: e.touches[0].clientX, clientY: e.touches[0].clientY });
+            }
+          });
+          container.value.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 1) {
+              onMouseMove({ clientX: e.touches[0].clientX, clientY: e.touches[0].clientY });
+            }
+          });
+          container.value.addEventListener('touchend', onMouseUp);
         }
         
-        console.log('鼠标控制器已配置，可以拖动视角');
+        console.log('鼠标控制器已配置');
       } catch (error) {
         console.error('控制器设置失败:', error);
       }
@@ -133,7 +157,6 @@ export default {
     const setInitialScene = () => {
       if (props.naviData.length === 0) return;
 
-      // 查找初始场景
       let initialSceneIndex = 0;
       if (props.initialSceneKey) {
         initialSceneIndex = props.naviData.findIndex(item => 
@@ -155,54 +178,70 @@ export default {
 
     // 加载场景
     const loadScene = (sceneData) => {
-      // 清除之前的几何体
       if (sphere) scene.remove(sphere);
 
       const { scene: sceneInfo } = sceneData;
       
-      // 只使用球面贴图
       if (sceneInfo.sphereSource && sceneInfo.sphereSource.thumb) {
         loadSphereTexture(sceneInfo.sphereSource.thumb);
       }
 
-      // 设置初始旋转角度
       if (sceneInfo.rotation) {
-        // 通过OrbitControls设置初始角度
         if (controls) {
           controls.reset();
         }
       }
 
-      // 渲染导航点
       renderOverlays(sceneData.overlays || []);
     };
 
-    // 加载球面贴图
+    // 加载球面贴图（带进度追踪）
     const loadSphereTexture = (textureUrl) => {
+      state.isLoading = true;
+      state.loadProgress = 0;
+      
       const textureLoader = new THREE.TextureLoader();
-      textureLoader.load(textureUrl, (texture) => {
-        const geometry = new THREE.SphereGeometry(100, 50, 50);
-        // 翻转球体，使纹理从内部正确显示
-        geometry.scale(-1, 1, 1);
-        
-        const material = new THREE.MeshBasicMaterial({
-          map: texture,
-          side: THREE.DoubleSide, // 双面渲染，从内外都能看到纹理
-          color: 0xffffff
-        });
-        
-        sphere = new THREE.Mesh(geometry, material);
-        scene.add(sphere);
+      textureLoader.load(
+        textureUrl, 
+        // onLoad
+        (texture) => {
+          const geometry = new THREE.SphereGeometry(100, 50, 50);
+          geometry.scale(-1, 1, 1);
+          
+          const material = new THREE.MeshBasicMaterial({
+            map: texture,
+            side: THREE.DoubleSide,
+            color: 0xffffff
+          });
+          
+          sphere = new THREE.Mesh(geometry, material);
+          scene.add(sphere);
 
-        console.log('球体网格创建完成，位置:', sphere.position);
-      }, undefined, (error) => {
-        console.error('全景图纹理加载失败:', error);
-      });
+          console.log('球体网格创建完成');
+          
+          state.loadProgress = 100;
+          setTimeout(() => {
+            state.isLoading = false;
+          }, 300);
+        }, 
+        // onProgress
+        (xhr) => {
+          if (xhr.lengthComputable) {
+            state.loadProgress = Math.round((xhr.loaded / xhr.total) * 100);
+          } else {
+            state.loadProgress = Math.min(state.loadProgress + 10, 90);
+          }
+        },
+        // onError
+        (error) => {
+          console.error('全景图纹理加载失败:', error);
+          state.isLoading = false;
+        }
+      );
     };
 
     // 渲染导航点
     const renderOverlays = (overlays) => {
-      // 清除之前的导航点
       state.overlays.forEach(overlay => {
         if (overlay.mesh) scene.remove(overlay.mesh);
       });
@@ -225,7 +264,6 @@ export default {
       
       const mesh = new THREE.Mesh(geometry, material);
       
-      // 将经纬度转换为球面坐标
       const phi = (90 - overlayData.y) * Math.PI / 180;
       const theta = (overlayData.x + 180) * Math.PI / 180;
       
@@ -327,7 +365,7 @@ export default {
 
     return {
       container,
-      currentScene: state.currentScene,
+      ...toRefs(state),
       walkTo
     };
   }
@@ -347,6 +385,65 @@ export default {
   height: 100%;
 }
 
+/* Loading Overlay Styles */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(17, 24, 39, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.loading-content {
+  text-align: center;
+  color: white;
+}
+
+.loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #3B82F6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: 16px;
+  margin-bottom: 16px;
+  color: #E5E7EB;
+}
+
+.progress-bar {
+  width: 200px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 0 auto 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3B82F6, #60A5FA);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 14px;
+  color: #9CA3AF;
+}
 
 .scene-info {
   position: absolute;

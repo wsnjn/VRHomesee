@@ -77,13 +77,19 @@ public class RoomInfo {
     @Column(name = "updated_time", nullable = false)
     private LocalDateTime updatedTime = LocalDateTime.now();
 
+    @Column(name = "latitude")
+    private Double latitude;
+
+    @Column(name = "longitude")
+    private Double longitude;
+
     // 构造函数
     public RoomInfo() {
     }
 
-    public RoomInfo(String province, String city, String district, String street, 
-                   String communityName, String doorNumber, BigDecimal rentPrice, 
-                   String landlordPhone) {
+    public RoomInfo(String province, String city, String district, String street,
+            String communityName, String doorNumber, BigDecimal rentPrice,
+            String landlordPhone) {
         this.province = province;
         this.city = city;
         this.district = district;
@@ -277,5 +283,21 @@ public class RoomInfo {
 
     public void setUpdatedTime(LocalDateTime updatedTime) {
         this.updatedTime = updatedTime;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
     }
 }

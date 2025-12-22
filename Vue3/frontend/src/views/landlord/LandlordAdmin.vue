@@ -112,18 +112,16 @@
       <div class="main-content">
 
         <!-- 我的房屋 -->
-        <div v-if="activeTab === 'my-houses'">
+        <div v-if="activeTab === 'my-houses'" class="dashboard-view">
           <!-- 仪表盘统计卡片 -->
           <landlord-dashboard-stats :stats="dashboardStats" />
           
-          <!-- 快捷操作 -->
-          <landlord-quick-actions 
-            :pendingCount="pendingMaintenanceCount"
-            @navigate="handleQuickAction"
+          <!-- 数据驾驶舱图表 -->
+          <landlord-data-charts 
+            :houses="myHouses"
+            :contracts="tenantContracts"
+            :statistics="statistics"
           />
-          
-          <!-- 信息提示卡片 -->
-          <my-houses />
         </div>
 
         <!-- 房屋状态 -->
@@ -192,7 +190,7 @@ import MyTenants from './components/MyTenants.vue'
 
 import LandlordMaintenance from './components/LandlordMaintenance.vue'
 import LandlordDashboardStats from './LandlordDashboardStats.vue'
-import LandlordQuickActions from './LandlordQuickActions.vue'
+import LandlordDataCharts from './LandlordDataCharts.vue'
 
 // 占位页面组件
 const PlaceholderPage = {

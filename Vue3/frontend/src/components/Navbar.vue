@@ -99,6 +99,7 @@ const isActive = (path) => route.path === path
       <div class="nav-links-center">
         <a class="nav-item" :class="{ active: isActive('/') }" @click="navigateTo('/')">首页</a>
         <a class="nav-item" :class="{ active: isActive('/house-selection') }" @click="navigateTo('/house-selection')">房源精选</a>
+        <a class="nav-item" :class="{ active: isActive('/map-search') }" @click="navigateTo('/map-search')">地图找房</a>
         <a class="nav-item" :class="{ active: isActive('/community') }" @click="navigateTo('/community')">社区交流</a>
         <a class="nav-item" :class="{ active: isActive('/smart-matching') }" @click="navigateTo('/smart-matching')">智能匹配</a>
       </div>

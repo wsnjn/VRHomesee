@@ -15,6 +15,7 @@ const router = createRouter({
     { path: '/community', name: 'community', component: () => import('../views/community/Community.vue'), meta: { requiresAuth: true, allowedUserTypes: [1, 2, 3] } },
     { path: '/friend-circle', name: 'friend-circle', component: () => import('../views/community/FriendCircle.vue'), meta: { requiresAuth: true, allowedUserTypes: [1, 2, 3] } },
     { path: '/community-page', name: 'community-page', component: () => import('../views/community/CommunityPage.vue'), meta: { requiresAuth: true, allowedUserTypes: [1, 2, 3] } },
+    { path: '/map-search', name: 'map-search', component: () => import('../views/tenant/MapSearch.vue'), meta: { requiresAuth: true, allowedUserTypes: [1, 2, 3] } },
 
     // 登录页面（共享，无需登录）
     { path: '/login', name: 'login', component: () => import('../views/Login.vue'), meta: { requiresAuth: false } },

@@ -427,6 +427,14 @@
         </div>
 
         <div class="modal-footer">
+          <button class="action-btn download-btn" @click="openPdfPreview">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            下载合同 PDF
+          </button>
           <button class="action-btn contact-btn" @click="contactTenant(selectedContract)">
             联系租户
           </button>
@@ -436,12 +444,37 @@
         </div>
       </div>
     </div>
+
+    <!-- PDF 预览弹窗 -->
+    <div v-if="showPdfPreview" class="modal-overlay pdf-modal" @click.self="closePdfPreview">
+      <div class="modal-content pdf-preview-content">
+        <div class="modal-header">
+          <h3>合同PDF预览</h3>
+          <button class="close-btn" @click="closePdfPreview">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="pdf-preview-body">
+          <ContractTemplate 
+            v-if="selectedContract"
+            :contract="selectedContract"
+            :room="selectedContract"
+            :landlord="landlordInfo"
+            :tenant="{ realName: selectedContract.tenantName, phone: selectedContract.tenantPhone }"
+          />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
+import ContractTemplate from '@/components/ContractTemplate.vue'
 
 const props = defineProps({
   userPhone: {
@@ -699,6 +732,25 @@ const closeContractModal = () => {
   selectedContract.value = null
   editingReadings.value = { water: '', electric: '' }
   editingStatuses.value = { contractStatus: '', rentStatus: '', depositStatus: '' }
+}
+
+// PDF 预览相关
+const showPdfPreview = ref(false)
+const landlordInfo = ref({})
+
+const openPdfPreview = () => {
+  // 从 localStorage 获取房东信息
+  const user = JSON.parse(localStorage.getItem('user') || '{}')
+  landlordInfo.value = {
+    realName: user.realName || user.username || '房东',
+    phone: user.phone || '',
+    idNumber: user.idNumber || ''
+  }
+  showPdfPreview.value = true
+}
+
+const closePdfPreview = () => {
+  showPdfPreview.value = false
 }
 
 // 保存状态更改
@@ -1345,5 +1397,35 @@ onMounted(() => {
   .detail-item.full-width {
     grid-column: span 1;
   }
+}
+
+/* Download Button */
+.download-btn {
+  background: #10B981;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.download-btn:hover {
+  background: #059669;
+}
+
+/* PDF Preview Modal */
+.pdf-modal .modal-content {
+  max-width: 900px;
+  width: 95%;
+  max-height: 90vh;
+}
+
+.pdf-modal .modal-content.pdf-preview-content {
+  padding: 0;
+}
+
+.pdf-preview-body {
+  max-height: calc(90vh - 60px);
+  overflow-y: auto;
+  background: #f5f5f5;
 }
 </style>
