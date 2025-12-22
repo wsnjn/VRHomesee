@@ -20,6 +20,13 @@
       ref="vrHouseTour"
     />
 
+    <!-- AI 看房助手 -->
+    <VrChatAssistant 
+      :room-info="roomInfo"
+      :renderer="vrRenderer"
+      :user-id="currentUserId"
+    />
+
     <!-- 场景选择面板 -->
     <div v-if="showControls" class="scene-panel">
       <h3>场景选择</h3>
@@ -36,16 +43,6 @@
         </div>
       </div>
     </div>
-
-    <!-- 操作说明 -->
-    <div class="instructions">
-      <h3>操作说明</h3>
-      <ul>
-        <li>鼠标拖拽：旋转视角</li>
-        <li>点击红色导航点：切换场景</li>
-        <li>使用下方控制按钮：左右旋转、重置视角</li>
-      </ul>
-    </div>
   </div>
 </template>
 
@@ -53,6 +50,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import VrHouseTour from '../../components/VrHouseTour.vue'
+import VrChatAssistant from '../../components/VrChatAssistant.vue'
 import { houseTourData as fullHouseTourData } from '../../data/houseTourData.js'
 import axios from 'axios'
 
@@ -65,6 +63,27 @@ const houseTourData = ref(fullHouseTourData)
 const loading = ref(true)
 
 const API_BASE_URL = 'https://api.homesee.xyz/api'
+
+// 房源信息（传递给AI助手）
+const roomInfo = ref({})
+
+// 当前用户ID
+const getUserId = () => {
+  try {
+    const userStr = localStorage.getItem('user')
+    if (userStr) {
+      const user = JSON.parse(userStr)
+      return user.id
+    }
+  } catch (e) {
+    console.error('Failed to parse user from localStorage', e)
+  }
+  return null
+}
+const currentUserId = ref(getUserId())
+
+// VR渲染器引用（用于截图）
+const vrRenderer = ref(null)
 
 // 计算当前场景
 const currentScene = computed(() => {
@@ -143,6 +162,30 @@ const loadVrScenes = async () => {
   }
 }
 
+// 获取房屋详情
+const fetchHouseDetail = async (houseId) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/rooms/${houseId}`)
+    if (response.data.success && response.data.room) {
+      const room = response.data.room
+      roomInfo.value = {
+        title: `${room.communityName} ${room.buildingUnit || ''} ${room.roomNumber || ''}`,
+        price: room.rentPrice,
+        area: room.roomArea,
+        layout: room.layout || (room.roomNumber + '室'),
+        address: `${room.city}${room.district}${room.street}${room.communityName}`,
+        description: room.description,
+        // 原始字段也传一份，方便后端灵活取用
+        rentPrice: room.rentPrice,
+        communityName: room.communityName,
+        roomArea: room.roomArea
+      }
+    }
+  } catch (error) {
+    console.error('Failed to fetch house details:', error)
+  }
+}
+
 // 确保URL使用HTTPS
 // 确保URL使用HTTPS，并替换不安全的源
 const ensureHttps = (url) => {
@@ -164,17 +207,34 @@ const ensureHttps = (url) => {
 }
 
 onMounted(() => {
-  loadVrScenes()
+  const houseId = route.query.houseId
+  if (houseId) {
+    loadVrScenes()
+    fetchHouseDetail(houseId)
+  } else {
+    alert('未指定房屋')
+    router.push('/')
+  }
+  
+  // 延迟获取渲染器引用
+  setTimeout(() => {
+    if (vrHouseTour.value && vrHouseTour.value.getRenderer) {
+      vrRenderer.value = vrHouseTour.value.getRenderer()
+    }
+  }, 1000)
 })
 </script>
 
 <style scoped>
+/* 工业极简风格 - Industrial Minimal Design */
 .house-tour-page {
   position: relative;
   height: 100vh;
   overflow: hidden;
+  font-family: 'Inter', system-ui, sans-serif;
 }
 
+/* 顶部导航栏 */
 .navbar {
   position: absolute;
   top: 0;
@@ -183,130 +243,153 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
-  background-color: rgba(44, 62, 80, 0.8);
-  color: white;
+  padding: 12px 24px;
+  background-color: #111827;
+  color: #FFFFFF;
   z-index: 100;
-  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #E5E7EB;
 }
 
 .nav-brand h2 {
   margin: 0;
-  color: white;
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
 .nav-links {
   display: flex;
-  gap: 1rem;
+  gap: 0;
   align-items: center;
 }
 
 .nav-link {
-  color: white;
+  color: #FFFFFF;
   text-decoration: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  transition: background-color 0.3s;
+  padding: 8px 16px;
+  border-radius: 0;
+  transition: background-color 0.2s;
   cursor: pointer;
+  font-size: 14px;
+  border: 1px solid transparent;
+  background: transparent;
 }
 
 .nav-link:hover {
   background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .control-btn {
-  background-color: #007bff;
-  border: none;
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 14px;
+  color: #FFFFFF;
 }
 
 .control-btn:hover {
-  background-color: #0056b3;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
+/* 场景选择面板 */
 .scene-panel {
   position: absolute;
-  top: 80px;
+  top: 60px;
   right: 20px;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: #FFFFFF;
+  padding: 16px;
+  border-radius: 0;
+  border: 1px solid #E5E7EB;
   z-index: 90;
-  backdrop-filter: blur(10px);
-  max-width: 300px;
+  max-width: 280px;
 }
 
 .scene-panel h3 {
-  margin: 0 0 1rem 0;
-  color: #2c3e50;
-  font-size: 1.1rem;
+  margin: 0 0 12px 0;
+  color: #111827;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .scene-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 8px;
 }
 
 .scene-item {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  border-radius: 4px;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 0;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.2s;
+  border: 1px solid transparent;
+  background: #FFFFFF;
 }
 
 .scene-item:hover {
-  background-color: rgba(0, 123, 255, 0.1);
+  background-color: #F9FAFB;
+  border-color: #E5E7EB;
 }
 
 .scene-item.active {
-  background-color: rgba(0, 123, 255, 0.2);
-  border: 1px solid #007bff;
+  background-color: #F9FAFB;
+  border-color: #111827;
+  border-left-width: 3px;
 }
 
 .scene-thumb {
-  width: 40px;
-  height: 40px;
-  border-radius: 4px;
+  width: 48px;
+  height: 48px;
+  border-radius: 0;
   object-fit: cover;
+  border: 1px solid #E5E7EB;
 }
 
 .scene-title {
-  font-size: 0.9rem;
-  color: #333;
+  font-size: 13px;
+  color: #111827;
   font-weight: 500;
+}
+
+.scene-item.active .scene-title {
+  font-weight: 600;
 }
 
 .instructions {
   position: absolute;
   bottom: 80px;
   left: 20px;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: #FFFFFF;
+  padding: 16px;
+  border-radius: 0;
+  border: 1px solid #E5E7EB;
   z-index: 90;
-  backdrop-filter: blur(10px);
   max-width: 250px;
 }
 
 .instructions h3 {
-  margin: 0 0 0.5rem 0;
-  color: #2c3e50;
-  font-size: 1.1rem;
+  margin: 0 0 8px 0;
+  color: #111827;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .instructions ul {
   margin: 0;
   padding-left: 1.2rem;
-  color: #555;
-  font-size: 0.9rem;
-  line-height: 1.4;
+  color: #374151;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .instructions li {

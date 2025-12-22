@@ -55,6 +55,9 @@ const navigateToCommunity = () => {
   router.push('/community')
 }
 
+const navigateToMapSearch = () => {
+  router.push('/map-search')
+}
 
 
 // 获取用户预约信息
@@ -193,6 +196,14 @@ const formatDate = (dateString) => {
             <span class="link-text">JOIN <span class="arrow">→</span></span>
           </div>
 
+          <div class="feature-card" @click="navigateToMapSearch">
+            <div class="card-icon map-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            </div>
+            <h3>Map Search</h3>
+            <p>地图选房 / 区域筛选 / 周边配套</p>
+            <span class="link-text">EXPLORE <span class="arrow">→</span></span>
+          </div>
 
 
         </div>

@@ -84,9 +84,9 @@ public class SmartMatchingService {
         systemContent.append("\n【重要指令】\n");
         systemContent.append("1. 如果推荐了具体房源，必须提供以下两个链接（请使用HTML格式）：\n");
         systemContent.append(
-                "   - VR在线看房: <a href=\"http://39.108.142.250:9999/#/house-tour?houseId={id}\" target=\"_blank\">VR看房</a>\n");
+                "   - VR在线看房: <a href=\"https://www.homesee.xyz/#/house-tour?houseId={id}\" target=\"_blank\">VR看房</a>\n");
         systemContent.append(
-                "   - 预约现场看房: <a href=\"http://39.108.142.250:9999/#/appointment?houseId={id}\" target=\"_blank\">预约看房</a>\n");
+                "   - 预约现场看房: <a href=\"https://www.homesee.xyz/#/appointment?houseId={id}\" target=\"_blank\">预约看房</a>\n");
         systemContent.append("2. 请使用HTML标签来格式化你的回答，使其美观易读：\n");
         systemContent.append("   - 使用 <p> 标签分段。\n");
         systemContent.append("   - 使用 <br> 换行。\n");

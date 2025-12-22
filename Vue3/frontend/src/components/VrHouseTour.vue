@@ -60,8 +60,11 @@ export default {
       scene = new THREE.Scene();
       scene.background = new THREE.Color(0x222222);
 
-      // 创建渲染器
-      renderer = new THREE.WebGLRenderer({ antialias: true });
+      // 创建渲染器 - preserveDrawingBuffer 用于截图
+      renderer = new THREE.WebGLRenderer({ 
+        antialias: true,
+        preserveDrawingBuffer: true  // 重要：允许截图
+      });
       renderer.setSize(container.value.clientWidth, container.value.clientHeight);
       renderer.setPixelRatio(window.devicePixelRatio);
       container.value.appendChild(renderer.domElement);
@@ -366,7 +369,9 @@ export default {
     return {
       container,
       ...toRefs(state),
-      walkTo
+      walkTo,
+      // 暴露渲染器获取方法（用于截图）
+      getRenderer: () => renderer
     };
   }
 };

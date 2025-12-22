@@ -28,6 +28,9 @@ const router = createRouter({
 
 
 
+    // Agent Router 测试页面
+    { path: '/agent-test', name: 'agent-test', component: () => import('../views/AgentRouterTest.vue'), meta: { requiresAuth: true, allowedUserTypes: [1, 2, 3] } },
+
     // 语音识别测试页面
     { path: '/speech-test', name: 'speech-test', component: () => import('../views/SpeechTest.vue'), meta: { requiresAuth: true, allowedUserTypes: [1, 2, 3] } }
   ],

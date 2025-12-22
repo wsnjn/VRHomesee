@@ -1,6 +1,7 @@
 com\example\homesee\service\CommunityService.class
 com\example\homesee\service\UserService.class
 com\example\homesee\controller\AdminUserController.class
+com\example\homesee\service\AiAgentService.class
 com\example\homesee\controller\DatabaseController.class
 com\example\homesee\repository\SocialLikeRepository.class
 com\example\homesee\controller\TenantMatchingController.class
@@ -15,6 +16,7 @@ com\example\homesee\service\AdminChannelService.class
 com\example\homesee\repository\TenantManagementRepository.class
 com\example\homesee\entity\ChatGroup.class
 com\example\homesee\entity\ContractChange.class
+com\example\homesee\controller\AiHouseTourController.class
 com\example\homesee\controller\LandlordHouseController.class
 com\example\homesee\entity\RentPayment.class
 com\example\homesee\entity\ChatMessage.class
@@ -35,6 +37,7 @@ com\example\homesee\service\AppointmentService.class
 com\example\homesee\dto\SocialPostDTO.class
 com\example\homesee\service\ViewingAppointmentService.class
 com\example\homesee\controller\LandlordTenantMatchingController.class
+com\example\homesee\controller\AiProxyController.class
 com\example\homesee\entity\TenantManagement.class
 com\example\homesee\controller\RoomInfoController.class
 com\example\homesee\entity\SocialLike.class

@@ -14,8 +14,10 @@ E:\wslop\End\Springboot\src\main\java\com\example\homesee\repository\ChatGroupRe
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\repository\HouseTourRepository.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\controller\LandlordHouseController.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\entity\Friendship.java
+E:\wslop\End\Springboot\src\main\java\com\example\homesee\service\AiAgentService.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\dto\ChatGroupDTO.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\entity\HouseTour.java
+E:\wslop\End\Springboot\src\main\java\com\example\homesee\controller\AiHouseTourController.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\dto\FriendDTO.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\service\AppointmentService.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\service\CommunityService.java
@@ -32,6 +34,7 @@ E:\wslop\End\Springboot\src\main\java\com\example\homesee\entity\RoomVrScene.jav
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\repository\AppointmentRepository.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\repository\SocialCommentRepository.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\controller\TenantManagementController.java
+E:\wslop\End\Springboot\src\main\java\com\example\homesee\controller\AiProxyController.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\controller\ViewingAppointmentController.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\controller\RoomVrSceneController.java
 E:\wslop\End\Springboot\src\main\java\com\example\homesee\entity\ChatGroup.java
