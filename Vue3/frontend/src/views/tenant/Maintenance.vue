@@ -88,7 +88,6 @@ const requests = ref([])
 const showCreateModal = ref(false)
 const activeLease = ref(null)
 const houseDetails = ref(null)
-const currentUserId = userState.user ? userState.user.id : 0
 
 const newRequest = ref({
   requestTitle: '',
@@ -97,9 +96,19 @@ const newRequest = ref({
 })
 
 const fetchActiveLease = async () => {
-  if (!currentUserId) return
+  // Get user ID dynamically to ensure it's available even if state updates late
+  let uid = userState.user ? userState.user.id : 0;
+  if (!uid) {
+    const local = localStorage.getItem('user');
+    if (local) {
+       try { uid = JSON.parse(local).id; } catch(e){}
+    }
+  }
+  
+  if (!uid) return;
+
   try {
-    const res = await fetch(`https://api.homesee.xyz/api/admin/tenant/tenant/${currentUserId}`)
+    const res = await fetch(`https://api.homesee.xyz/api/admin/tenant/tenant/${uid}`)
     const data = await res.json()
     if (data.success && data.contracts && data.contracts.length > 0) {
       const active = data.contracts.find(c => c.contractStatus === 1 || c.contractStatus === 2)
