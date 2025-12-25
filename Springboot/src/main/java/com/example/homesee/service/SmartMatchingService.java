@@ -87,6 +87,8 @@ public class SmartMatchingService {
                 "   - VR在线看房: <a href=\"https://www.homesee.xyz/#/house-tour?houseId={id}\" target=\"_blank\">VR看房</a>\n");
         systemContent.append(
                 "   - 预约现场看房: <a href=\"https://www.homesee.xyz/#/appointment?houseId={id}\" target=\"_blank\">预约看房</a>\n");
+        systemContent.append("   ⚠️ 【严格禁止】绝对不允许在链接中使用任何IP地址！必须使用域名 https://www.homesee.xyz\n");
+        systemContent.append("   ⚠️ 如果你在历史消息中看到了带IP地址的链接（如 http://39.108.142.250），那是错误的，请忽略并使用正确的域名。\n");
         systemContent.append("2. 请使用HTML标签来格式化你的回答，使其美观易读：\n");
         systemContent.append("   - 使用 <p> 标签分段。\n");
         systemContent.append("   - 使用 <br> 换行。\n");
@@ -127,9 +129,27 @@ public class SmartMatchingService {
         // 4. Call DeepSeek API
         String aiResponseContent = callDeepSeekApi(messages);
 
-        // 5. Save AI Response
+        // 5. Sanitize response: Replace any IP addresses with correct domain
+        aiResponseContent = sanitizeResponse(aiResponseContent);
+
+        // 6. Save AI Response
         ChatHistory aiHistory = new ChatHistory(userId, "assistant", aiResponseContent);
         return chatHistoryRepository.save(aiHistory);
+    }
+
+    /**
+     * Sanitize AI response to replace any IP-based URLs with domain-based URLs
+     */
+    private String sanitizeResponse(String content) {
+        if (content == null)
+            return content;
+
+        // Replace any http://IP:PORT with https://www.homesee.xyz
+        // Pattern: http://[IP address]:[port number]
+        content = content.replaceAll("http://\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}(:\\d+)?",
+                "https://www.homesee.xyz");
+
+        return content;
     }
 
     private String callDeepSeekApi(List<Map<String, String>> messages) {
