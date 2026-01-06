@@ -1,3 +1,14 @@
+<!--
+/**
+ * 文件名: AddHouse.vue
+ * 作者: 牛迦楠
+ * 学校: 东华理工大学
+ * 专业: 软件工程（中外合作办学）
+ * 课题: 融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 创建日期: 2026-01-06
+ * 描述: 添加房屋表单组件，提供完整的房屋信息录入界面
+ */
+-->
 <template>
   <div class="add-house-page">
     <div class="page-header">
@@ -351,44 +362,44 @@ defineExpose({ resetForm })
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px; /* Compact margin */
-  padding: 12px 16px; /* Compact padding */
+  margin-bottom: 16px; /* 紧凑边距 */
+  padding: 12px 16px; /* 紧凑内边距 */
   background-color: #1e3a5f;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 直角 */
 }
 
 .page-header h2 {
   margin: 0;
   color: white;
-  font-size: 1.4rem; /* Slightly smaller */
+  font-size: 1.4rem; /* 稍小 */
   font-weight: 500;
 }
 
 .header-actions {
   display: flex;
-  gap: 8px; /* Compact gap */
+  gap: 8px; /* 紧凑间距 */
   align-items: center;
 }
 
-/* Common Button Styles */
+/* 通用按钮样式 */
 .cancel-btn,
 .submit-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 6px 12px; /* Compact button */
+  padding: 6px 12px; /* 紧凑按钮 */
   border: none;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 直角 */
   font-weight: 500;
   font-size: 13px;
   cursor: pointer;
   transition: background-color 0.2s ease;
-  min-width: 80px; /* Reduced width */
+  min-width: 80px; /* 减小宽度 */
 }
 
 .cancel-btn {
-  background-color: #c0392b; /* Slightly darker red */
+  background-color: #c0392b; /* 稍深的红色 */
   color: white;
 }
 
@@ -413,17 +424,17 @@ defineExpose({ resetForm })
 
 .form-container {
   background: white;
-  border-radius: 0; /* Square */
-  box-shadow: none; /* Flat */
+  border-radius: 0; /* 直角 */
+  box-shadow: none; /* 扁平 */
   border: 1px solid #ddd;
 }
 
 .house-form {
-  padding: 16px; /* Compact padding */
+  padding: 16px; /* 紧凑内边距 */
 }
 
 .form-section {
-  margin-bottom: 16px; /* Compact margin */
+  margin-bottom: 16px; /* 紧凑边距 */
   padding-bottom: 16px;
   border-bottom: 1px solid #eee;
 }
@@ -434,18 +445,18 @@ defineExpose({ resetForm })
 }
 
 .form-section h3 {
-  margin: 0 0 12px 0; /* Compact margin */
+  margin: 0 0 12px 0; /* 紧凑边距 */
   color: #333;
-  font-size: 1rem; /* Smaller font */
+  font-size: 1rem; /* 较小字体 */
   font-weight: 600;
   padding-left: 8px;
-  border-left: 3px solid #1e3a5f; /* Industrial Blue Accent */
+  border-left: 3px solid #1e3a5f; /* 工业蓝强调色 */
 }
 
 .form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 8px 16px; /* Compact Gap: 8px vertical, 16px horizontal */
+  gap: 8px 16px; /* 紧凑间距：垂直8px，水平16px */
 }
 
 .form-group {
@@ -458,19 +469,19 @@ defineExpose({ resetForm })
 }
 
 .form-group label {
-  margin-bottom: 4px; /* Compact */
+  margin-bottom: 4px; /* 紧凑 */
   color: #555;
   font-weight: 500;
-  font-size: 12px; /* Smaller label */
+  font-size: 12px; /* 较小标签 */
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
-  padding: 8px; /* Compact input */
+  padding: 8px; /* 紧凑输入 */
   border: 1px solid #ccc;
-  border-radius: 0; /* Square */
-  font-size: 13px; /* Smaller text */
+  border-radius: 0; /* 直角 */
+  font-size: 13px; /* 较小文本 */
   transition: all 0.2s;
   background: white;
   color: #333;
@@ -480,8 +491,8 @@ defineExpose({ resetForm })
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #1e3a5f; /* Sharp Focus */
-  box-shadow: none; /* No Glow */
+  border-color: #1e3a5f; /* 清晰焦点 */
+  box-shadow: none; /* 无发光 */
 }
 
 .form-group input::placeholder,
@@ -492,7 +503,7 @@ defineExpose({ resetForm })
 
 .form-group textarea {
   resize: vertical;
-  min-height: 60px; /* Reduced min-height */
+  min-height: 60px; /* 减小最小高度 */
   font-family: inherit;
 }
 
@@ -507,7 +518,7 @@ defineExpose({ resetForm })
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: 16px; /* Compact margin */
+  margin-top: 16px; /* 紧凑边距 */
   padding-top: 16px;
   border-top: 1px solid #eee;
 }

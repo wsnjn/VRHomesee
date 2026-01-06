@@ -1,3 +1,12 @@
+<!--
+  项目名称：融合大模型交互与3D全景预览的智能选房平台
+  文件名称：TenantManagement.vue
+  开发者：牛迦楠
+  专业：软件工程（中外合作办学）
+  学校：东华理工大学
+  功能描述：租约管理组件，提供租约列表展示、详情查看和状态管理功能
+  创建日期：2026-01-06
+-->
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
@@ -11,7 +20,7 @@ const API_BASE_URL = 'https://api.homesee.xyz/api'
 // 响应式数据
 const appointments = ref([])
 const loadingAppointments = ref(false)
-const selectedStatusFilter = ref('all') // all, 0, 1, 2, 3, 4, 5
+const selectedStatusFilter = ref('all') // 全部, 0, 1, 2, 3, 4, 5
 const expandedAppointments = ref({}) // 存储每个预约项的展开状态
 const searchQuery = ref('') // 搜索查询
 
@@ -200,6 +209,9 @@ onMounted(() => {
 })
 </script>
 
+<!--
+  (已移动至文件头部)
+-->
 <template>
   <div class="tenant-management">
     <div class="page-header">
@@ -457,7 +469,7 @@ onMounted(() => {
   margin: 0 auto;
 }
 
-/* Page Header */
+/* 页面头部 */
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -465,7 +477,7 @@ onMounted(() => {
   margin-bottom: 20px;
   padding: 16px 24px;
   background-color: #1e3a5f;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 方形圆角 */
 }
 
 .page-header h2 {
@@ -488,7 +500,7 @@ onMounted(() => {
 .container {
   position: relative;
   background-color: white;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 方形圆角 */
   padding: 0;
   display: grid;
   place-content: center;
@@ -497,7 +509,7 @@ onMounted(() => {
 
 .search-container {
   width: 100%;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 方形圆角 */
   background-color: white;
   padding: 0;
   display: flex;
@@ -506,7 +518,7 @@ onMounted(() => {
 }
 
 .input {
-  padding: 8px 12px; /* Compact */
+  padding: 8px 12px; /* 紧凑 */
   width: 100%;
   background: transparent;
   border: none;
@@ -531,14 +543,14 @@ onMounted(() => {
   fill: #888;
 }
 
-/* Refresh Button */
+/* 刷新按钮 */
 .refresh-btn {
   display: flex;
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
   border: none;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 方形圆角 */
   cursor: pointer;
   font-weight: 500;
   font-size: 13px;
@@ -557,11 +569,11 @@ onMounted(() => {
   opacity: 0.7;
 }
 
-/* Status Filter */
+/* 状态筛选 */
 .status-filter {
   background: white;
-  padding: 12px 16px; /* Compact */
-  border-radius: 0; /* Square */
+  padding: 12px 16px; /* 紧凑 */
+  border-radius: 0; /* 方形圆角 */
   box-shadow: none;
   margin-bottom: 20px;
   display: flex;
@@ -584,9 +596,9 @@ onMounted(() => {
 }
 
 .filter-btn {
-  padding: 4px 10px; /* Compact */
+  padding: 4px 10px; /* 紧凑 */
   border: 1px solid #ddd;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 方形圆角 */
   background: white;
   color: #666;
   cursor: pointer;
@@ -606,10 +618,10 @@ onMounted(() => {
   color: white;
 }
 
-/* Appointments List */
+/* 预约列表 */
 .appointments-container {
   background: white;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 方形圆角 */
   box-shadow: none;
   overflow: hidden;
   border: 1px solid #ddd;
@@ -630,7 +642,7 @@ onMounted(() => {
 
 .appointment-item {
   border-bottom: 1px solid #eee;
-  padding: 0; /* Reset */
+  padding: 0; /* 重置 */
   transition: background-color 0.3s;
 }
 
@@ -638,12 +650,12 @@ onMounted(() => {
   border-bottom: none;
 }
 
-/* Header Row */
+/* 表头行 */
 .appointment-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px; /* Compact */
+  padding: 12px 16px; /* 紧凑 */
   cursor: pointer;
   background: #fff;
   transition: all 0.2s;
@@ -666,17 +678,17 @@ onMounted(() => {
 }
 
 .clickable-status {
-  padding: 2px 8px; /* Compact Tag */
-  border-radius: 0; /* Square */
+  padding: 2px 8px; /* 紧凑标签 */
+  border-radius: 0; /* 方形圆角 */
   font-size: 12px;
   font-weight: 500;
   text-align: center;
   min-width: 60px;
   cursor: pointer;
-  border: 1px solid transparent; /* To handle borders if needed */
+  border: 1px solid transparent; /* 需要时处理边框 */
 }
 
-/* Status Colors (Flat/Pastel) */
+/* 状态颜色（扁平/柔和） */
 .status-pending { background-color: #fff3cd; color: #856404; }
 .status-confirmed { background-color: #d1ecf1; color: #0c5460; }
 .status-completed { background-color: #d4edda; color: #155724; }
@@ -694,7 +706,7 @@ onMounted(() => {
   transform: rotate(180deg);
 }
 
-/* Expanded Content */
+/* 展开内容 */
 .appointment-content {
   padding: 16px;
   background: #fcfcfc;
@@ -716,7 +728,7 @@ onMounted(() => {
 .info-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 8px 16px; /* Compact Grid */
+  gap: 8px 16px; /* 紧凑网格 */
 }
 
 .info-item {
@@ -755,7 +767,7 @@ onMounted(() => {
   background-color: #27ae60;
   color: white;
   border: none;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 方形圆角 */
   font-size: 12px;
   cursor: pointer;
 }
@@ -764,7 +776,7 @@ onMounted(() => {
   background-color: #219a52;
 }
 
-/* Modals */
+/* 模态框 */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -782,7 +794,7 @@ onMounted(() => {
   background: white;
   width: 100%;
   max-width: 500px;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 方形圆角 */
   box-shadow: none;
   border: 1px solid #333;
 }
@@ -833,7 +845,7 @@ onMounted(() => {
   background: white;
   cursor: pointer;
   font-size: 12px;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 方形圆角 */
 }
 
 .status-btn.active {
@@ -851,7 +863,7 @@ onMounted(() => {
 
 .btn {
   padding: 6px 16px;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 方形圆角 */
   border: none;
   font-size: 12px;
   cursor: pointer;

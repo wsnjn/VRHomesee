@@ -1,3 +1,12 @@
+<!--
+  项目名称：融合大模型交互与3D全景预览的智能选房平台
+  文件名称：LandlordMaintenance.vue
+  开发者：牛迦楠
+  专业：软件工程（中外合作办学）
+  学校：东华理工大学
+  功能描述：房东维修工单管理组件，提供维修请求处理、状态跟踪和费用管理功能
+  创建日期：2026-01-06
+-->
 <template>
   <div class="landlord-maintenance">
     <div class="header">
@@ -27,7 +36,7 @@
     <div v-else class="request-list">
       <div v-for="req in filteredRequests" :key="req.id" class="request-card">
         <div class="card-body">
-          <!-- Header Content Merged Here -->
+          <!-- 头部内容合并至此 -->
           <div class="new-card-header">
             <div class="header-left">
               <span class="req-id">#{{ req.id }}</span>
@@ -84,7 +93,7 @@
             </div>
           </div>
 
-          <!-- Actions Merged Here -->
+          <!-- 操作按钮合并至此 -->
           <div class="actions">
             <button 
               v-if="req.requestStatus === 0" 
@@ -112,7 +121,7 @@
       </div>
     </div>
 
-    <!-- Complete Modal -->
+    <!-- 完成维修模态框 -->
     <div v-if="showCompleteModal" class="modal-overlay">
       <div class="modal-content">
         <h3>完成维修工单</h3>
@@ -183,7 +192,7 @@ const loadRequests = async () => {
       requests.value = res.data.data || []
     }
   } catch (e) {
-    console.error('Failed to load maintenance requests:', e)
+    console.error('加载维修请求失败:', e)
   } finally {
     loading.value = false
   }
@@ -194,7 +203,7 @@ const openCompleteModal = (req) => {
     id: req.id,
     repairCost: 0,
     costBearer: 1,
-    req: req // Keep reference to update local state
+    req: req // 保持引用以更新本地状态
   }
   showCompleteModal.value = true
 }
@@ -204,7 +213,7 @@ const submitComplete = async () => {
   try {
     const updateData = {
       id: req.id,
-      requestStatus: 2, // Completed
+      requestStatus: 2, // 已完成
       tenantManagementId: req.tenantManagementId,
       requestTitle: req.requestTitle,
       requestDescription: req.requestDescription,
@@ -217,7 +226,7 @@ const submitComplete = async () => {
 
     const res = await axios.post('https://api.homesee.xyz/api/maintenance/update', updateData)
     if (res.data.success) {
-      // Update local state
+      // 更新本地状态
       req.requestStatus = 2
       req.repairCost = completeForm.value.repairCost
       req.costBearer = completeForm.value.costBearer
@@ -227,7 +236,7 @@ const submitComplete = async () => {
       alert('更新失败')
     }
   } catch (e) {
-    console.error('Failed to complete request:', e)
+    console.error('完成请求失败:', e)
     alert('更新失败，请重试')
   }
 }
@@ -259,7 +268,7 @@ const updateStatus = async (req, newStatus) => {
       alert('更新失败')
     }
   } catch (e) {
-    console.error('Failed to update status:', e)
+    console.error('更新状态失败:', e)
     alert('更新失败，请重试')
   }
 }
@@ -295,9 +304,9 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Personal Development Style - Light Industrial (Compact) */
+/* 个人开发风格 - 轻工业风 (紧凑) */
 .landlord-maintenance {
-  padding: 16px; /* Reduced from 24px */
+  padding: 16px; /* 从 24px 减少 */
   width: 100%;
   max-width: none;
   background-color: #FFFFFF;
@@ -310,20 +319,20 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px; /* Reduced */
+  margin-bottom: 16px; /* 已减少 */
   border-bottom: 1px solid #E5E7EB;
   padding-bottom: 16px; /* Reduced */
 }
 
 .header h3 {
-  font-size: 18px; /* Slightly smaller */
+  font-size: 18px; /* 略微变小 */
   font-weight: 600;
   color: #111827;
   margin: 0;
   letter-spacing: -0.5px;
 }
 
-/* Filters - Toolbar Style */
+/* 筛选器 - 工具栏风格 */
 .filters {
   display: flex;
   gap: -1px;
@@ -333,12 +342,12 @@ onMounted(() => {
 }
 
 .filter-btn {
-  padding: 6px 16px; /* Reduced padding */
+  padding: 6px 16px; /* 减少内边距 */
   border: none;
   border-right: 1px solid #E5E7EB;
   background: white;
   border-radius: 0;
-  font-size: 12px; /* Smaller font */
+  font-size: 12px; /* 字体变小 */
   color: #6B7280;
   cursor: pointer;
   transition: all 0s;
@@ -359,11 +368,11 @@ onMounted(() => {
   font-weight: 600;
 }
 
-/* Request List */
+/* 请求列表 */
 .request-list {
   display: flex;
   flex-direction: column;
-  gap: 12px; /* Reduced gap */
+  gap: 12px; /* 减少间隙 */
 }
 
 .request-card {
@@ -390,7 +399,7 @@ onMounted(() => {
 .header-left {
   display: flex;
   align-items: center;
-  gap: 12px; /* Reduced gap */
+  gap: 12px; /* 减少间隙 */
 }
 
 .req-id {
@@ -409,7 +418,7 @@ onMounted(() => {
   font-size: 14px;
 }
 
-/* Status Badges - Minimal */
+/* 状态徽章 - 极简 */
 .status-badge {
   font-size: 11px;
   padding: 2px 6px;
@@ -423,7 +432,7 @@ onMounted(() => {
 .status-completed { background: #F0FDF4; color: #166534; border-color: #BBF7D0; }
 .status-closed { background: #F3F4F6; color: #4B5563; border-color: #E5E7EB; }
 
-/* Progress Bar - Linear Square */
+/* 进度条 - 线性方形 */
 .status-progress {
   display: flex;
   align-items: center;
@@ -432,11 +441,11 @@ onMounted(() => {
 .progress-step {
   display: flex;
   align-items: center;
-  gap: 6px; /* Reduced */
+  gap: 6px; /* 已减少 */
 }
 
 .step-dot {
-  width: 6px; /* Smaller */
+  width: 6px; /* 更小 */
   height: 6px;
   border-radius: 0;
   background: #E5E7EB;
@@ -468,7 +477,7 @@ onMounted(() => {
 }
 
 .progress-line {
-  width: 16px; /* Shorter line */
+  width: 16px; /* 更短的线 */
   height: 1px;
   background: #E5E7EB;
   margin: 0 6px;
@@ -478,18 +487,18 @@ onMounted(() => {
   background: #9CA3AF;
 }
 
-/* Card Body */
+/* 卡片主体 */
 .card-body {
-  padding: 16px; /* Reduced padding */
+  padding: 16px; /* 减少内边距 */
 }
 
 .req-desc {
   color: #374151;
-  margin-bottom: 16px; /* Reduced margin */
-  font-size: 13px; /* Smaller font */
+  margin-bottom: 16px; /* 减少外边距 */
+  font-size: 13px; /* 字体变小 */
   line-height: 1.5;
   background: #F9FAFB;
-  padding: 10px; /* Reduced padding */
+  padding: 10px; /* 减少内边距 */
   border: 1px solid #E5E7EB;
   border-radius: 0;
   font-family: 'JetBrains Mono', monospace;
@@ -498,19 +507,19 @@ onMounted(() => {
 .info-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px; /* Reduced gap */
+  gap: 16px; /* 减少间隙 */
   background: transparent;
   padding: 0;
   border: none;
-  margin-bottom: 16px; /* Added margin before actions */
+  margin-bottom: 16px; /* 操作按钮前增加外边距 */
 }
 
 .info-item {
   display: flex;
   flex-direction: column;
-  gap: 4px; /* Reduced gap */
-  border-left: 1px solid #E5E7EB; /* Thinner border */
-  padding-left: 12px; /* Reduced padding */
+  gap: 4px; /* 减少间隙 */
+  border-left: 1px solid #E5E7EB; /* 更细的边框 */
+  padding-left: 12px; /* 减少内边距 */
 }
 
 .info-item .label {
@@ -527,19 +536,19 @@ onMounted(() => {
   font-weight: 500;
 }
 
-/* Actions merged into body */
+/* 操作按钮合并入主体 */
 .actions {
   display: flex;
-  gap: 8px; /* Reduced gap */
+  gap: 8px; /* 减少间隙 */
   justify-content: flex-end;
   border-top: 1px solid #F3F4F6;
   padding-top: 12px;
 }
 
 .action-btn {
-  padding: 6px 16px; /* Reduced padding */
+  padding: 6px 16px; /* 减少内边距 */
   border-radius: 0;
-  font-size: 12px; /* Smaller font */
+  font-size: 12px; /* 字体变小 */
   font-weight: 500;
   cursor: pointer;
   background: white;
@@ -575,13 +584,13 @@ onMounted(() => {
   color: white;
 }
 
-/* Empty & Loading */
+/* 空状态与加载中 */
 .loading-state, .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40px 0; /* Reduced padding */
+  padding: 40px 0; /* 减少内边距 */
   color: #9CA3AF;
   border: 1px dashed #E5E7EB;
   border-radius: 0;
@@ -604,7 +613,7 @@ onMounted(() => {
   margin-bottom: 12px;
 }
 
-/* Modal */
+/* 模态框 */
 .modal-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -618,12 +627,12 @@ onMounted(() => {
 
 .modal-content {
   background: white;
-  padding: 20px; /* Reduced */
+  padding: 20px; /* 已减少 */
   border: 1px solid #E5E7EB;
   border-radius: 0;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   width: 90%;
-  max-width: 360px; /* Reduced max-width */
+  max-width: 360px; /* 减少最大宽度 */
 }
 
 .modal-content h3 {

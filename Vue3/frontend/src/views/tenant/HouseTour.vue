@@ -1,3 +1,14 @@
+<!--
+/**
+ * 文件名: HouseTour.vue
+ * 作者: 牛迦楠
+ * 学校: 东华理工大学
+ * 专业: 软件工程（中外合作办学）
+ * 课题: 融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 创建日期: 2026-01-06
+ * 描述: VR看房组件，提供3D全景漫游体验和AI看房助手功能
+ */
+-->
 <template>
   <div class="house-tour-page">
     <!-- 顶部导航栏 -->
@@ -76,7 +87,7 @@ const getUserId = () => {
       return user.id
     }
   } catch (e) {
-    console.error('Failed to parse user from localStorage', e)
+    console.error('解析localStorage中的用户数据失败', e)
   }
   return null
 }
@@ -155,7 +166,7 @@ const loadVrScenes = async () => {
       // router.push('/') // Optional: redirect or show empty state
     }
   } catch (error) {
-    console.error('Failed to load VR scenes:', error)
+    console.error('加载VR场景失败:', error)
     alert('加载VR场景失败')
   } finally {
     loading.value = false
@@ -182,7 +193,7 @@ const fetchHouseDetail = async (houseId) => {
       }
     }
   } catch (error) {
-    console.error('Failed to fetch house details:', error)
+    console.error('获取房屋详情失败:', error)
   }
 }
 
@@ -226,7 +237,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* 工业极简风格 - Industrial Minimal Design */
+/* 工业极简风格 */
 .house-tour-page {
   position: relative;
   height: 100vh;

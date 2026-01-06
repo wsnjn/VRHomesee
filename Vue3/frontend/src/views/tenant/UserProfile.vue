@@ -1,3 +1,14 @@
+<!--
+/**
+ * 文件名: UserProfile.vue
+ * 作者: 牛迦楠
+ * 学校: 东华理工大学
+ * 专业: 软件工程（中外合作办学）
+ * 课题: 融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 创建日期: 2026-01-06
+ * 描述: 用户信息管理组件，提供个人信息查看、编辑和头像上传功能
+ */
+-->
 <script setup>
 import { ref, onMounted, reactive } from 'vue'
 import { useRouter } from 'vue-router'

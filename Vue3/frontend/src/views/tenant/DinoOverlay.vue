@@ -1,3 +1,14 @@
+<!--
+/**
+ * 文件名: DinoOverlay.vue
+ * 作者: 牛迦楠
+ * 学校: 东华理工大学
+ * 专业: 软件工程（中外合作办学）
+ * 课题: 融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 创建日期: 2026-01-06
+ * 描述: 小恐龙叠加层组件，提供智能匹配入口的交互式动画引导
+ */
+-->
 <template>
   <div class="dino-overlay-container">
     <div class="ghost-animation" :class="{ 'jump': isJumping }" @click="makeDinoJump">

@@ -1,3 +1,13 @@
+/**
+ * 文件名: index.js
+ * 作者: 牛迦楠
+ * 学校: 东华理工大学
+ * 专业: 软件工程（中外合作办学）
+ * 课题: 融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 创建日期: 2026-01-06
+ * 描述: Vue Router路由配置文件，定义应用的所有路由规则和权限控制
+ */
+
 import { createRouter, createWebHashHistory } from 'vue-router'
 
 const router = createRouter({

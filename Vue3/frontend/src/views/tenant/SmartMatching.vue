@@ -1,3 +1,14 @@
+<!--
+/**
+ * 文件名: SmartMatching.vue
+ * 作者: 牛迦楠
+ * 学校: 东华理工大学
+ * 专业: 软件工程（中外合作办学）
+ * 课题: 融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 创建日期: 2026-01-06
+ * 描述: 智能租房匹配组件，基于DeepSeek AI提供个性化租房建议
+ */
+-->
 <template>
   <div class="chat-container">
     <Navbar />
@@ -116,7 +127,7 @@ const fetchHistory = async () => {
       }
     }
   } catch (error) {
-    console.error('Failed to fetch history:', error)
+    console.error('获取历史失败:', error)
   }
 }
 
@@ -202,7 +213,7 @@ const sendMessage = async () => {
     }
 
   } catch (error) {
-    console.error('API Error:', error)
+    console.error('API错误:', error)
     messages.value.splice(loadingMsgIndex, 1)
     addMessage('assistant', '网络连接出现问题，请检查您的网络设置。')
   } finally {

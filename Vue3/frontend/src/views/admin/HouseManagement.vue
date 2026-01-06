@@ -1,3 +1,14 @@
+<!--
+/**
+ * 文件名: HouseManagement.vue
+ * 作者: 牛迦楠
+ * 学校: 东华理工大学
+ * 专业: 软件工程（中外合作办学）
+ * 课题: 融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 创建日期: 2026-01-06
+ * 描述: 管理员房屋管理页面，提供房屋的增删改查、状态管理及VR场景管理功能
+ */
+-->
 <template>
   <div class="house-management">
     <!-- 工具栏 -->
@@ -695,7 +706,7 @@ const closeDetailDialog = () => {
   detailHouse.value = null
 }
 
-// VR Dialog Logic
+// VR对话框逻辑
 const showVrDialog = async (house) => {
   currentHouse.value = house
   showVrDialogVisible.value = true
@@ -717,7 +728,7 @@ const loadVrScenes = async (roomId) => {
        vrScenes.value = response.data.data
     }
   } catch (error) {
-    console.error('Load scenes failed:', error)
+    console.error('加载场景失败:', error)
   }
 }
 const handleFileSelect = (event) => {
@@ -742,7 +753,7 @@ const uploadVrScene = async () => {
       alert('上传成功')
       newSceneName.value = ''
       selectedFile.value = null
-      // Clear file input
+      // 清空文件输入
       const fileInput = document.querySelector('.file-input')
       if (fileInput) fileInput.value = ''
       
@@ -751,7 +762,7 @@ const uploadVrScene = async () => {
        alert('上传失败: ' + response.data.message)
     }
   } catch (error) {
-     console.error('Upload failed:', error)
+    console.error('上传失败:', error)
     alert('上传失败')
   } finally {
     uploading.value = false
@@ -769,7 +780,7 @@ const deleteVrScene = async (id) => {
       alert('删除失败')
     }
   } catch (error) {
-    console.error('Delete failed:', error)
+    console.error('删除场景失败:', error)
   }
 }
 
@@ -799,6 +810,7 @@ const closeDialog = () => {
   showEditDialog.value = false
   resetForm()
 }
+
 
 
 // 重置表单

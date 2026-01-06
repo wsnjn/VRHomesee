@@ -1,3 +1,14 @@
+<!--
+/**
+ * 文件名: Admin.vue
+ * 作者: 牛迦楠
+ * 学校: 东华理工大学
+ * 专业: 软件工程（中外合作办学）
+ * 课题: 融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 创建日期: 2026-01-06
+ * 描述: 管理员后台主界面，包含数据概览（大屏可视化风格）和各功能模块的导航入口
+ */
+-->
 <template>
   <div class="admin">
     <!-- 顶部导航栏 -->
@@ -340,12 +351,12 @@ const user = ref(null)
 const currentTime = ref('')
 let timer = null
 
-// Raw Data
+// 原始数据
 const rawHouses = ref([])
 const rawContracts = ref([])
 const rawUsers = ref([])
 
-// Aggregated Data
+// 聚合数据
 const statistics = ref({
   totalContracts: 0,
   activeContracts: 0,
@@ -410,7 +421,7 @@ const occupancyRate = computed(() => {
   return Math.round((houseStatusStats.value.rented / total) * 100)
 })
 
-// Chart Refs
+// 图表引用
 const contractChartRef = ref(null)
 const mapChartRef = ref(null)
 const occupancyChartRef = ref(null)
@@ -512,7 +523,7 @@ const processData = () => {
     rented: houses.filter(h => h.status === 1).length
   }
 
-  // 2. 城市分布 (Map Data)
+  // 2. 城市分布 (地图数据)
   const cityDist = {}
   houses.forEach(h => {
     if (h.city) {
@@ -1197,7 +1208,7 @@ onUnmounted(() => {
   background-color: #f8f9fa;
 }
 
-/* Dark Theme for Dashboard */
+/* 仪表盘暗色主题 */
 .main-content.dark-theme {
   background-color: #0b0b15;
   color: #fff;
@@ -1302,7 +1313,7 @@ onUnmounted(() => {
   min-height: 200px;
 }
 
-/* Full height map for center column */
+/* 中间列地图全高 */
 .map-card-full {
   flex: 1;
 }
@@ -1312,7 +1323,7 @@ onUnmounted(() => {
   min-height: 100%;
 }
 
-/* KPI Board */
+/* KPI 面板 */
 .kpi-board {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1320,7 +1331,7 @@ onUnmounted(() => {
   margin-bottom: 1.5rem;
 }
 
-/* Dashboard Header */
+/* 仪表盘头部 */
 .top-bar {
   display: flex;
   justify-content: flex-end;
@@ -1351,7 +1362,7 @@ onUnmounted(() => {
   text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
 }
 
-/* Chart with Info Layout */
+/* 带信息的图表布局 */
 .chart-with-info {
   display: flex;
   flex: 1;
@@ -1423,7 +1434,7 @@ onUnmounted(() => {
   text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
 }
 
-/* KPI Row - 5 Cards */
+/* KPI 行 - 5张卡片 */
 .kpi-row {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -1504,7 +1515,7 @@ onUnmounted(() => {
   margin-top: 0;
 }
 
-/* Old KPI Item (keep for compatibility) */
+/* 旧 KPI 项目（保留以兼容） */
 .kpi-item {
   background: rgba(0, 242, 255, 0.1);
   border: 1px solid rgba(0, 242, 255, 0.2);
@@ -1532,7 +1543,7 @@ onUnmounted(() => {
   text-transform: uppercase;
 }
 
-/* Expiring List Viz */
+/* 到期列表可视化 */
 .expiring-list-viz {
   flex: 1;
   overflow-y: auto;
@@ -1579,7 +1590,7 @@ onUnmounted(() => {
   padding: 2rem;
 }
 
-/* Scrollbar for dark theme */
+/* 暗色主题滚动条 */
 .dark-theme ::-webkit-scrollbar {
   width: 6px;
 }

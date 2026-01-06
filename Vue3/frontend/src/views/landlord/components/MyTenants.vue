@@ -1,3 +1,14 @@
+<!--
+/**
+ * 文件名: MyTenants.vue
+ * 作者: 牛迦楠
+ * 学校: 东华理工大学
+ * 专业: 软件工程（中外合作办学）
+ * 课题: 融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 创建日期: 2026-01-06
+ * 描述: 我的租户组件，展示当前租户信息和租约详情
+ */
+-->
 <template>
   <div class="my-tenants">
 
@@ -853,7 +864,7 @@ onMounted(() => {
   margin: 0 auto;
 }
 
-/* Page Header */
+/* 页面头部 */
 .page-header {
   margin-bottom: 20px;
 }
@@ -871,19 +882,19 @@ onMounted(() => {
   font-size: 0.9rem;
 }
 
-/* Stats Grid */
+/* 统计网格 */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px; /* Compact */
+  gap: 16px; /* 紧凑 */
   margin-bottom: 20px;
 }
 
 .stat-card {
   background: white;
   padding: 16px;
-  border-radius: 0; /* Square */
-  box-shadow: none; /* Flat */
+  border-radius: 0; /* 直角 */
+  box-shadow: none; /* 扁平 */
   border: 1px solid #ddd;
   display: flex;
   align-items: center;
@@ -900,7 +911,7 @@ onMounted(() => {
   height: 40px;
   background-color: #f0f2f5;
   color: #1e3a5f;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 直角 */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -924,11 +935,11 @@ onMounted(() => {
   font-weight: 500;
 }
 
-/* Filter Section */
+/* 筛选区域 */
 .filter-section {
   background: white;
-  padding: 12px 16px; /* Compact */
-  border-radius: 0; /* Square */
+  padding: 12px 16px; /* 紧凑 */
+  border-radius: 0; /* 直角 */
   box-shadow: none;
   margin-bottom: 20px;
   display: flex;
@@ -954,9 +965,9 @@ onMounted(() => {
 
 .search-box input {
   width: 100%;
-  padding: 8px 12px 8px 32px; /* Compact */
+  padding: 8px 12px 8px 32px; /* 紧凑 */
   border: 1px solid #ddd;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 直角 */
   font-size: 13px;
   transition: border-color 0.2s;
 }
@@ -974,7 +985,7 @@ onMounted(() => {
 .filter-controls select {
   padding: 8px 12px;
   border: 1px solid #ddd;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 直角 */
   background: white;
   font-size: 13px;
   cursor: pointer;
@@ -986,12 +997,12 @@ onMounted(() => {
   border-color: #1e3a5f;
 }
 
-/* Loading & Empty States */
+/* 加载与空状态 */
 .loading-section, .empty-state {
   text-align: center;
   padding: 40px;
   color: #666;
-  border: 1px dashed #ddd; /* Engineering style */
+  border: 1px dashed #ddd; /* 工程风格 */
   background: #fcfcfc;
 }
 
@@ -1010,7 +1021,7 @@ onMounted(() => {
   100% { transform: rotate(360deg); }
 }
 
-/* Tenant Cards */
+/* 租户卡片 */
 .tenant-cards {
   display: flex;
   flex-direction: column;
@@ -1019,10 +1030,10 @@ onMounted(() => {
 
 .tenant-card {
   background: white;
-  border-radius: 0; /* Square */
-  box-shadow: none; /* Flat */
+  border-radius: 0; /* 直角 */
+  box-shadow: none; /* 扁平 */
   border: 1px solid #eee;
-  padding: 0; /* Reset */
+  padding: 0; /* 重置 */
   transition: border-color 0.2s;
 }
 
@@ -1060,13 +1071,13 @@ onMounted(() => {
 
 .status-tag, .rent-status {
   padding: 2px 8px;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 直角 */
   font-size: 12px;
   font-weight: 500;
-  border: 1px solid transparent; /* Ensure borders align */
+  border: 1px solid transparent; /* 确保边框对齐 */
 }
 
-/* Status Colors (Flat) */
+/* 状态颜色（扁平） */
 .status-pending { background: #fff3cd; color: #856404; border-color: #ffeeba; }
 .status-signed { background: #d1ecf1; color: #0c5460; border-color: #bee5eb; }
 .status-active { background: #d4edda; color: #155724; border-color: #c3e6cb; }
@@ -1079,7 +1090,7 @@ onMounted(() => {
 .rent-overdue { background: #fff3cd; color: #856404; border-color: #ffeeba; }
 .rent-partial { background: #d1ecf1; color: #0c5460; border-color: #bee5eb; }
 
-/* Content Sections */
+/* 内容区域 */
 .house-info, .contract-info, .emergency-contact {
   padding: 12px 16px;
 }
@@ -1136,7 +1147,7 @@ onMounted(() => {
 .days-warning { color: #f0ad4e; }
 .days-normal { color: #5cb85c; }
 
-/* Actions */
+/* 操作按钮 */
 .tenant-actions {
   display: flex;
   gap: 8px;
@@ -1148,7 +1159,7 @@ onMounted(() => {
   flex: 1;
   padding: 6px 12px;
   border: 1px solid #ddd;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 直角 */
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
@@ -1167,9 +1178,9 @@ onMounted(() => {
   background-color: #f8f9fa;
 }
 
-/* Specific override if needed, but generic style is cleaner */
+/* 如果需要，可在此覆盖，但通用样式更整洁 */
 
-/* Emergency Contact */
+/* 紧急联系人 */
 .emergency-contact {
   background: #fafafa;
   border-top: 1px solid #eee;
@@ -1197,7 +1208,7 @@ onMounted(() => {
   font-family: monospace;
 }
 
-/* Modal */
+/* 模态框 */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -1217,7 +1228,7 @@ onMounted(() => {
   width: 90%;
   max-width: 600px;
   max-height: 90vh;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 直角 */
   box-shadow: none;
   border: 1px solid #333;
   display: flex;
@@ -1267,7 +1278,7 @@ onMounted(() => {
   color: #333;
   margin: 0 0 12px 0;
   padding-bottom: 4px;
-  border-bottom: 2px solid #1e3a5f; /* Accent underline */
+  border-bottom: 2px solid #1e3a5f; /* 强调下划线 */
   display: inline-block;
 }
 
@@ -1312,11 +1323,11 @@ onMounted(() => {
   background: #fcfcfc;
 }
 
-/* Edit Inputs/Selects in Modal */
+/* 模态框中的编辑输入框/选择框 */
 .status-select, .reading-input {
   padding: 4px 8px;
   border: 1px solid #ddd;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 直角 */
   font-size: 12px;
 }
 
@@ -1367,7 +1378,7 @@ onMounted(() => {
   background: #e0e0e0;
 }
 
-/* Scrollbar */
+/* 滚动条 */
 .modal-body::-webkit-scrollbar {
   width: 4px;
 }
@@ -1378,7 +1389,7 @@ onMounted(() => {
   background-color: #ddd;
 }
 
-/* Responsive */
+/* 响应式 */
 @media (max-width: 768px) {
   .filter-section {
     flex-direction: column;
@@ -1399,7 +1410,7 @@ onMounted(() => {
   }
 }
 
-/* Download Button */
+/* 下载按钮 */
 .download-btn {
   background: #10B981;
   color: white;
@@ -1412,7 +1423,7 @@ onMounted(() => {
   background: #059669;
 }
 
-/* PDF Preview Modal */
+/* PDF预览模态框 */
 .pdf-modal .modal-content {
   max-width: 900px;
   width: 95%;

@@ -1,3 +1,12 @@
+<!--
+  项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+  文件名称：HouseStatus.vue
+  开发者：牛迦楠
+  专业：软件工程（中外合作办学）
+  学校：东华理工大学
+  功能描述：房屋状态管理组件，提供房屋列表展示、状态切换、编辑和VR场景上传功能
+  创建日期：2026-01-06
+-->
 <template>
   <div class="my-houses">
     <div class="page-header">
@@ -741,17 +750,17 @@ const statusCounts = computed(() => {
   )
   
   // 统计各状态房屋数（允许重叠）
-  let available = 0 // status === 0
+  let available = 0 // 状态 === 0 (可租)
   let rented = 0    // 有有效合同
-  let offline = 0   // status === 2
+  let offline = 0   // 状态 === 2 (下架)
   let preRent = 0   // 有待确认预约
   
   props.myHouses.forEach(house => {
-    // 可租：按 status === 0 统计
+    // 可租：按 状态 === 0 统计
     if (house.status === 0) {
       available++
     }
-    // 下架：按 status === 2 统计
+    // 下架：按 状态 === 2 统计
     if (house.status === 2) {
       offline++
     }
@@ -1064,8 +1073,8 @@ const getStatusBtnText = (status) => {
 // 获取状态按钮样式类
 const getStatusBtnClass = (status) => {
   const classMap = {
-    0: 'btn-offline', // Redish for toggling away
-    1: 'btn-available', // Green for setting available
+    0: 'btn-offline', // 红色用于下架操作
+    1: 'btn-available', // 绿色用于上架操作
     2: 'btn-available',
     3: 'btn-available'
   }
@@ -1081,7 +1090,7 @@ const toggleHouseStatus = async (house) => {
   
   // 根据当前状态确定新状态
   switch (currentStatus) {
-    case 0: // 可租 -> 已租 (Admin Logic: Set as Rented)
+    case 0: // 可租 -> 已租 (管理员逻辑：设为已租)
       newStatus = 1
       break
     case 1: // 已租 -> 可租
@@ -1144,7 +1153,7 @@ const loadVrScenes = async (roomId) => {
        vrScenes.value = response.data.data
     }
   } catch (error) {
-    console.error('Load scenes failed:', error)
+    console.error('加载场景失败:', error)
   }
 }
 
@@ -1179,7 +1188,7 @@ const uploadVrScene = async () => {
        alert('上传失败: ' + response.data.message)
     }
   } catch (error) {
-     console.error('Upload failed:', error)
+     console.error('上传失败:', error)
     alert('上传失败')
   } finally {
     uploadingVr.value = false
@@ -1197,7 +1206,7 @@ const deleteVrScene = async (id) => {
       alert('删除失败')
     }
   } catch (error) {
-    console.error('Delete failed:', error)
+    console.error('删除失败:', error)
   }
 }
 
@@ -1484,11 +1493,11 @@ const formatDate = (dateString) => {
   background-color: #219a52;
 }
 
-/* 房屋列表样式 (Admin Style - Personal Refined) */
+/* 房屋列表样式 (管理员风格 - 个人优化) */
 .house-list {
   background: #fff;
   border: 1px solid #ddd;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 方形圆角 */
 }
 
 /* 搜索无结果提示 */
@@ -1517,7 +1526,7 @@ const formatDate = (dateString) => {
 .house-row {
   display: flex;
   align-items: center;
-  padding: 8px 16px; /* Compact */
+  padding: 8px 16px; /* 紧凑 */
   border-bottom: 1px solid #e5e5e5;
   font-size: 13px;
   transition: background-color 0.2s;
@@ -1557,7 +1566,7 @@ const formatDate = (dateString) => {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px 16px; /* Standardize gap */
+  gap: 8px 16px; /* 统一间距 */
 }
 
 .info-label {
@@ -1601,9 +1610,9 @@ const formatDate = (dateString) => {
 
 .status-tag {
   display: inline-block;
-  padding: 2px 6px; /* Compact */
+  padding: 2px 6px; /* 紧凑 */
   font-size: 12px;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 方形圆角 */
   white-space: nowrap;
 }
 
@@ -1618,7 +1627,7 @@ const formatDate = (dateString) => {
   flex: 0 0 auto;
   padding-left: 16px;
   display: flex;
-  gap: 8px; /* Standardize gap */
+  gap: 8px; /* 统一间距 */
 }
 
 .row-actions button {
@@ -1627,7 +1636,7 @@ const formatDate = (dateString) => {
   background: #fff;
   color: #333;
   font-size: 12px;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 方形圆角 */
   cursor: pointer;
   transition: all 0.2s;
   white-space: nowrap;
@@ -1710,7 +1719,7 @@ const formatDate = (dateString) => {
   background-color: #27ae60;
   color: white;
   border: none;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 方形圆角 */
   cursor: pointer;
   font-weight: 500;
 }
@@ -1736,13 +1745,13 @@ const formatDate = (dateString) => {
 
 .modal-content {
   background-color: white;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 方形圆角 */
   width: 100%;
   max-width: 800px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: none; /* No shadow */
-  border: 1px solid #333; /* Stronger border for modal */
+  box-shadow: none; /* 无阴影 */
+  border: 1px solid #333; /* 模态框边框加强 */
 }
 
 .modal-header {
@@ -1752,7 +1761,7 @@ const formatDate = (dateString) => {
   padding: 16px;
   border-bottom: 1px solid #ddd;
   background-color: #f9f9f9;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 方形圆角 */
 }
 
 .modal-header h3 {
@@ -1765,7 +1774,7 @@ const formatDate = (dateString) => {
 .close-btn {
   background: transparent;
   border: 1px solid #ddd;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 方形圆角 */
   width: 24px;
   height: 24px;
   font-size: 14px;
@@ -1803,7 +1812,7 @@ const formatDate = (dateString) => {
   font-weight: 400;
   font-size: 12px;
   background: transparent;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 方形圆角 */
   transition: background-color 0.2s ease;
 }
 
@@ -1867,7 +1876,7 @@ const formatDate = (dateString) => {
   border: 1px solid #ddd;
   font-size: 13px;
   background: #fff;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 方形圆角 */
   transition: border-color 0.3s;
 }
 
@@ -1884,7 +1893,7 @@ const formatDate = (dateString) => {
   min-height: 80px;
 }
 
-/* VR Dialog Styles */
+/* VR对话框样式 */
 .vr-dialog {
   max-width: 700px;
 }
@@ -1911,7 +1920,7 @@ const formatDate = (dateString) => {
 
 .scene-card {
   border: 1px solid #eee;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 方形圆角 */
   overflow: hidden;
   background: #f9f9f9;
 }
@@ -1983,7 +1992,7 @@ const formatDate = (dateString) => {
   border: 1px solid #ddd;
   font-size: 13px;
   flex: 1;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 方形圆角 */
 }
 
 .vr-file-input {
@@ -1996,7 +2005,7 @@ const formatDate = (dateString) => {
   background: #1e3a5f;
   color: white;
   border: none;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 方形圆角 */
   cursor: pointer;
   font-size: 13px;
 }

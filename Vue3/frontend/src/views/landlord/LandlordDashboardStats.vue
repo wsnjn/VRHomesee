@@ -1,3 +1,14 @@
+<!--
+/**
+ * 文件名: LandlordDashboardStats.vue
+ * 作者: 牛迦楠
+ * 学校: 东华理工大学
+ * 专业: 软件工程（中外合作办学）
+ * 课题: 融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 创建日期: 2026-01-06
+ * 描述: 房东仪表盘统计卡片组件，展示月收入、入住率、待处理报修等关键指标
+ */
+-->
 <template>
   <div class="dashboard-stats-container">
     <div class="stat-card income-card">
@@ -123,7 +134,7 @@ const formatPercent = (value) => {
   flex-shrink: 0;
 }
 
-/* Specific Card Styles - 极简配色 */
+/* 特定卡片样式 - 极简配色 */
 .income-card .stat-icon {
   background-color: #e8f4fd;
   color: #1e3a5f;

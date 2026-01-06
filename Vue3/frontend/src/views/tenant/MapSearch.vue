@@ -1,3 +1,14 @@
+<!--
+/**
+ * 文件名: MapSearch.vue
+ * 作者: 牛迦楠
+ * 学校: 东华理工大学
+ * 专业: 软件工程（中外合作办学）
+ * 课题: 融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 创建日期: 2026-01-06
+ * 描述: 地图搜索组件，基于高德地图提供房源地图展示和周边配套AI分析功能
+ */
+-->
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue'
 import AMapLoader from '@amap/amap-jsapi-loader'
@@ -74,10 +85,10 @@ const fetchRooms = async () => {
         console.warn('Unexpected API response structure:', data)
       }
     } else {
-        console.error('API Error:', response.status)
+        console.error('API错误:', response.status)
     }
   } catch (error) {
-    console.error('Failed to fetch rooms:', error)
+    console.error('获取房源数据失败:', error)
   } finally {
     loading.value = false
   }
@@ -243,7 +254,7 @@ const startAICompletion = async () => {
                         })
                         if (res.ok) successCount++
                     } catch (e) {
-                        console.error('Update failed for room ' + room.id, e)
+                        console.error('更新房源 ' + room.id + ' 失败', e)
                     }
                 }
                 resolve()

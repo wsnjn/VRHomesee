@@ -1,3 +1,12 @@
+<!--
+  项目名称：融合大模型交互与3D全景预览的智能选房平台
+  文件名称：LandlordTenantMatching.vue
+  开发者：牛迦楠
+  专业：软件工程（中外合作办学）
+  学校：东华理工大学
+  功能描述：房东租客匹配组件，基于AI推荐系统为空置房源匹配合适租客
+  创建日期：2026-01-06
+-->
 <template>
   <div class="landlord-tenant-matching">
 
@@ -783,7 +792,7 @@ watch(() => props.preSelectedData, async (newData) => {
   font-family: 'Inter', sans-serif;
 }
 
-/* Tenant Card Actions - Compact Style */
+/* 租户卡片操作 - 紧凑风格 */
 .tenant-card-actions {
   display: flex;
   gap: 8px;
@@ -953,7 +962,7 @@ watch(() => props.preSelectedData, async (newData) => {
   margin-bottom: 20px;
   padding: 16px 24px;
   background-color: #1e3a5f;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 方形圆角 */
 }
 
 .page-header h2 {
@@ -971,17 +980,17 @@ watch(() => props.preSelectedData, async (newData) => {
 
 .matching-container {
   display: grid;
-  grid-template-columns: 1fr 280px 1fr; /* Fixed width for action panel */
+  grid-template-columns: 1fr 280px 1fr; /* 操作面板固定宽度 */
   gap: 24px;
-  height: calc(100vh - 140px); /* Adjust for header */
+  height: calc(100vh - 140px); /* 适配头部高度 */
   align-items: stretch;
 }
 
-/* Panel Styles */
+/* 面板样式 */
 .panel {
   background: white;
-  border-radius: 0; /* Square */
-  box-shadow: none; /* Flat */
+  border-radius: 0; /* 方形圆角 */
+  box-shadow: none; /* 扁平 */
   display: flex;
   flex-direction: column;
   border: 1px solid #ddd;
@@ -1008,7 +1017,7 @@ watch(() => props.preSelectedData, async (newData) => {
 .search-input, .status-select {
   padding: 6px 8px;
   border: 1px solid #ddd;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 方形圆角 */
   flex: 1;
   font-size: 12px;
 }
@@ -1033,7 +1042,7 @@ watch(() => props.preSelectedData, async (newData) => {
   font-style: italic;
 }
 
-/* Items List */
+/* 项目列表 */
 .items-list {
   display: flex;
   flex-direction: column;
@@ -1042,7 +1051,7 @@ watch(() => props.preSelectedData, async (newData) => {
 
 .item-card {
   border: 1px solid #eee;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 方形圆角 */
   padding: 12px;
   cursor: pointer;
   transition: all 0.2s;
@@ -1058,7 +1067,7 @@ watch(() => props.preSelectedData, async (newData) => {
   border-color: #1e3a5f;
   background-color: #f0f4f8;
   border-width: 2px;
-  margin: -1px; /* Offset border width increase */
+  margin: -1px; /* 抵消边框宽度增加 */
 }
 
 .item-header {
@@ -1078,7 +1087,7 @@ watch(() => props.preSelectedData, async (newData) => {
 
 .status-badge {
   padding: 2px 6px;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 方形圆角 */
   font-size: 11px;
   font-weight: 500;
   text-align: center;
@@ -1107,7 +1116,7 @@ watch(() => props.preSelectedData, async (newData) => {
   color: #444;
 }
 
-/* Action Panel (Center) */
+/* 操作面板 (中间) */
 .action-panel {
   display: flex;
   flex-direction: column;
@@ -1172,7 +1181,7 @@ watch(() => props.preSelectedData, async (newData) => {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 方形圆角 */
   box-shadow: none;
   width: 100%;
   text-transform: uppercase;
@@ -1189,7 +1198,7 @@ watch(() => props.preSelectedData, async (newData) => {
   opacity: 0.7;
 }
 
-/* Recommendation Tags */
+/* 推荐标签 */
 .recommendation-tags {
   display: flex;
   flex-wrap: wrap;
@@ -1214,7 +1223,7 @@ watch(() => props.preSelectedData, async (newData) => {
 .rec-tag.intent { background: #dbeafe; color: #1e40af; border-color: #bfdbfe; }
 .rec-tag.contact { background: #fef3c7; color: #92400e; border-color: #fde68a; }
 
-/* Quick Contact */
+/* 快速联系 */
 .quick-contact-actions {
   margin-top: 8px;
 }
@@ -1236,7 +1245,7 @@ watch(() => props.preSelectedData, async (newData) => {
   background: #059669;
 }
 
-/* Modal */
+/* 模态框 */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -1255,8 +1264,10 @@ watch(() => props.preSelectedData, async (newData) => {
   background: white;
   width: 90%;
   max-width: 600px;
-  max-height: 90vh; /* Scrollable if tall */
-  border-radius: 0; /* Square */
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh; /* 如果内容过高则滚动 */
+  border-radius: 0; /* 方形圆角 */
   box-shadow: none;
   border: 1px solid #333;
   display: flex;
@@ -1342,7 +1353,7 @@ watch(() => props.preSelectedData, async (newData) => {
 .form-group input, .form-group select, .form-group textarea {
   padding: 8px 12px;
   border: 1px solid #ddd;
-  border-radius: 0; /* Square */
+  border-radius: 0; /* 方形圆角 */
   font-size: 13px;
 }
 
@@ -1400,7 +1411,7 @@ watch(() => props.preSelectedData, async (newData) => {
 .cancel-btn:hover { background: #e0e0e0; }
 .confirm-btn:hover { background: #2d5a87; }
 
-/* Responsive */
+/* 响应式设计 */
 @media (max-width: 1024px) {
   .matching-container {
     grid-template-columns: 1fr;

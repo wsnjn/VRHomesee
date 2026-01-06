@@ -1,3 +1,14 @@
+<!--
+/**
+ * 文件名: Home.vue
+ * 作者: 牛迦楠
+ * 学校: 东华理工大学
+ * 专业: 软件工程（中外合作办学）
+ * 课题: 融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 创建日期: 2026-01-06
+ * 描述: 租户端首页组件，展示核心功能入口、预约信息概览和特色卡片
+ */
+-->
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
