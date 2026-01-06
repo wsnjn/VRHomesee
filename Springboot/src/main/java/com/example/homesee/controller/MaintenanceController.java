@@ -1,3 +1,12 @@
+/**
+ * 项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 文件名称：MaintenanceController.java
+ * 开发者：牛迦楠
+ * 专业：软件工程（中外合作办学）
+ * 学校：东华理工大学
+ * 功能描述：报修管理控制器，处理租客提交的报修申请、房东端查看报修列表、以及报修订单的状态更新
+ * 创建日期：2026-01-06
+ */
 package com.example.homesee.controller;
 
 import com.example.homesee.entity.MaintenanceRequest;

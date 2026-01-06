@@ -1,3 +1,12 @@
+/**
+ * 项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 文件名称：Appointment.java
+ * 开发者：牛迦楠
+ * 专业：软件工程（中外合作办学）
+ * 学校：东华理工大学
+ * 功能描述：预约实体类，记录用户提交的看房或合同签约预约申请，包含联系人、预约时间、类型及生命周期状态
+ * 创建日期：2026-01-06
+ */
 package com.example.homesee.entity;
 
 import jakarta.persistence.*;
@@ -46,8 +55,8 @@ public class Appointment {
         this.updatedTime = LocalDateTime.now();
     }
 
-    public Appointment(Long houseId, Long userId, String contactName, String contactPhone, 
-                      LocalDateTime appointmentDateTime, Integer appointmentType, String remarks) {
+    public Appointment(Long houseId, Long userId, String contactName, String contactPhone,
+            LocalDateTime appointmentDateTime, Integer appointmentType, String remarks) {
         this();
         this.houseId = houseId;
         this.userId = userId;

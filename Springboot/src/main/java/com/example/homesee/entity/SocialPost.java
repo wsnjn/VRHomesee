@@ -1,3 +1,12 @@
+/**
+ * 项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 文件名称：SocialPost.java
+ * 开发者：牛迦楠
+ * 专业：软件工程（中外合作办学）
+ * 学校：东华理工大学
+ * 功能描述：社交动态实体类，记录用户发布的图文信息、可见范围设定及创建时间，支持多媒体内容的 JSON 序列化存储
+ * 创建日期：2026-01-06
+ */
 package com.example.homesee.entity;
 
 import jakarta.persistence.*;
@@ -17,10 +26,10 @@ public class SocialPost {
     private String content;
 
     @Column(name = "media_urls", columnDefinition = "TEXT")
-    private String mediaUrls; // JSON array string
+    private String mediaUrls; // JSON 格式的文件名列表
 
     @Column(name = "visibility")
-    private Integer visibility; // 0-Public, 1-Friends Only
+    private Integer visibility; // 0-公开, 1-仅好友可见
 
     @Column(name = "created_time", updatable = false)
     private LocalDateTime createdTime;
@@ -30,7 +39,7 @@ public class SocialPost {
         createdTime = LocalDateTime.now();
     }
 
-    // Getters and Setters
+    // Getter 和 Setter 方法
     public Long getId() {
         return id;
     }

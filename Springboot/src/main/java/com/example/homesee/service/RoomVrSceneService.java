@@ -1,3 +1,12 @@
+/**
+ * 项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 文件名称：RoomVrSceneService.java
+ * 开发者：牛迦楠
+ * 专业：软件工程（中外合作办学）
+ * 学校：东华理工大学
+ * 功能描述：VR场景服务类，提供房源VR全景场景的获取、文件路由转换（拼接待下载链接）、场景记录新增及删除等功能
+ * 创建日期：2026-01-06
+ */
 package com.example.homesee.service;
 
 import com.example.homesee.entity.RoomVrScene;
@@ -32,7 +41,7 @@ public class RoomVrSceneService {
     public RoomVrScene addScene(Long roomId, String sceneName, MultipartFile file) throws IOException {
         // 1. 上传文件到文件服务器
         String fileName = file.getOriginalFilename();
-        
+
         // 2. 创建实体，只保存文件名
         // 实际文件存储在文件服务器，这里只保存文件名用于后续获取
         RoomVrScene scene = new RoomVrScene(roomId, sceneName, fileName);

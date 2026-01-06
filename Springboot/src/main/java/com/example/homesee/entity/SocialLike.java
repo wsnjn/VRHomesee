@@ -1,3 +1,12 @@
+/**
+ * 项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 文件名称：SocialLike.java
+ * 开发者：牛迦楠
+ * 专业：软件工程（中外合作办学）
+ * 学校：东华理工大学
+ * 功能描述：社交点赞实体类，通过联合唯一索引确保用户对同一动态仅能进行一次点赞操作
+ * 创建日期：2026-01-06
+ */
 package com.example.homesee.entity;
 
 import jakarta.persistence.*;
@@ -26,7 +35,7 @@ public class SocialLike {
         createdTime = LocalDateTime.now();
     }
 
-    // Getters and Setters
+    // Getter 和 Setter 方法
     public Long getId() {
         return id;
     }

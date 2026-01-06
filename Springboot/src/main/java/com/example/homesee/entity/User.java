@@ -1,3 +1,12 @@
+/**
+ * 项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 文件名称：User.java
+ * 开发者：牛迦楠
+ * 专业：软件工程（中外合作办学）
+ * 学校：东华理工大学
+ * 功能描述：用户实体类，系统核心账户模型，存储用户基础账号信息、实名认证状态、职业背景、社交禁言状态及信用积分等核心画像数据
+ * 创建日期：2026-01-06
+ */
 package com.example.homesee.entity;
 
 import jakarta.persistence.*;
@@ -106,7 +115,7 @@ public class User {
         this.realName = realName;
     }
 
-    // Getters and Setters
+    // Getter 和 Setter 方法
     public Long getId() {
         return id;
     }

@@ -1,3 +1,12 @@
+/**
+ * 项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 文件名称：Friendship.java
+ * 开发者：牛迦楠
+ * 专业：软件工程（中外合作办学）
+ * 学校：东华理工大学
+ * 功能描述：好友关系实体类，记录用户之间的社交关联状态（申请中、已接受、已拒绝）及建立时间
+ * 创建日期：2026-01-06
+ */
 package com.example.homesee.entity;
 
 import jakarta.persistence.*;
@@ -17,7 +26,7 @@ public class Friendship {
     private Long friendId;
 
     @Column(name = "status")
-    private Integer status = 0; // 0-Pending, 1-Accepted, 2-Rejected
+    private Integer status = 0; // 0-待处理, 1-互为好友, 2-已拒绝
 
     @Column(name = "created_time", updatable = false)
     private LocalDateTime createdTime;
@@ -27,7 +36,7 @@ public class Friendship {
         createdTime = LocalDateTime.now();
     }
 
-    // Getters and Setters
+    // Getter 和 Setter 方法
     public Long getId() {
         return id;
     }

@@ -1,3 +1,12 @@
+/**
+ * 项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 文件名称：SocialComment.java
+ * 开发者：牛迦楠
+ * 专业：软件工程（中外合作办学）
+ * 学校：东华理工大学
+ * 功能描述：社交评论实体类，存储用户对朋友圈动态的评论内容及其关联的时间戳
+ * 创建日期：2026-01-06
+ */
 package com.example.homesee.entity;
 
 import jakarta.persistence.*;
@@ -27,7 +36,7 @@ public class SocialComment {
         createdTime = LocalDateTime.now();
     }
 
-    // Getters and Setters
+    // Getter 和 Setter 方法
     public Long getId() {
         return id;
     }

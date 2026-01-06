@@ -1,3 +1,12 @@
+/**
+ * 项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 文件名称：ChatGroup.java
+ * 开发者：牛迦楠
+ * 专业：软件工程（中外合作办学）
+ * 学校：东华理工大学
+ * 功能描述：聊天群组实体类，映射数据库 chat_group 表，存储群组的基础属性、类型及其所有者信息
+ * 创建日期：2026-01-06
+ */
 package com.example.homesee.entity;
 
 import jakarta.persistence.*;
@@ -14,7 +23,7 @@ public class ChatGroup {
     private String groupName;
 
     @Column(name = "group_type", nullable = false)
-    private Integer groupType; // 0-Normal, 1-Global, 2-Tenant
+    private Integer groupType; // 0-普通群, 1-系统全员群, 2-租客特定群
 
     @Column(name = "owner_id")
     private Long ownerId;
@@ -30,7 +39,7 @@ public class ChatGroup {
         createdTime = LocalDateTime.now();
     }
 
-    // Getters and Setters
+    // Getter 和 Setter 方法
     public Long getId() {
         return id;
     }

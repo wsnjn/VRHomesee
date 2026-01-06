@@ -1,3 +1,12 @@
+/**
+ * 项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 文件名称：LandlordTenantMatchingController.java
+ * 开发者：牛迦楠
+ * 专业：软件工程（中外合作办学）
+ * 学校：东华理工大学
+ * 功能描述：房东端租客匹配控制器，允许房东针对自有房源创建租赁合同、查询名下所有租约状态及按状态筛选过滤
+ * 创建日期：2026-01-06
+ */
 package com.example.homesee.controller;
 
 import com.example.homesee.service.TenantManagementService;

@@ -1,3 +1,12 @@
+/**
+ * 项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 文件名称：UserService.java
+ * 开发者：牛迦楠
+ * 专业：软件工程（中外合作办学）
+ * 学校：东华理工大学
+ * 功能描述：用户服务类，提供用户注册（含密码MD5加密）、登录认证、个人资料深度维护（含头像异步上传逻辑）及用户搜索等核心功能
+ * 创建日期：2026-01-06
+ */
 package com.example.homesee.service;
 
 import com.example.homesee.entity.User;
@@ -236,7 +245,7 @@ public class UserService {
             if (updateData.containsKey("username")) {
                 String newUsername = getStringValue(updateData.get("username"));
                 if (newUsername != null && !newUsername.isEmpty() && !newUsername.equals(user.getUsername())) {
-                    // Check if username already exists
+                    // 检查用户名是否已存在
                     if (userRepository.existsByUsername(newUsername)) {
                         result.put("success", false);
                         result.put("message", "用户名已存在");

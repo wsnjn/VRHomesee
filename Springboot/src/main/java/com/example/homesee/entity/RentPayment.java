@@ -1,3 +1,12 @@
+/**
+ * 项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 文件名称：RentPayment.java
+ * 开发者：牛迦楠
+ * 专业：软件工程（中外合作办学）
+ * 学校：东华理工大学
+ * 功能描述：租金支付记录实体类，管理合同项下的分期租金缴纳，包含应付/实付金额、支付渠道、逾期费及流水状态
+ * 创建日期：2026-01-06
+ */
 package com.example.homesee.entity;
 
 import jakarta.persistence.*;
@@ -52,15 +61,15 @@ public class RentPayment {
     public RentPayment() {
     }
 
-    public RentPayment(Long tenantManagementId, String paymentPeriod, 
-                      BigDecimal payableAmount, LocalDate dueDate) {
+    public RentPayment(Long tenantManagementId, String paymentPeriod,
+            BigDecimal payableAmount, LocalDate dueDate) {
         this.tenantManagementId = tenantManagementId;
         this.paymentPeriod = paymentPeriod;
         this.payableAmount = payableAmount;
         this.dueDate = dueDate;
     }
 
-    // Getters and Setters
+    // Getter 和 Setter 方法
     public Long getId() {
         return id;
     }

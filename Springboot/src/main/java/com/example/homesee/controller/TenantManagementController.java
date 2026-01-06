@@ -1,3 +1,12 @@
+/**
+ * 项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 文件名称：TenantManagementController.java
+ * 开发者：牛迦楠
+ * 专业：软件工程（中外合作办学）
+ * 学校：东华理工大学
+ * 功能描述：租赁管理控制器，提供租赁合同的创建、状态追踪（签约、缴费、押金）、水电读数更新及合同趋势统计等功能
+ * 创建日期：2026-01-06
+ */
 package com.example.homesee.controller;
 
 import com.example.homesee.service.TenantManagementService;

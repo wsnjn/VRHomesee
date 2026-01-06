@@ -1,3 +1,12 @@
+/**
+ * 项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 文件名称：TenantManagementService.java
+ * 开发者：牛迦楠
+ * 专业：软件工程（中外合作办学）
+ * 学校：东华理工大学
+ * 功能描述：租赁管理服务类，提供租赁合同生命周期管理（创建、签约、到期提醒）、水电表抄表记录及多维度的租赁业务数据统计
+ * 创建日期：2026-01-06
+ */
 package com.example.homesee.service;
 
 import com.example.homesee.entity.TenantManagement;
@@ -475,17 +484,17 @@ public class TenantManagementService {
         contractMap.put("createdTime", contract.getCreatedTime());
         contractMap.put("updatedTime", contract.getUpdatedTime());
 
-        // Enrich with tenant info
+        // 补充租客信息
         try {
             userRepository.findById(contract.getTenantId()).ifPresent(user -> {
                 contractMap.put("tenantName", user.getRealName() != null ? user.getRealName() : user.getUsername());
                 contractMap.put("tenantPhone", user.getPhone());
             });
         } catch (Exception e) {
-            // Ignore if user not found or error
+            // 如果未找到用户或出错，则忽略
         }
 
-        // Enrich with room info
+        // 补充房屋信息
         try {
             roomInfoRepository.findById(contract.getRoomId()).ifPresent(room -> {
                 contractMap.put("province", room.getProvince());
@@ -506,7 +515,7 @@ public class TenantManagementService {
                 contractMap.put("electricPrice", room.getElectricPrice());
             });
         } catch (Exception e) {
-            // Ignore if room not found or error
+            // 如果未找到房间或出错，则忽略
         }
 
         return contractMap;

@@ -1,3 +1,12 @@
+/**
+ * 项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 文件名称：TenantManagement.java
+ * 开发者：牛迦楠
+ * 专业：软件工程（中外合作办学）
+ * 学校：东华理工大学
+ * 功能描述：租约管理实体类，核心业务实体之一，维护合同全生命周期数据，包括租期起止、租金押金、支付周期、费用底数及紧急联系信息
+ * 创建日期：2026-01-06
+ */
 package com.example.homesee.entity;
 
 import jakarta.persistence.*;
@@ -90,9 +99,9 @@ public class TenantManagement {
     public TenantManagement() {
     }
 
-    public TenantManagement(String contractNumber, Long roomId, Long landlordId, Long tenantId, 
-                          LocalDate contractStartDate, LocalDate contractEndDate, 
-                          BigDecimal monthlyRent, BigDecimal depositAmount) {
+    public TenantManagement(String contractNumber, Long roomId, Long landlordId, Long tenantId,
+            LocalDate contractStartDate, LocalDate contractEndDate,
+            BigDecimal monthlyRent, BigDecimal depositAmount) {
         this.contractNumber = contractNumber;
         this.roomId = roomId;
         this.landlordId = landlordId;
@@ -103,7 +112,7 @@ public class TenantManagement {
         this.depositAmount = depositAmount;
     }
 
-    // Getters and Setters
+    // Getter 和 Setter 方法
     public Long getId() {
         return id;
     }

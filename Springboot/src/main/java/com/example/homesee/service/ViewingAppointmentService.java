@@ -1,3 +1,12 @@
+/**
+ * 项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 文件名称：ViewingAppointmentService.java
+ * 开发者：牛迦楠
+ * 专业：软件工程（中外合作办学）
+ * 学校：东华理工大学
+ * 功能描述：预约看房服务类，提供预约创建、时间冲突检查、预约编号生成、状态流转（确认/取消/完成）及跟进处理等核心业务逻辑实现
+ * 创建日期：2026-01-06
+ */
 package com.example.homesee.service;
 
 import com.example.homesee.entity.ViewingAppointment;
@@ -22,10 +31,10 @@ public class ViewingAppointmentService {
 
     @Autowired
     private ViewingAppointmentRepository viewingAppointmentRepository;
-    
+
     @Autowired
     private RoomInfoRepository roomInfoRepository;
-    
+
     @Autowired
     private UserRepository userRepository;
 
@@ -33,10 +42,10 @@ public class ViewingAppointmentService {
      * 创建预约看房
      */
     public Map<String, Object> createViewingAppointment(Long roomId, Long userId, LocalDate preferredDate,
-                                                       String preferredTimeSlot, Integer appointmentType,
-                                                       String contactName, String contactPhone, String wechatId,
-                                                       Integer tenantCount, LocalDate expectedMoveInDate,
-                                                       String rentalIntention) {
+            String preferredTimeSlot, Integer appointmentType,
+            String contactName, String contactPhone, String wechatId,
+            Integer tenantCount, LocalDate expectedMoveInDate,
+            String rentalIntention) {
         Map<String, Object> result = new HashMap<>();
 
         try {
@@ -49,7 +58,7 @@ public class ViewingAppointmentService {
             }
 
             RoomInfo room = roomOptional.get();
-            
+
             // 通过房东手机号获取房东用户信息
             String landlordPhone = room.getLandlordPhone();
             Optional<User> landlordOptional = userRepository.findByPhone(landlordPhone);
@@ -103,10 +112,9 @@ public class ViewingAppointmentService {
             result.put("appointmentNumber", savedAppointment.getAppointmentNumber());
             result.put("assignedAgentId", landlordId);
             result.put("landlordInfo", Map.of(
-                "id", landlord.getId(),
-                "realName", landlord.getRealName(),
-                "phone", landlord.getPhone()
-            ));
+                    "id", landlord.getId(),
+                    "realName", landlord.getRealName(),
+                    "phone", landlord.getPhone()));
 
         } catch (Exception e) {
             result.put("success", false);
@@ -406,7 +414,8 @@ public class ViewingAppointmentService {
         Map<String, Object> result = new HashMap<>();
 
         try {
-            List<ViewingAppointment> appointments = viewingAppointmentRepository.findByLandlordPhoneAndStatus(landlordPhone, status);
+            List<ViewingAppointment> appointments = viewingAppointmentRepository
+                    .findByLandlordPhoneAndStatus(landlordPhone, status);
             List<Map<String, Object>> appointmentList = appointments.stream()
                     .map(this::convertToMap)
                     .toList();
@@ -435,11 +444,11 @@ public class ViewingAppointmentService {
      */
     private Map<String, Object> convertRoomToMap(RoomInfo room) {
         Map<String, Object> roomMap = new HashMap<>();
-        
+
         // 构建完整地址
         String address = buildFullAddress(room);
         roomMap.put("address", address);
-        
+
         return roomMap;
     }
 
@@ -448,7 +457,7 @@ public class ViewingAppointmentService {
      */
     private String buildFullAddress(RoomInfo room) {
         StringBuilder address = new StringBuilder();
-        
+
         if (room.getProvince() != null && !room.getProvince().isEmpty()) {
             address.append(room.getProvince());
         }
@@ -473,7 +482,7 @@ public class ViewingAppointmentService {
         if (room.getRoomNumber() != null && !room.getRoomNumber().isEmpty()) {
             address.append(room.getRoomNumber());
         }
-        
+
         return address.length() > 0 ? address.toString() : "未知地址";
     }
 

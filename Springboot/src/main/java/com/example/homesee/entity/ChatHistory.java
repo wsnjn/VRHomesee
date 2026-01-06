@@ -1,3 +1,12 @@
+/**
+ * 项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 文件名称：ChatHistory.java
+ * 开发者：牛迦楠
+ * 专业：软件工程（中外合作办学）
+ * 学校：东华理工大学
+ * 功能描述：对话历史实体类，用于持久化存储用户与 AI 助手之间的咨询及匹配对话记录
+ * 创建日期：2026-01-06
+ */
 package com.example.homesee.entity;
 
 import jakarta.persistence.*;
@@ -14,7 +23,7 @@ public class ChatHistory {
     private Long userId;
 
     @Column(name = "role", nullable = false, length = 20)
-    private String role; // "user" or "assistant"
+    private String role; // "user" (用户) 或 "assistant" (助手)
 
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;

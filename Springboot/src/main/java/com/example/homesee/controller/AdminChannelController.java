@@ -1,3 +1,12 @@
+/**
+ * 项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 文件名称：AdminChannelController.java
+ * 开发者：牛迦楠
+ * 专业：软件工程（中外合作办学）
+ * 学校：东华理工大学
+ * 功能描述：管理员频道管理控制器，负责聊天消息监管、用户禁言以及社区动态的审核与管理
+ * 创建日期：2026-01-06
+ */
 package com.example.homesee.controller;
 
 import com.example.homesee.service.AdminChannelService;
@@ -22,7 +31,7 @@ public class AdminChannelController {
     @Autowired
     private AdminChannelService adminChannelService;
 
-    // Chat Management
+    // 聊天管理
     @GetMapping("/chat/messages")
     public ResponseEntity<List<Map<String, Object>>> getAllChatMessages() {
         return ResponseEntity.ok(adminChannelService.getAllChatMessages());
@@ -42,7 +51,7 @@ public class AdminChannelController {
         return ResponseEntity.ok().build();
     }
 
-    // Community Management
+    // 社区管理
     @GetMapping("/community/posts")
     public ResponseEntity<List<Map<String, Object>>> getAllSocialPosts() {
         return ResponseEntity.ok(adminChannelService.getAllSocialPosts());

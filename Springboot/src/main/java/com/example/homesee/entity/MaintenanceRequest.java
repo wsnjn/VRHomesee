@@ -1,3 +1,12 @@
+/**
+ * 项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 文件名称：MaintenanceRequest.java
+ * 开发者：牛迦楠
+ * 专业：软件工程（中外合作办学）
+ * 学校：东华理工大学
+ * 功能描述：报修申请实体类，记录租客提交的维修请求，包含故障描述、处理状态、维修费用及其承担方信息
+ * 创建日期：2026-01-06
+ */
 package com.example.homesee.entity;
 
 import jakarta.persistence.*;
@@ -25,7 +34,7 @@ public class MaintenanceRequest {
     private LocalDateTime requestDate;
 
     @Column(name = "request_status", nullable = false)
-    private Integer requestStatus = 0; // 0-Pending, 1-Processing, 2-Completed, 3-Closed
+    private Integer requestStatus = 0; // 0-待处理, 1-处理中, 2-已完成, 3-已关闭
 
     @Column(name = "expected_fix_date")
     private LocalDate expectedFixDate;
@@ -37,7 +46,7 @@ public class MaintenanceRequest {
     private BigDecimal repairCost;
 
     @Column(name = "cost_bearer")
-    private Integer costBearer; // 1-Landlord, 2-Tenant, 3-Shared
+    private Integer costBearer; // 1-房东承担, 2-租客承担, 3-双方分担
 
     @Column(name = "fix_notes", columnDefinition = "TEXT")
     private String fixNotes;
@@ -62,7 +71,7 @@ public class MaintenanceRequest {
         updatedTime = LocalDateTime.now();
     }
 
-    // Getters and Setters
+    // Getter 和 Setter 方法
     public Long getId() {
         return id;
     }

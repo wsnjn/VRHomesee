@@ -1,3 +1,12 @@
+/**
+ * 项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 文件名称：ChatMessage.java
+ * 开发者：牛迦楠
+ * 专业：软件工程（中外合作办学）
+ * 学校：东华理工大学
+ * 功能描述：聊天消息实体类，存储社区即时通讯过程中的文本、图片及视频类消息内容及其关联的发收关系
+ * 创建日期：2026-01-06
+ */
 package com.example.homesee.entity;
 
 import jakarta.persistence.*;
@@ -23,7 +32,7 @@ public class ChatMessage {
     private String content;
 
     @Column(name = "msg_type")
-    private Integer msgType; // 0-Text, 1-Image, 2-Video
+    private Integer msgType; // 0-文本, 1-图片, 2-视频
 
     @Column(name = "created_time", updatable = false)
     private LocalDateTime createdTime;
@@ -33,7 +42,7 @@ public class ChatMessage {
         createdTime = LocalDateTime.now();
     }
 
-    // Getters and Setters
+    // Getter 和 Setter 方法
     public Long getId() {
         return id;
     }

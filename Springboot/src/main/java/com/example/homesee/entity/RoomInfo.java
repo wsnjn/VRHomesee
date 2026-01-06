@@ -1,3 +1,12 @@
+/**
+ * 项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 文件名称：RoomInfo.java
+ * 开发者：牛迦楠
+ * 专业：软件工程（中外合作办学）
+ * 学校：东华理工大学
+ * 功能描述：动态房源实体类，存储房屋的关键地理信息、建筑规格（面积、楼层、朝向）、租赁商务条款（租金、水电费、租赁方式）及实时地理经纬度坐标
+ * 创建日期：2026-01-06
+ */
 package com.example.homesee.entity;
 
 import jakarta.persistence.*;
@@ -100,7 +109,7 @@ public class RoomInfo {
         this.landlordPhone = landlordPhone;
     }
 
-    // Getters and Setters
+    // Getter 和 Setter 方法
     public Long getId() {
         return id;
     }

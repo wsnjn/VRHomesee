@@ -1,3 +1,12 @@
+/**
+ * 项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 文件名称：AiAgentService.java
+ * 开发者：牛迦楠
+ * 专业：软件工程（中外合作办学）
+ * 学校：东华理工大学
+ * 功能描述：AI导购核心服务类，负责大语言模型（DeepSeek）与视觉模型（Qwen-VL）的编排调度，支持多模态看房对话、上下文理解及消息持久化
+ * 创建日期：2026-01-06
+ */
 package com.example.homesee.service;
 
 import org.springframework.http.HttpEntity;
@@ -62,7 +71,7 @@ public class AiAgentService {
                 // 获取用户信息用于Prompt
                 user = userRepository.findById(userId).orElse(null);
             } catch (Exception e) {
-                System.err.println("Failed to save user message or get user: " + e.getMessage());
+                System.err.println("保存用户消息或获取用户信息失败: " + e.getMessage());
             }
         }
 
@@ -100,7 +109,7 @@ public class AiAgentService {
                         "assistant", cleanedResponse);
                 chatHistoryRepository.save(aiHistory);
             } catch (Exception e) {
-                System.err.println("Failed to save AI message: " + e.getMessage());
+                System.err.println("保存 AI 消息失败: " + e.getMessage());
             }
         }
 
@@ -175,7 +184,7 @@ public class AiAgentService {
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(payload, headers);
 
         try {
-            System.out.println("Calling ModelScope API with model: " + payload.get("model"));
+            System.out.println("正在通过模型调用 ModelScope API: " + payload.get("model"));
             ResponseEntity<Map> response = restTemplate.postForEntity(MODELSCOPE_URL, request, Map.class);
 
             if (response.getBody() != null) {
@@ -187,7 +196,7 @@ public class AiAgentService {
             }
             return "抱歉，AI 暂时无法回答您的问题。";
         } catch (Exception e) {
-            System.err.println("ModelScope API Error: " + e.getMessage());
+            System.err.println("ModelScope API 错误: " + e.getMessage());
             e.printStackTrace();
             return "抱歉，AI 服务暂时不可用：" + e.getMessage();
         }

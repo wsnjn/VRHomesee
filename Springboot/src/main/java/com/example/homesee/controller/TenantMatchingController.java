@@ -1,3 +1,12 @@
+/**
+ * 项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 文件名称：TenantMatchingController.java
+ * 开发者：牛迦楠
+ * 专业：软件工程（中外合作办学）
+ * 学校：东华理工大学
+ * 功能描述：管理员租客匹配控制器，处理房源选择、租客匹配以及租赁合同的创建与管理逻辑
+ * 创建日期：2026-01-06
+ */
 package com.example.homesee.controller;
 
 import com.example.homesee.entity.TenantManagement;
@@ -217,7 +226,7 @@ public class TenantMatchingController {
             TenantManagement savedContract = tenantManagementRepository.save(tenantManagement);
 
             // 更新房屋状态为已出租
-            
+
             room.setStatus(1); // 已出租
             roomInfoRepository.save(room);
 

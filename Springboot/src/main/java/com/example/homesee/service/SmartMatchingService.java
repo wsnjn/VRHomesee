@@ -1,3 +1,12 @@
+/**
+ * 项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 文件名称：SmartMatchingService.java
+ * 开发者：牛迦楠
+ * 专业：软件工程（中外合作办学）
+ * 学校：东华理工大学
+ * 功能描述：智能选房服务类，对接DeepSeek大模型实现用户交互需求精准画像、房源智能匹配推荐及响应结果的敏感信息脱敏（URL净化）
+ * 创建日期：2026-01-06
+ */
 package com.example.homesee.service;
 
 import com.example.homesee.entity.ChatHistory;
@@ -42,19 +51,19 @@ public class SmartMatchingService {
     }
 
     public ChatHistory chat(Long userId, String userMessage) {
-        // 1. Save User Message
+        // 1. 保存用户消息
         ChatHistory userHistory = new ChatHistory(userId, "user", userMessage);
         chatHistoryRepository.save(userHistory);
 
-        // 2. Prepare Context
+        // 2. 准备上下文数据
         User user = userRepository.findById(userId).orElse(null);
-        List<RoomInfo> rooms = roomInfoRepository.findAll(); // In production, limit this or use vector search
+        List<RoomInfo> rooms = roomInfoRepository.findAll(); // 生产环境下建议使用向量搜索或分页限制数量
         List<ChatHistory> history = chatHistoryRepository.findByUserIdOrderByCreatedTimeAsc(userId);
 
-        // 3. Build Prompt
+        // 3. 构建提示词模板
         List<Map<String, String>> messages = new ArrayList<>();
 
-        // System Prompt with Context
+        // 带上下文的系统提示词
         StringBuilder systemContent = new StringBuilder();
         systemContent.append("你是一个专业的房屋租赁智能助手。你的目标是帮助用户找到最合适的房源。\n\n");
 
@@ -70,7 +79,7 @@ public class SmartMatchingService {
 
         systemContent.append("【可用房源列表】\n");
         for (RoomInfo room : rooms) {
-            if (room.getStatus() == 0) { // Only available rooms
+            if (room.getStatus() == 0) { // 仅显示可租房源
                 systemContent.append(String.format("- ID:%d, %s%s%s%s, %s, %.0f元/月, %s\n",
                         room.getId(), room.getCity(), room.getDistrict(), room.getStreet(), room.getCommunityName(),
                         room.getRoomNumber() != null ? room.getRoomNumber() : "",
@@ -108,44 +117,38 @@ public class SmartMatchingService {
         systemMessage.put("content", systemContent.toString());
         messages.add(systemMessage);
 
-        // History Messages (Limit to last 20 to avoid token limits)
+        // 历史消息处理（限制为最近20条以避免超出 Token 限制）
         int start = Math.max(0, history.size() - 20);
         for (int i = start; i < history.size(); i++) {
             ChatHistory h = history.get(i);
-            // Skip the one we just saved to avoid duplication if we re-fetch,
-            // but here 'history' includes the one we just saved?
-            // Actually 'history' was fetched AFTER saving, so it includes the current
-            // message.
-            // We should exclude the last one because we want to send it as the 'latest'
-            // message or just include all.
-            // DeepSeek API expects the conversation flow.
-            // Let's just add all history including the current one.
+            // 这里的 history 包含刚刚保存的消息。
+            // 按照 DeepSeek API 要求的对话流，我们将包含当前消息在内的所有历史记录加入。
             Map<String, String> msg = new HashMap<>();
             msg.put("role", h.getRole());
             msg.put("content", h.getContent());
             messages.add(msg);
         }
 
-        // 4. Call DeepSeek API
+        // 4. 调用 DeepSeek API接口
         String aiResponseContent = callDeepSeekApi(messages);
 
-        // 5. Sanitize response: Replace any IP addresses with correct domain
+        // 5. 结果清理：将响应中的所有 IP 地址替换为正确的域名
         aiResponseContent = sanitizeResponse(aiResponseContent);
 
-        // 6. Save AI Response
+        // 6. 保存 AI 回复内容
         ChatHistory aiHistory = new ChatHistory(userId, "assistant", aiResponseContent);
         return chatHistoryRepository.save(aiHistory);
     }
 
     /**
-     * Sanitize AI response to replace any IP-based URLs with domain-based URLs
+     * 清理 AI 响应，将基于 IP 的 URL 替换为基于域名的 URL
      */
     private String sanitizeResponse(String content) {
         if (content == null)
             return content;
 
-        // Replace any http://IP:PORT with https://www.homesee.xyz
-        // Pattern: http://[IP address]:[port number]
+        // 将 http://IP:端口 替换为 https://www.homesee.xyz
+        // 正则模式: http://[IP地址]:[可选端口号]
         content = content.replaceAll("http://\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}(:\\d+)?",
                 "https://www.homesee.xyz");
 

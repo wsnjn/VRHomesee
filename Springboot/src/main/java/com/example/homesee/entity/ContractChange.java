@@ -1,3 +1,12 @@
+/**
+ * 项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 文件名称：ContractChange.java
+ * 开发者：牛迦楠
+ * 专业：软件工程（中外合作办学）
+ * 学校：东华理工大学
+ * 功能描述：合同变更记录实体类，记录合同生命周期中的关键变动（如续租、退租、转租及租金调整）及其原因和时间
+ * 创建日期：2026-01-06
+ */
 package com.example.homesee.entity;
 
 import jakarta.persistence.*;
@@ -36,14 +45,14 @@ public class ContractChange {
     public ContractChange() {
     }
 
-    public ContractChange(Long tenantManagementId, Integer changeType, 
-                         LocalDate changeDate) {
+    public ContractChange(Long tenantManagementId, Integer changeType,
+            LocalDate changeDate) {
         this.tenantManagementId = tenantManagementId;
         this.changeType = changeType;
         this.changeDate = changeDate;
     }
 
-    // Getters and Setters
+    // Getter 和 Setter 方法
     public Long getId() {
         return id;
     }

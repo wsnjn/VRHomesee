@@ -1,3 +1,12 @@
+/**
+ * 项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 文件名称：CommunityController.java
+ * 开发者：牛迦楠
+ * 专业：软件工程（中外合作办学）
+ * 学校：东华理工大学
+ * 功能描述：社区与社交管理控制器，提供聊天群组维护（创建、解散、邀请）、即时通讯消息收发、朋友圈动态社交互动及好友关系维护功能
+ * 创建日期：2026-01-06
+ */
 package com.example.homesee.controller;
 
 import com.example.homesee.entity.ChatGroup;
@@ -21,7 +30,7 @@ public class CommunityController {
     @Autowired
     private CommunityService communityService;
 
-    // --- Chat Groups ---
+    // --- 聊天群组管理 ---
     @GetMapping("/groups")
     public ResponseEntity<Map<String, Object>> getAllGroups() {
         List<ChatGroup> list = communityService.getAllGroups();
@@ -61,7 +70,7 @@ public class CommunityController {
             communityService.deleteGroup(groupId, userId);
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
-            response.put("message", "Group deleted successfully");
+            response.put("message", "群组删除成功");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Map<String, Object> response = new HashMap<>();
@@ -81,7 +90,7 @@ public class CommunityController {
             communityService.inviteToGroup(groupId, inviterId, inviteeId);
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
-            response.put("message", "User invited successfully");
+            response.put("message", "用户邀请成功");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Map<String, Object> response = new HashMap<>();
@@ -91,7 +100,7 @@ public class CommunityController {
         }
     }
 
-    // --- Chat Messages ---
+    // --- 聊天消息记录 ---
     @GetMapping("/messages/group/{groupId}")
     public ResponseEntity<Map<String, Object>> getGroupMessages(@PathVariable Long groupId) {
         List<ChatMessage> list = communityService.getGroupMessages(groupId);
@@ -110,7 +119,7 @@ public class CommunityController {
         return ResponseEntity.ok(response);
     }
 
-    // --- Social Feed ---
+    // --- 社交朋友圈动态 ---
     @GetMapping("/posts")
     public ResponseEntity<Map<String, Object>> getAllPosts() {
         List<SocialPost> list = communityService.getAllPosts();
@@ -174,7 +183,7 @@ public class CommunityController {
         return ResponseEntity.ok(response);
     }
 
-    // --- Group Membership ---
+    // --- 群组成员管理 ---
     @PostMapping("/groups/join")
     public ResponseEntity<Map<String, Object>> joinGroup(@RequestBody Map<String, Object> request) {
         Long groupId = Long.valueOf(request.get("groupId").toString());
@@ -206,7 +215,7 @@ public class CommunityController {
         return ResponseEntity.ok(response);
     }
 
-    // --- Friendships ---
+    // --- 好友关系维护 ---
     @PostMapping("/friends/request")
     public ResponseEntity<Map<String, Object>> sendFriendRequest(@RequestBody Map<String, Object> request) {
         Long userId = Long.valueOf(request.get("userId").toString());
@@ -249,7 +258,7 @@ public class CommunityController {
         return ResponseEntity.ok(response);
     }
 
-    // --- Media Upload ---
+    // --- 媒体文件上传 ---
     @PostMapping("/upload")
     public ResponseEntity<Map<String, Object>> uploadMedia(@RequestParam("file") MultipartFile file) {
         Map<String, Object> response = new HashMap<>();
@@ -266,13 +275,13 @@ public class CommunityController {
                 extension = originalFilename.substring(originalFilename.lastIndexOf("."));
             }
 
-            // Generate unique filename with original extension
+            // 生成带有原始后缀的唯一文件名
             String newFilename = java.util.UUID.randomUUID().toString() + extension;
 
-            // Upload to file server
+            // 上传至文件服务器
             String fileServerUrl = "https://files.homesee.xyz/api/files/upload";
 
-            // Create multipart request
+            // 构建多部分表单请求 (Multipart Request)
             org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
             headers.setContentType(org.springframework.http.MediaType.MULTIPART_FORM_DATA);
 
@@ -300,7 +309,7 @@ public class CommunityController {
                         return ResponseEntity.status(500).body(response);
                     }
 
-                    // Extract filename from URL (last part after last slash)
+                    // 从 URL 中提取文件名（最后一个斜杠后的部分）
                     String fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
 
                     // 输出日志信息

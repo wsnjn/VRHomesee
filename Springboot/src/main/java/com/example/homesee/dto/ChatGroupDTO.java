@@ -1,3 +1,12 @@
+/**
+ * 项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 文件名称：ChatGroupDTO.java
+ * 开发者：牛迦楠
+ * 专业：软件工程（中外合作办学）
+ * 学校：东华理工大学
+ * 功能描述：聊天群组数据传输对象，封装群组基础信息及面向前端展示的派生字段（如显示名称、头像及私聊目标用户等）
+ * 创建日期：2026-01-06
+ */
 package com.example.homesee.dto;
 
 import java.time.LocalDateTime;
@@ -5,17 +14,17 @@ import java.time.LocalDateTime;
 public class ChatGroupDTO {
     private Long id;
     private String groupName;
-    private Integer groupType; // 0-Normal, 1-Global, 2-Tenant, 3-Private
+    private Integer groupType; // 0-普通群, 1-全员群, 2-租客群, 3-私聊
     private Long ownerId;
     private String announcement;
     private LocalDateTime createdTime;
 
-    // Display fields for frontend
+    // 前端展示增强字段
     private String displayName;
     private String displayAvatar;
-    private Long targetUserId; // For private chat, the other user's ID
+    private Long targetUserId; // 对于私聊，为对方用户的 ID
 
-    // Getters and Setters
+    // Getter 和 Setter 方法
     public Long getId() {
         return id;
     }
