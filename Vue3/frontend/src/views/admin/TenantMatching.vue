@@ -1,13 +1,11 @@
 <!--
-/**
- * 文件名: TenantMatching.vue
- * 作者: 牛迦楠
- * 学校: 东华理工大学
- * 专业: 软件工程(中外合作办学)
- * 课题: 融合大模型交互与3D全景预览的智能选房平台设计与实现
- * 创建日期: 2026-01-06
- * 描述: 管理员租客匹配页面,用于创建和管理租赁合同
- */
+  项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+  文件名称：TenantMatching.vue
+  开发者：牛迦楠
+  专业：软件工程（中外合作办学）
+  学校：东华理工大学
+  功能描述：管理员租客匹配页面，支持房源选择、租客匹配、查看租客意向及创建租赁合同
+  创建日期：2026-01-06
 -->
 <template>
   <div class="tenant-matching">
@@ -288,7 +286,7 @@
 import { ref, onMounted, computed, watch } from 'vue'
 import axios from 'axios'
 
-// Props
+// 属性
 const props = defineProps({
   preSelectedData: {
     type: Object,

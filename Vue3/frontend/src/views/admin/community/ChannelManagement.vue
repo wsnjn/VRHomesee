@@ -1,3 +1,12 @@
+<!--
+  项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+  文件名称：ChannelManagement.vue
+  开发者：牛迦楠
+  专业：软件工程（中外合作办学）
+  学校：东华理工大学
+  功能描述：管理员频道管理页面，支持聊天消息管理及社区动态审核与禁言处理
+  创建日期：2026-01-06
+-->
 <template>
   <div class="channel-management">
     <div class="page-header">
@@ -171,7 +180,7 @@ const activeTab = ref('chat');
 const chatMessages = ref([]);
 const socialPosts = ref([]);
 const showModal = ref(false);
-const modalType = ref(''); // 'mute' or 'ban'
+const modalType = ref(''); // 'mute' (禁言) 或 'ban' (禁发动态)
 const selectedUserId = ref(null);
 const selectedUserName = ref('');
 const duration = ref(60);

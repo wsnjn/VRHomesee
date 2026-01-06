@@ -1,13 +1,11 @@
 <!--
-/**
- * 文件名: Admin.vue
- * 作者: 牛迦楠
- * 学校: 东华理工大学
- * 专业: 软件工程（中外合作办学）
- * 课题: 融合大模型交互与3D全景预览的智能选房平台设计与实现
- * 创建日期: 2026-01-06
- * 描述: 管理员后台主界面，包含数据概览（大屏可视化风格）和各功能模块的导航入口
- */
+  项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+  文件名称：Admin.vue
+  开发者：牛迦楠
+  专业：软件工程（中外合作办学）
+  学校：东华理工大学
+  功能描述：管理员主入口页面，包含侧边栏导航、系统总览看板、实时KPI展示及各管理模块的路由跳转
+  创建日期：2026-01-06
 -->
 <template>
   <div class="admin">
@@ -1237,6 +1235,7 @@ onUnmounted(() => {
   font-size: 1.8rem;
   background: linear-gradient(to right, #00f2ff, #007bff);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -1632,7 +1631,7 @@ onUnmounted(() => {
 </style>
 
 <style scoped>
-/* Title Card Styles */
+/* 标题卡片样式 */
 .title-card {
   display: flex;
   align-items: center;
@@ -1649,6 +1648,7 @@ onUnmounted(() => {
   font-size: 1.5rem;
   background: linear-gradient(to right, #00f2ff, #007bff);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   letter-spacing: 1px;
 }
