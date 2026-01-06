@@ -1,6 +1,15 @@
+<!--
+  项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+  文件名称：CommunityPage.vue
+  开发者：牛迦楠
+  专业：软件工程（中外合作办学）
+  学校：东华理工大学
+  功能描述：社区动态页面组件，展示所有公开的社区动态，支持点赞、评论和分享
+  创建日期：2026-01-06
+-->
 <template>
   <div class="community-page-container">
-    <!-- Header -->
+    <!-- 头部 -->
     <div class="community-header">
       <h1>社区动态</h1>
       <div class="filter-controls">
@@ -11,7 +20,7 @@
       </div>
     </div>
 
-    <!-- Feed List -->
+    <!-- 动态列表 -->
     <div class="feed-list">
       <div v-for="post in filteredPosts" :key="post.id" class="post-card">
         <div class="post-header">
@@ -60,7 +69,7 @@
           </button>
         </div>
 
-        <!-- Comments Section -->
+        <!-- 评论区域 -->
         <div class="comments-section" v-if="post.showComments">
           <div class="comment-list" v-if="post.comments && post.comments.length > 0">
             <div v-for="comment in post.comments" :key="comment.id" class="comment-item">
@@ -93,7 +102,7 @@ const feedFilter = ref('all') // all, popular
 const currentUserId = userState.user ? userState.user.id : 0
 const friends = ref([])
 
-// Computed properties for filtered posts (社区页面显示所有公开动态)
+// 过滤后的动态计算属性 (社区页面显示所有公开动态)
 const filteredPosts = computed(() => {
   let filtered = posts.value.filter(post => {
     // 社区页面只显示公开动态
@@ -138,7 +147,7 @@ const fetchPosts = async () => {
   }
 }
 
-// --- Interaction Logic ---
+// --- 交互逻辑 ---
 
 const toggleLike = async (post) => {
   try {
@@ -160,7 +169,7 @@ const toggleLike = async (post) => {
 const toggleComments = async (post) => {
   post.showComments = !post.showComments
   if (post.showComments && (!post.comments || post.comments.length === 0)) {
-    // Load comments if opening and empty
+    // 如果打开且为空则加载评论
     await loadComments(post)
   }
 }
@@ -191,7 +200,7 @@ const submitComment = async (post) => {
     })
     const data = await res.json()
     if (data.success) {
-      // Add new comment to list
+      // 将新评论添加到列表
       if (!post.comments) post.comments = []
       post.comments.push(data.data)
       post.commentCount++
@@ -204,7 +213,7 @@ const submitComment = async (post) => {
 }
 
 const sharePost = (post) => {
-  // Simple copy link simulation
+  // 简单的复制链接模拟
   const link = `${window.location.origin}/#/community?post=${post.id}`
   navigator.clipboard.writeText(link).then(() => {
     alert('链接已复制到剪贴板')
@@ -475,7 +484,7 @@ onMounted(() => {
 .like-btn.active { color: #EF4444; }
 .like-btn.active:hover { background: #fee2e2; }
 
-/* Comments Styles */
+/* 评论样式 */
 .comments-section {
   background: #F9FAFB;
   padding: 16px;

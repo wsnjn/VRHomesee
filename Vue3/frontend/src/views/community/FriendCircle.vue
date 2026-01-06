@@ -1,6 +1,15 @@
+<!--
+  项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+  文件名称：FriendCircle.vue
+  开发者：牛迦楠
+  专业：软件工程（中外合作办学）
+  学校：东华理工大学
+  功能描述：朋友圈组件，支持住户发布图文/视频动态、点赞、评论及朋友社交互动
+  创建日期：2026-01-06
+-->
 <template>
   <div class="friend-circle-container">
-    <!-- Header -->
+    <!-- 头部 -->
     <div class="friend-circle-header">
       <h1>朋友圈</h1>
       <div class="filter-controls">
@@ -11,7 +20,7 @@
       </div>
     </div>
 
-    <!-- Create Post -->
+    <!-- 发布动态 -->
     <div class="create-post-card">
       <div class="input-wrapper">
         <div class="avatar">
@@ -72,7 +81,7 @@
       </div>
     </div>
 
-    <!-- Feed List -->
+    <!-- 动态列表 -->
     <div class="feed-list">
       <div v-for="post in filteredPosts" :key="post.id" class="post-card">
         <div class="post-header">
@@ -88,7 +97,7 @@
             {{ post.visibility === 1 ? '仅好友' : '公开' }}
           </div>
           
-          <!-- More Menu for Own Posts -->
+          <!-- 个人动态更多操作菜单 -->
           <div class="more-menu-container" v-if="post.userId === currentUserId">
             <button class="more-btn" @click.stop="toggleMenu(post.id)">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
@@ -141,7 +150,7 @@
           </button>
         </div>
         
-        <!-- Comments Section -->
+        <!-- 评论区域 -->
         <div class="comments-section" v-if="post.showComments">
           <div class="comment-list" v-if="post.comments && post.comments.length > 0">
             <div v-for="comment in post.comments" :key="comment.id" class="comment-item">
@@ -177,7 +186,7 @@ const hasActiveLease = ref(false)
 const visibility = ref('0') // 0-公开, 1-仅好友
 const feedFilter = ref('all') // all, friends
 
-// Refs for file inputs
+// 文件输入引用
 const imageInput = ref(null)
 const videoInput = ref(null)
 const audioInput = ref(null)
@@ -187,9 +196,9 @@ const MAX_FILE_SIZE = 100 * 1024 * 1024 // 100MB
 
 const friends = ref([])
 
-// Computed properties for filtered posts (朋友圈只显示自己和朋友的动态)
+// 过滤后的动态计算属性 (朋友圈只显示自己和朋友的动态)
 const filteredPosts = computed(() => {
-  // Now friend.friendId is guaranteed to be the friend's ID
+  // 现在 friend.friendId 保证是朋友的 ID
   const friendIds = friends.value.map(f => f.friendId)
   
   return posts.value.filter(post => {
@@ -364,7 +373,7 @@ const toggleMenu = (postId) => {
   activeMenuId.value = activeMenuId.value === postId ? null : postId
 }
 
-// Close menu when clicking outside
+// 点击外部关闭菜单
 const closeMenu = () => {
   activeMenuId.value = null
 }
@@ -417,7 +426,7 @@ const changeVisibility = async (post) => {
   }
 }
 
-// --- Interaction Logic ---
+// --- 交互逻辑 ---
 
 const toggleLike = async (post) => {
   try {

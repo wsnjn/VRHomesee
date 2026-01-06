@@ -321,7 +321,7 @@ onMounted(() => {
   align-items: center;
   margin-bottom: 16px; /* 已减少 */
   border-bottom: 1px solid #E5E7EB;
-  padding-bottom: 16px; /* Reduced */
+  padding-bottom: 16px; /* 已减少 */
 }
 
 .header h3 {

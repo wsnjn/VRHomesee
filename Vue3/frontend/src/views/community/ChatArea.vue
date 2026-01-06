@@ -1,8 +1,17 @@
+<!--
+  项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+  文件名称：ChatArea.vue
+  开发者：牛迦楠
+  专业：软件工程（中外合作办学）
+  学校：东华理工大学
+  功能描述：即时通讯聊天组件，支持好友私聊、群组聊天、好友管理等功能
+  创建日期：2026-01-06
+-->
 <template>
   <div class="chat-layout">
-    <!-- Sidebar -->
+    <!-- 侧边栏 -->
     <div class="sidebar">
-      <!-- User Profile Summary -->
+      <!-- 用户个人资料摘要 -->
       <div class="user-profile">
         <div class="avatar">
           <img v-if="userState.user?.avatar" :src="getAvatarSrc(userState.user.avatar)" class="avatar-img" />
@@ -16,7 +25,7 @@
         </div>
       </div>
 
-      <!-- Tabs -->
+      <!-- 标签页 -->
       <div class="sidebar-tabs">
         <button :class="{ active: activeTab === 'groups' }" @click="activeTab = 'groups'">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
@@ -28,7 +37,7 @@
         </button>
       </div>
 
-      <!-- Group List -->
+      <!-- 群组列表 -->
       <div v-if="activeTab === 'groups'" class="list-container">
         <div class="list-header">
           <span>我的群组</span>
@@ -55,7 +64,7 @@
         </div>
       </div>
 
-      <!-- Friends List -->
+      <!-- 好友列表 -->
       <div v-if="activeTab === 'friends'" class="list-container">
         <div class="list-header">
           <span>我的好友</span>
@@ -64,7 +73,7 @@
           </button>
         </div>
         
-        <!-- Pending Requests -->
+        <!-- 待处理请求 -->
         <div v-if="pendingRequests.length > 0" class="pending-section">
           <div class="section-label">好友申请</div>
           <div v-for="req in pendingRequests" :key="req.id" class="pending-item">
@@ -96,7 +105,7 @@
       </div>
     </div>
 
-    <!-- Chat Window -->
+    <!-- 聊天窗口 -->
     <div class="chat-window" v-if="activeGroup">
       <div class="chat-header">
         <div class="header-info">
@@ -157,7 +166,7 @@
       </div>
     </div>
 
-    <!-- Create Group Modal -->
+    <!-- 创建群组弹窗 -->
     <div v-if="showCreateGroupModal" class="modal-overlay">
       <div class="modal-content">
         <h3>创建新群组</h3>
@@ -170,7 +179,7 @@
       </div>
     </div>
 
-    <!-- Add Friend Modal -->
+    <!-- 添加好友弹窗 -->
     <div v-if="showAddFriendModal" class="modal-overlay">
       <div class="modal-content">
         <h3>添加好友</h3>
@@ -182,7 +191,7 @@
       </div>
     </div>
 
-    <!-- Invite Friend Modal -->
+    <!-- 邀请好友弹窗 -->
     <div v-if="showInviteModal" class="modal-overlay">
       <div class="modal-content">
         <h3>邀请好友入群</h3>
@@ -445,12 +454,12 @@ const startPrivateChat = async (friend) => {
     })
     const data = await res.json()
     if (data.success) {
-      // Add to groups list if not exists
+      // 如果不存在则添加到群组列表
       const exists = groups.value.find(g => g.id === data.data.id)
       if (!exists) {
         groups.value.push(data.data)
       }
-      // Select it
+      // 选中它
       selectGroup(data.data)
       activeTab.value = 'groups'
     }
@@ -476,7 +485,7 @@ const userInfoCache = ref({})
 const getUserInfo = async (userId) => {
   if (userInfoCache.value[userId]) return userInfoCache.value[userId]
   
-  // Placeholder to prevent multiple fetches
+  // 占位符防止重复获取
   userInfoCache.value[userId] = { username: `用户 ${userId}`, avatar: '' }
   
   try {
@@ -528,7 +537,7 @@ onMounted(() => {
   fetchFriends()
   fetchPendingRequests()
   
-  // Poll for updates every 3 seconds
+  // 每3秒轮询一次更新
   pollInterval = setInterval(() => {
     fetchGroups()
     fetchFriends()
@@ -571,7 +580,7 @@ const deleteGroup = async () => {
 const selectedInviteFriends = ref([])
 
 const selectFriendToInvite = (friend) => {
-  // Check if already member
+  // 检查是否已是成员
   if (groupMembers.value.some(m => m.userId === friend.friendId)) return
 
   const index = selectedInviteFriends.value.indexOf(friend.friendId)
@@ -650,9 +659,9 @@ const getAvatarSrc = (avatarName) => {
 .avatar {
   width: 48px;
   height: 48px;
-  background: #111827; /* Dark Industrial */
+  background: #111827; /* 深色工业风 */
   color: white;
-  border-radius: 50%; /* Circular */
+  border-radius: 50%; /* 圆形 */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -688,7 +697,7 @@ const getAvatarSrc = (avatarName) => {
   width: 6px;
   height: 6px;
   background: #10B981;
-  border-radius: 50%; /* Circular dot */
+  border-radius: 50%; /* 圆点 */
 }
 
 .sidebar-tabs {
@@ -778,7 +787,7 @@ const getAvatarSrc = (avatarName) => {
 .item-avatar {
   width: 40px;
   height: 40px;
-  border-radius: 50%; /* Circular */
+  border-radius: 50%; /* 圆形 */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -996,7 +1005,7 @@ const getAvatarSrc = (avatarName) => {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(5px); /* Keep slight blur for focus */
+  backdrop-filter: blur(5px); /* 保持轻微虚化以聚焦 */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1059,7 +1068,7 @@ const getAvatarSrc = (avatarName) => {
 .btn-cancel:hover { border-color: #111827; color: #111827; }
 .btn-confirm:hover { background: white; color: #111827; }
 
-/* Styles for lists in modals etc */
+/* 弹窗中列表等样式 */
 .chat-btn {
   background: none;
   border: 1px solid #E5E7EB;
@@ -1129,7 +1138,7 @@ const getAvatarSrc = (avatarName) => {
 .checkbox { width: 16px; height: 16px; border: 1px solid #D1D5DB; }
 .checkbox.checked { background: #111827; border-color: #111827; }
 
-/* Custom Scrollbar for sidebar list */
+/* 侧边栏列表自定义滚动条 */
 .list-container::-webkit-scrollbar { width: 4px; }
 .list-container::-webkit-scrollbar-thumb { background: #E5E7EB; }
 </style>

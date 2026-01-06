@@ -1,10 +1,19 @@
+<!--
+  项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+  文件名称：Community.vue
+  开发者：牛迦楠
+  专业：软件工程（中外合作办学）
+  学校：东华理工大学
+  功能描述：社区模块主入口组件，整合聊天、朋友圈和社区动态Tab页
+  创建日期：2026-01-06
+-->
 <template>
   <div class="page-container">
     <Navbar />
     <div class="page-header-spacer"></div>
     
     <div class="community-layout">
-      <!-- Top Tab Navigation -->
+      <!-- 顶部标签导航 -->
       <div class="top-tabs">
         <div class="tab-container">
           <div 
@@ -34,7 +43,7 @@
         </div>
       </div>
 
-      <!-- Content Area -->
+      <!-- 内容区域 -->
       <div class="content-area">
         <transition name="fade" mode="out-in">
           <ChatArea v-if="currentTab === 'chat'" key="chat" />
@@ -69,7 +78,7 @@ const currentTab = ref('chat')
 }
 
 .page-header-spacer {
-  height: 64px; /* Matches navbar */
+  height: 64px; /* 与导航栏匹配 */
   flex-shrink: 0;
 }
 
@@ -92,7 +101,7 @@ const currentTab = ref('chat')
   max-width: 1400px;
   margin: 0 auto;
   display: flex;
-  gap: 0; /* Removing gap to have connected tabs */
+  gap: 0; /* 移除间距以使标签连通 */
 }
 
 .tab-item {
@@ -141,7 +150,7 @@ const currentTab = ref('chat')
   background: #FFFFFF;
 }
 
-/* Transitions */
+/* 过渡效果 */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.15s ease;

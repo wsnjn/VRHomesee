@@ -376,7 +376,7 @@
       </div>
     </div>
 
-    <!-- 房屋列表 (Admin Style) -->
+    <!-- 房屋列表 (管理员风格) -->
     <div class="house-list-container">
       <div v-if="loadingHouses" class="loading">加载中...</div>
       
