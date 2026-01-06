@@ -1,3 +1,12 @@
+/**
+ * 项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 文件名称：AppointmentService.java
+ * 开发者：牛迦楠
+ * 专业：软件工程（中外合作办学）
+ * 学校：东华理工大学
+ * 功能描述：基础预约管理服务类，实现房源预约的冲突检测、状态机流转（创建、确认、取消）及用户预约历史查询等核心逻辑
+ * 创建日期：2026-01-06
+ */
 package com.example.homesee.service;
 
 import com.example.homesee.entity.Appointment;
@@ -19,26 +28,28 @@ public class AppointmentService {
 
     /**
      * 创建预约
-     * @param houseId 房屋ID
-     * @param userId 用户ID
-     * @param contactName 联系人姓名
-     * @param contactPhone 联系电话
+     * 
+     * @param houseId             房屋ID
+     * @param userId              用户ID
+     * @param contactName         联系人姓名
+     * @param contactPhone        联系电话
      * @param appointmentDateTime 预约时间
-     * @param appointmentType 预约类型
-     * @param remarks 备注信息
+     * @param appointmentType     预约类型
+     * @param remarks             备注信息
      * @return 创建结果
      */
-    public Map<String, Object> createAppointment(Long houseId, Long userId, String contactName, 
-                                                String contactPhone, LocalDateTime appointmentDateTime, 
-                                                Integer appointmentType, String remarks) {
+    public Map<String, Object> createAppointment(Long houseId, Long userId, String contactName,
+            String contactPhone, LocalDateTime appointmentDateTime,
+            Integer appointmentType, String remarks) {
         Map<String, Object> result = new HashMap<>();
 
         try {
             // 检查时间冲突（同一房屋在同一时间段的预约）
             LocalDateTime startTime = appointmentDateTime.minusHours(1);
             LocalDateTime endTime = appointmentDateTime.plusHours(1);
-            
-            List<Appointment> conflictingAppointments = appointmentRepository.findConflictingAppointments(houseId, startTime, endTime);
+
+            List<Appointment> conflictingAppointments = appointmentRepository.findConflictingAppointments(houseId,
+                    startTime, endTime);
             if (!conflictingAppointments.isEmpty()) {
                 result.put("success", false);
                 result.put("message", "该时间段已有预约，请选择其他时间");
@@ -46,36 +57,37 @@ public class AppointmentService {
             }
 
             // 创建预约记录
-            Appointment appointment = new Appointment(houseId, userId, contactName, contactPhone, 
-                                                     appointmentDateTime, appointmentType, remarks);
-            
+            Appointment appointment = new Appointment(houseId, userId, contactName, contactPhone,
+                    appointmentDateTime, appointmentType, remarks);
+
             Appointment savedAppointment = appointmentRepository.save(appointment);
-            
+
             result.put("success", true);
             result.put("message", "预约提交成功");
             result.put("appointmentId", savedAppointment.getId());
-            
+
         } catch (Exception e) {
             result.put("success", false);
             result.put("message", "预约失败: " + e.getMessage());
         }
-        
+
         return result;
     }
 
     /**
      * 根据ID获取预约详情
+     * 
      * @param appointmentId 预约ID
      * @return 预约详情
      */
     public Map<String, Object> getAppointmentById(Long appointmentId) {
         Map<String, Object> result = new HashMap<>();
-        
+
         try {
             Optional<Appointment> appointmentOptional = appointmentRepository.findById(appointmentId);
             if (appointmentOptional.isPresent()) {
                 Appointment appointment = appointmentOptional.get();
-                
+
                 Map<String, Object> appointmentInfo = new HashMap<>();
                 appointmentInfo.put("id", appointment.getId());
                 appointmentInfo.put("houseId", appointment.getHouseId());
@@ -88,7 +100,7 @@ public class AppointmentService {
                 appointmentInfo.put("status", appointment.getStatus());
                 appointmentInfo.put("createdTime", appointment.getCreatedTime());
                 appointmentInfo.put("updatedTime", appointment.getUpdatedTime());
-                
+
                 result.put("success", true);
                 result.put("appointment", appointmentInfo);
             } else {
@@ -99,18 +111,19 @@ public class AppointmentService {
             result.put("success", false);
             result.put("message", "获取预约详情失败: " + e.getMessage());
         }
-        
+
         return result;
     }
 
     /**
      * 根据用户ID获取预约列表
+     * 
      * @param userId 用户ID
      * @return 预约列表
      */
     public Map<String, Object> getAppointmentsByUserId(Long userId) {
         Map<String, Object> result = new HashMap<>();
-        
+
         try {
             var appointments = appointmentRepository.findByUserId(userId);
             result.put("success", true);
@@ -119,28 +132,29 @@ public class AppointmentService {
             result.put("success", false);
             result.put("message", "获取预约列表失败: " + e.getMessage());
         }
-        
+
         return result;
     }
 
     /**
      * 更新预约状态
+     * 
      * @param appointmentId 预约ID
-     * @param status 新状态
+     * @param status        新状态
      * @return 更新结果
      */
     public Map<String, Object> updateAppointmentStatus(Long appointmentId, Integer status) {
         Map<String, Object> result = new HashMap<>();
-        
+
         try {
             Optional<Appointment> appointmentOptional = appointmentRepository.findById(appointmentId);
             if (appointmentOptional.isPresent()) {
                 Appointment appointment = appointmentOptional.get();
                 appointment.setStatus(status);
                 appointment.setUpdatedTime(LocalDateTime.now());
-                
+
                 appointmentRepository.save(appointment);
-                
+
                 result.put("success", true);
                 result.put("message", "预约状态更新成功");
             } else {
@@ -151,12 +165,13 @@ public class AppointmentService {
             result.put("success", false);
             result.put("message", "更新预约状态失败: " + e.getMessage());
         }
-        
+
         return result;
     }
 
     /**
      * 取消预约
+     * 
      * @param appointmentId 预约ID
      * @return 取消结果
      */
@@ -166,6 +181,7 @@ public class AppointmentService {
 
     /**
      * 确认预约
+     * 
      * @param appointmentId 预约ID
      * @return 确认结果
      */

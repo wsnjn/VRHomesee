@@ -1,3 +1,12 @@
+/**
+ * 项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 文件名称：CommunityService.java
+ * 开发者：牛迦楠
+ * 专业：软件工程（中外合作办学）
+ * 学校：东华理工大学
+ * 功能描述：社区服务类，提供聊天群组管理、社交圈动态、好友关系维护、点赞评论以及私聊会话建立等综合社交功能逻辑实现
+ * 创建日期：2026-01-06
+ */
 package com.example.homesee.service;
 
 import com.example.homesee.entity.*;

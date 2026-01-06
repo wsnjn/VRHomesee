@@ -1,3 +1,12 @@
+/**
+ * 项目名称：融合大模型交互与3D全景预览的智能选房平台设计与实现
+ * 文件名称：AppointmentController.java
+ * 开发者：牛迦楠
+ * 专业：软件工程（中外合作办学）
+ * 学校：东华理工大学
+ * 功能描述：基础预约管理控制器，处理用户侧的房源带看与合同面谈预约创建、详情查询及状态控制逻辑
+ * 创建日期：2026-01-06
+ */
 package com.example.homesee.controller;
 
 import com.example.homesee.service.AppointmentService;
